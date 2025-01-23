@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # darb
 
 A new Flutter project.
@@ -14,3 +15,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# Darb
+Our graduation project 
+>>>>>>> cc465e369cc50020d0889a1154b1a02f5a3ab4b0
