@@ -35,7 +35,7 @@ class K0Screen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             CustomImageView(
-              // imagePath: ImageConstant.img5935976241859510486,
+              imagePath: ImageConstant.img5935976241859510486,
               height: 122.h,
               width: 182.h,
               margin: EdgeInsets.only(right: 56.h),

@@ -40,9 +40,16 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_svg: ^2.0.17
 
+assets:
+    - assets/images/img_5935976241859510486.png
+    - assets/images/image_not_found.png
+    - assets/images/img_refresh.svg   
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
