@@ -68,15 +68,21 @@ class AppNavigationScreen extends StatelessWidget {
                     children: [
                       _buildScreenTitle(
                         context,
-                        screenTitle: "تسجيل دخول",
+                        screenTitle: "map",
                         onTapScreenTitle: () =>
-                            onTapScreenTitle(context, AppRoutes.k0Screen),
+                            onTapScreenTitle(context, AppRoutes.mapScreen),
                       ),
                       _buildScreenTitle(
                         context,
-                        screenTitle: "تسجيل",
+                        screenTitle: "signin",
                         onTapScreenTitle: () =>
-                            onTapScreenTitle(context, AppRoutes.k1Screen),
+                            onTapScreenTitle(context, AppRoutes.signinScreen),
+                      ),
+                      _buildScreenTitle(
+                        context,
+                        screenTitle: "sign",
+                        onTapScreenTitle: () =>
+                            onTapScreenTitle(context, AppRoutes.signScreen),
                       )
                     ],
                   ),

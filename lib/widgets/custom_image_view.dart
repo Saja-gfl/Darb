@@ -31,7 +31,7 @@ class CustomImageView extends StatelessWidget {
       this.radius,
       this.margin,
       this.border,
-      this.placeHolder = 'assets/images/img5935976241859510486.png'});
+      this.placeHolder = 'assets/images/image_not_found.png'});
 
   ///[imagePath] is required parameter for showing image
   final String? imagePath;
