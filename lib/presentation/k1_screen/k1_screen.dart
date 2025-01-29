@@ -38,7 +38,7 @@ class K1Screen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: 18.h),
-                _buildRefreshRow(context),
+                _buildRefreshSection(context),
                 SizedBox(height: 12.h),
                 Container(
                   width: double.maxFinite,
@@ -113,7 +113,7 @@ class K1Screen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 18.h),
-                      _buildUserTypeRadioGroup(context),
+                      _buildUserTypeSelection(context),
                       SizedBox(height: 30.h),
                       _buildRegisterButton(context),
                       SizedBox(height: 14.h)
@@ -129,7 +129,7 @@ class K1Screen extends StatelessWidget {
   }
 
   /// Section Widget
-  Widget _buildRefreshRow(BuildContext context) {
+  Widget _buildRefreshSection(BuildContext context) {
     return Container(
       width: double.maxFinite,
       margin: EdgeInsets.symmetric(horizontal: 4.h),
@@ -218,7 +218,7 @@ class K1Screen extends StatelessWidget {
   }
 
   /// Section Widget
-  Widget _buildUserTypeRadioGroup(BuildContext context) {
+  Widget _buildUserTypeSelection(BuildContext context) {
     return Container(
       width: double.maxFinite,
       margin: EdgeInsets.symmetric(horizontal: 10.h),

@@ -79,11 +79,6 @@ class ThemeHelper {
           horizontal: -4,
         ),
       ),
-      dividerTheme: DividerThemeData(
-        thickness: 1,
-        space: 1,
-        color: appTheme.black9000c.withOpacity(0.1),
-      ),
     );
   }
 
@@ -109,35 +104,11 @@ class TextThemes {
           fontFamily: 'Inter',
           fontWeight: FontWeight.w400,
         ),
-        bodySmall: TextStyle(
-          color: appTheme.orange800,
-          fontSize: 12.fSize,
-          fontFamily: 'Roboto',
-          fontWeight: FontWeight.w400,
-        ),
-        headlineSmall: TextStyle(
-          color: colorScheme.primary.withOpacity(1),
-          fontSize: 24.fSize,
-          fontFamily: 'Inter',
-          fontWeight: FontWeight.w900,
-        ),
-        labelMedium: TextStyle(
-          color: colorScheme.primary.withOpacity(1),
-          fontSize: 10.fSize,
-          fontFamily: 'Roboto',
-          fontWeight: FontWeight.w500,
-        ),
         titleLarge: TextStyle(
           color: colorScheme.primary.withOpacity(1),
           fontSize: 20.fSize,
           fontFamily: 'Inter',
           fontWeight: FontWeight.w900,
-        ),
-        titleMedium: TextStyle(
-          color: appTheme.yellow900,
-          fontSize: 18.fSize,
-          fontFamily: 'Roboto',
-          fontWeight: FontWeight.w500,
         ),
       );
 }
@@ -153,16 +124,12 @@ class ColorSchemes {
 
 /// Class containing custom colors for a lightCode theme.
 class LightCodeColors {
-  // Black
-  Color get black9000c => Color(0X0C000000);
-// BlueGray
+  // BlueGray
   Color get blueGray100 => Color(0XFFD9D9D9);
 // Gray
   Color get gray100 => Color(0XFFF5F5F5);
   Color get gray300 => Color(0XFFE3E4E8);
   Color get gray400 => Color(0XFFB3B3B3);
-// Orange
-  Color get orange800 => Color(0XFFC97100);
 // Yellow
   Color get yellow900 => Color(0XFFF7931E);
 }

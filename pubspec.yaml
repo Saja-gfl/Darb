@@ -1,4 +1,4 @@
-name: reem_s_application8
+name: reem_s_application9
 description: A new Flutter project.
 version: 1.0.0+1
 environment: 
@@ -10,8 +10,6 @@ dependencies:
     sdk: flutter
   cached_network_image: ^3.3.1
   flutter_svg: ^2.0.10+1
-  responsive_grid_list: ^1.4.0
-  google_maps_flutter: ^2.7.0
   connectivity_plus: ^6.0.4
 dev_dependencies: 
   flutter_test: 
@@ -22,15 +20,9 @@ flutter:
     - assets/
     - assets/images/
   fonts: 
-    - family: Roboto
-      fonts: 
-        - asset: assets/fonts/RobotoMedium.ttf
-          weight: 500
-        - asset: assets/fonts/RobotoRegular.ttf
-          weight: 400
     - family: Inter
       fonts: 
-        - asset: assets/fonts/InterBlackItalic.ttf
-          weight: 900
         - asset: assets/fonts/InterRegular.ttf
           weight: 400
+        - asset: assets/fonts/InterBlackItalic.ttf
+          weight: 900

@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:label="reem_s_application8"
+        android:label="reem_s_application9"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
