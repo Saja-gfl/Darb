@@ -74,7 +74,7 @@ class UserFormScreen extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 121, right: 48),
                         width: 37,
                         height: 35,
-                        child: Image(image: AssetImage("assets/images/img_5935976241859510486.png")),
+                        child: Image(image: AssetImage("lib/assets/images/img5935976241859510486.png")),
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -90,7 +90,7 @@ class UserFormScreen extends StatelessWidget {
                                   Container(
                                     height: 122,
                                     width: double.infinity,
-                                    child: Image(image: AssetImage("assets/images/img_5935976241859510486.png")),
+                                    child: Image(image: AssetImage("lib/assets/images/img5935976241859510486.png")),
                                       //fit: BoxFit.fill,
                                     ),
                                   ),
