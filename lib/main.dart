@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return MaterialApp(
           theme: theme,
-          title: 'reem_s_application9',
+          title: 'Darb_application',
           debugShowCheckedModeBanner: false,
           initialRoute: AppRoutes.initialRoute,
           routes: AppRoutes.routes,
