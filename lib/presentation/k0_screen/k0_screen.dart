@@ -7,10 +7,7 @@ import '../../widgets/custom_text_form_field.dart';
 
 // ignore_for_file: must_be_immutable
 class K0Screen extends StatelessWidget {
-  K0Screen({Key? key})
-      : super(
-          key: key,
-        );
+  K0Screen({super.key});
 
   TextEditingController inputoneController = TextEditingController();
 

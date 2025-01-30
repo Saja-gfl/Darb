@@ -10,18 +10,18 @@ ThemeData get theme => ThemeHelper().themeData();
 // ignore_for_file: must_be_immutable
 class ThemeHelper {
   // A map of custom color themes supported by the app
-  Map<String, LightCodeColors> _supportedCustomColor = {
+  final Map<String, LightCodeColors> _supportedCustomColor = {
     'lightCode': LightCodeColors()
   };
 
 // A map of color schemes supported by the app
-  Map<String, ColorScheme> _supportedColorScheme = {
+  final Map<String, ColorScheme> _supportedColorScheme = {
     'lightCode': ColorSchemes.lightCodeColorScheme
   };
 
-  /// Changes the app theme to [_newTheme].
-  void changeTheme(String _newTheme) {
-    _appTheme = _newTheme;
+  /// Changes the app theme to [newTheme].
+  void changeTheme(String newTheme) {
+    _appTheme = newTheme;
   }
 
   /// Returns the lightCode colors for the current theme.
@@ -115,7 +115,7 @@ class TextThemes {
 
 /// Class containing the supported color schemes.
 class ColorSchemes {
-  static final lightCodeColorScheme = ColorScheme.light(
+  static final lightCodeColorScheme = const ColorScheme.light(
     primary: Color(0X99FBB03B),
     onPrimary: Color(0XFF757575),
     onPrimaryContainer: Color(0XFFFFFFFF),
@@ -125,11 +125,11 @@ class ColorSchemes {
 /// Class containing custom colors for a lightCode theme.
 class LightCodeColors {
   // BlueGray
-  Color get blueGray100 => Color(0XFFD9D9D9);
+  Color get blueGray100 => const Color(0XFFD9D9D9);
 // Gray
-  Color get gray100 => Color(0XFFF5F5F5);
-  Color get gray300 => Color(0XFFE3E4E8);
-  Color get gray400 => Color(0XFFB3B3B3);
+  Color get gray100 => const Color(0XFFF5F5F5);
+  Color get gray300 => const Color(0XFFE3E4E8);
+  Color get gray400 => const Color(0XFFB3B3B3);
 // Yellow
-  Color get yellow900 => Color(0XFFF7931E);
+  Color get yellow900 => const Color(0XFFF7931E);
 }

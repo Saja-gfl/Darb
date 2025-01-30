@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:darb/presentation/k1_screen/auth.dart';
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../theme/custom_button_style.dart';
@@ -8,19 +11,17 @@ import '../../widgets/custom_text_form_field.dart';
 
 // ignore_for_file: must_be_immutable
 class K1Screen extends StatelessWidget {
-  K1Screen({Key? key})
-      : super(
-          key: key,
-        );
+  K1Screen({super.key});
+  final _auth = auth1();
 
-  TextEditingController usernameInputController = TextEditingController();
+  final usernameInputController = TextEditingController();
 
-  TextEditingController passwordInputController = TextEditingController();
+  final passwordInputController = TextEditingController();
 
-  TextEditingController confirmPasswordInputController =
+  final confirmPasswordInputController =
       TextEditingController();
 
-  TextEditingController phoneNumberInputController = TextEditingController();
+  final emailInputController = TextEditingController();
 
   String radioGroup = "";
 
@@ -104,11 +105,11 @@ class K1Screen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              "رقم الهاتف:",
+                              "الايميل:",
                               style: theme.textTheme.bodyLarge,
                             ),
                             SizedBox(height: 8.h),
-                            _buildPhoneNumberInput(context)
+                            _buildEmailInput(context)
                           ],
                         ),
                       ),
@@ -208,10 +209,10 @@ class K1Screen extends StatelessWidget {
   }
 
   /// Section Widget
-  Widget _buildPhoneNumberInput(BuildContext context) {
+  Widget _buildEmailInput(BuildContext context) {
     return CustomTextFormField(
-      controller: phoneNumberInputController,
-      hintText: "أدخل رقم هاتفك الصحيح",
+      controller: emailInputController,
+      hintText: "أدخل بريدك الإلكتروني",
       textInputAction: TextInputAction.done,
       contentPadding: EdgeInsets.fromLTRB(12.h, 6.h, 12.h, 2.h),
     );
@@ -238,8 +239,8 @@ class K1Screen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(left: 6.h),
             child: CustomRadioButton(
-              text: "عميل",
-              value: "عميل",
+              text: "مستخدم",
+              value: "مستخدم",
               groupValue: radioGroup,
               onChange: (value) {
                 radioGroup = value;
@@ -255,6 +256,7 @@ class K1Screen extends StatelessWidget {
   Widget _buildRegisterButton(BuildContext context) {
     return CustomElevatedButton(
       text: "تسجيل",
+      onPressed: _signup,
       leftIcon: Container(
         margin: EdgeInsets.only(right: 8.h),
         child: CustomImageView(
@@ -270,5 +272,13 @@ class K1Screen extends StatelessWidget {
   /// Navigates to the k0Screen when the action is triggered.
   onTapBtnRefreshone(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.k0Screen);
+  }
+  _signup() async{
+    final user = await _auth.signingup(emailInputController.text, passwordInputController.text);
+    if (user != null) {
+      log('تم تسجيل الدخول بنجاح');
+    } else {
+      print('فشل تسجيل الدخول');
+    }
   }
 }

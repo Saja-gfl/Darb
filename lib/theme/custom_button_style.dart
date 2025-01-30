@@ -10,6 +10,6 @@ class CustomButtonStyles {
       padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
           EdgeInsetsDirectional.zero),
       side: WidgetStateProperty.all<BorderSide>(
-        BorderSide(color: Colors.transparent),
+        const BorderSide(color: Colors.transparent),
       ));
 }

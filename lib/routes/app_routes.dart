@@ -16,7 +16,7 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     k0Screen: (context) => K0Screen(),
     k1Screen: (context) => K1Screen(),
-    appNavigationScreen: (context) => AppNavigationScreen(),
+    appNavigationScreen: (context) => const AppNavigationScreen(),
     initialRoute: (context) => K0Screen()
   };
 }

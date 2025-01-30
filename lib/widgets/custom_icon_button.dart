@@ -2,22 +2,19 @@ import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 
 extension IconButtonStyleHelper on CustomIconButton {
-  static BoxDecoration get none => BoxDecoration();
+  static BoxDecoration get none => const BoxDecoration();
 }
 
 class CustomIconButton extends StatelessWidget {
-  CustomIconButton(
-      {Key? key,
+  const CustomIconButton(
+      {super.key,
       this.alignment,
       this.height,
       this.width,
       this.decoration,
       this.padding,
       this.onTap,
-      this.child})
-      : super(
-          key: key,
-        );
+      this.child});
 
   final AlignmentGeometry? alignment;
 
@@ -46,7 +43,7 @@ class CustomIconButton extends StatelessWidget {
         height: height ?? 0,
         width: width ?? 0,
         child: DecoratedBox(
-          decoration: decoration ?? BoxDecoration(),
+          decoration: decoration ?? const BoxDecoration(),
           child: IconButton(
             padding: padding ?? EdgeInsetsDirectional.zero,
             onPressed: onTap,
