@@ -84,7 +84,7 @@ class CustomSearchView extends StatelessWidget {
             Container(
               margin: EdgeInsetsDirectional.fromSTEB(12.h, 14.h, 16.h, 14.h),
               child: CustomImageView(
-                imagePath: ImageConstant.imgSearch,
+                // imagePath: ImageConstant.imgSearch,
                 height: 16.h,
                 width: 16.h,
               ),
@@ -96,7 +96,7 @@ class CustomSearchView extends StatelessWidget {
         suffixIcon: suffix ??
             Padding(
               padding: EdgeInsets.only(
-                end: 15.h,
+                bottom: 15.h,
               ),
               child: IconButton(
                 onPressed: () => controller!.clear(),

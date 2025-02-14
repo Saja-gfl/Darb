@@ -21,7 +21,7 @@ class UserHomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             CustomImageView(
-              imagePath: ImageConstant.img939976241859510486,
+              // imagePath: ImageConstant.img939976241859510486,
               height: 56.h,
               width: 116.h,
             ),
@@ -105,7 +105,7 @@ class UserHomePage extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 CustomImageView(
-                  imagePath: ImageConstant.imgIcon,
+                  // imagePath: ImageConstant.imgIcon,
                   height: 26.h,
                   width: 24.h,
                 ),
@@ -136,7 +136,7 @@ class UserHomePage extends StatelessWidget {
           },
           itemCount: 3,
           itemBuilder: (context, index) {
-            return ServicesListItemWidget();
+            // return ServicesListItemWidget();
           },
         ),
       ),

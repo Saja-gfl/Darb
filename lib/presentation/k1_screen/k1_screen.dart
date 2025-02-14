@@ -47,9 +47,15 @@ class K1Screen extends StatelessWidget {
                     horizontal: 22.h,
                     vertical: 28.h,
                   ),
-                  decoration: AppDecoration.outlineBluegray100.copyWith(
-                    borderRadius: BorderRadiusStyle.roundedBorder8,
-                  ),
+                  decoration: (AppDecoration.outlineBluegray100 != null
+    ? AppDecoration.outlineBluegray100.copyWith(
+        borderRadius: BorderRadiusStyle.roundedBorder8,
+      )
+    : BoxDecoration(
+        borderRadius: BorderRadiusStyle.roundedBorder8,
+        // Add other default properties if needed
+      )),
+
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [

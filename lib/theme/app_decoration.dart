@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 
 class AppDecoration {
+  static var outlineBlueGray;
+
+  static var outlineBluegray100;
+
     // Fill decorations
     static BoxDecoration get fillBlack => BoxDecoration(
         color: appTheme.black900.withOpacity(0.05),
@@ -126,6 +130,8 @@ class AppDecoration {
 }
 
 class BorderRadiusStyle {
+  static var roundedBorder8;
+
     // Circle borders
     static BorderRadius get circleBorder16 => BorderRadius.circular(16.h);
 

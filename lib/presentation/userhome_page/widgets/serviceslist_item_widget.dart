@@ -47,7 +47,7 @@ class ServiceslistItemWidget extends StatelessWidget {
           ),
           SizedBox(width: 8.h),
           CustomImageView(
-            imagePath: ImageConstant.imgTelevision,
+            // imagePath: ImageConstant.imgTelevision,
             height: 32.h,
             width: 34.h,
             alignment: Alignment.center,

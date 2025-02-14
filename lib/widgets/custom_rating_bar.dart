@@ -42,7 +42,7 @@ class CustomRatingBar extends StatelessWidget {
         direction: Axis.horizontal,
         allowHalfRating: false,
         itemSize: itemSize ?? 24.h,
-        unselectedColor: unselectedColor ?? Colors.grey,
+        // unselectedColor: unselectedColor ?? Colors.grey,
         itemCount: itemCount ?? 5,
         itemBuilder: (context, _) {
             return Icon(
