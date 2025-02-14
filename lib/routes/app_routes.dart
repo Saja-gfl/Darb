@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../presentation/app_navigation_screen/app_navigation_screen.dart';
-import '../presentation/k0_screen/k0_screen.dart';
-import '../presentation/k1_screen/k1_screen.dart';
+import '../Screens/app_navigation_screen/app_navigation_screen.dart';
+import '../Screens/k0_screen/k0_screen.dart';
+import '../Screens/k1_screen/k1_screen.dart';
 
 // ignore_for_file: must_be_immutable
 class AppRoutes {

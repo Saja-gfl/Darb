@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'core/app_export.dart';
+import 'Screens/otp.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 void main() {
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'darb',
           debugShowCheckedModeBanner: false,
+          // home: OTPVerificationScreen(),
           initialRoute: AppRoutes.initialRoute,
           routes: AppRoutes.routes,
           builder: (context, child) {
