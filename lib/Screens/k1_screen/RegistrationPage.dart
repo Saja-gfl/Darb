@@ -3,7 +3,6 @@ import '../../core/app_export.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_icon_button.dart';
-import '../../widgets/custom_radio_button.dart';
 import '../../widgets/custom_text_form_field.dart';
 
 // ignore_for_file: must_be_immutable
@@ -14,15 +13,13 @@ class K1Screen extends StatelessWidget {
         );
 
   TextEditingController usernameInputController = TextEditingController();
-
   TextEditingController passwordInputController = TextEditingController();
-
-  TextEditingController confirmPasswordInputController =
-      TextEditingController();
-
+  TextEditingController confirmPasswordInputController = TextEditingController();
   TextEditingController phoneNumberInputController = TextEditingController();
+  TextEditingController carTypeInputController = TextEditingController(); // New controller for car type
+  TextEditingController plateNumberInputController = TextEditingController(); // New controller for plate number
 
-  String radioGroup = "";
+  bool isDriver = false; // Toggle state for driver/client
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +45,12 @@ class K1Screen extends StatelessWidget {
                     vertical: 28.h,
                   ),
                   decoration: (AppDecoration.outlineBluegray100 != null
-    ? AppDecoration.outlineBluegray100.copyWith(
-        borderRadius: BorderRadiusStyle.roundedBorder8,
-      )
-    : BoxDecoration(
-        borderRadius: BorderRadiusStyle.roundedBorder8,
-        // Add other default properties if needed
-      )),
-
+                      ? AppDecoration.outlineBluegray100.copyWith(
+                          borderRadius: BorderRadiusStyle.roundedBorder8,
+                        )
+                      : BoxDecoration(
+                          borderRadius: BorderRadiusStyle.roundedBorder8,
+                        )),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -119,7 +114,40 @@ class K1Screen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 18.h),
-                      _buildUserTypeSelection(context),
+                      _buildUserTypeToggle(context), // Updated toggle switch
+                      // Show car type and plate number fields only if user is a driver
+                      if (isDriver) ...[
+                        SizedBox(height: 14.h),
+                        SizedBox(
+                          width: double.maxFinite,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                "نوع السيارة:",
+                                style: theme.textTheme.bodyLarge,
+                              ),
+                              SizedBox(height: 8.h),
+                              _buildCarTypeInput(context)
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 14.h),
+                        SizedBox(
+                          width: double.maxFinite,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                "رقم اللوحة:",
+                                style: theme.textTheme.bodyLarge,
+                              ),
+                              SizedBox(height: 8.h),
+                              _buildPlateNumberInput(context)
+                            ],
+                          ),
+                        ),
+                      ],
                       SizedBox(height: 30.h),
                       _buildRegisterButton(context),
                       SizedBox(height: 14.h)
@@ -224,34 +252,44 @@ class K1Screen extends StatelessWidget {
   }
 
   /// Section Widget
-  Widget _buildUserTypeSelection(BuildContext context) {
+  Widget _buildCarTypeInput(BuildContext context) {
+    return CustomTextFormField(
+      controller: carTypeInputController,
+      hintText: "أدخل نوع سيارتك",
+      contentPadding: EdgeInsets.fromLTRB(12.h, 10.h, 12.h, 6.h),
+    );
+  }
+
+  /// Section Widget
+  Widget _buildPlateNumberInput(BuildContext context) {
+    return CustomTextFormField(
+      controller: plateNumberInputController,
+      hintText: "أدخل رقم لوحة سيارتك",
+      contentPadding: EdgeInsets.fromLTRB(12.h, 10.h, 12.h, 6.h),
+    );
+  }
+
+  /// Section Widget
+  Widget _buildUserTypeToggle(BuildContext context) {
     return Container(
       width: double.maxFinite,
       margin: EdgeInsets.symmetric(horizontal: 10.h),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Padding(
-            padding: EdgeInsets.only(left: 96.h),
-            child: CustomRadioButton(
-              text: "سائق",
-              value: "سائق",
-              groupValue: radioGroup,
-              onChange: (value) {
-                radioGroup = value;
-              },
-            ),
+          Text(
+            isDriver ? "سائق" : "عميل",
+            style: theme.textTheme.bodyLarge,
           ),
-          Padding(
-            padding: EdgeInsets.only(left: 6.h),
-            child: CustomRadioButton(
-              text: "عميل",
-              value: "عميل",
-              groupValue: radioGroup,
-              onChange: (value) {
-                radioGroup = value;
-              },
-            ),
-          )
+          SizedBox(width: 8.h),
+          Switch(
+            value: isDriver,
+            onChanged: (value) {
+              isDriver = value;
+              // Force rebuild to update the UI
+              (context as Element).markNeedsBuild();
+            },
+          ),
         ],
       ),
     );
