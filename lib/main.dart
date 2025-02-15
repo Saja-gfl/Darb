@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:reem_s_application9/Screens/ChatPage';
+import 'package:reem_s_application9/Screens/DriverHomePage.dart';
 import 'package:reem_s_application9/Screens/userhome_page/userhome_page.dart';
 import 'core/app_export.dart';
 import 'Screens/otp.dart';
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'darb',
           debugShowCheckedModeBanner: false,
-          home: UserHomePage(),
+          home: DriverHomePage(),
 
 
           // initialRoute: AppRoutes.initialRoute,

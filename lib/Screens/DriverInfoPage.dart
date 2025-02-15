@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
 
-class UserProfilePage extends StatefulWidget {
+class DriverInfoPage extends StatefulWidget {
   @override
-  _UserProfilePageState createState() => _UserProfilePageState();
+  _DriverInfoPageState createState() => _DriverInfoPageState();
 }
 
-class _UserProfilePageState extends State<UserProfilePage> {
-  TextEditingController nameController = TextEditingController();
+class _DriverInfoPageState extends State<DriverInfoPage> {
+  TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  String? selectedGender;
+  TextEditingController carModelController = TextEditingController();
+  TextEditingController plateNumberController = TextEditingController();
+
+  String selectedGender = "";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text("تحديث بيانات السائق"),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        title: Text("تحديث بيانات الحساب"),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -32,7 +37,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundColor: Colors.grey.shade300,
+                    backgroundColor: Colors.grey[300],
                   ),
                   Positioned(
                     bottom: 0,
@@ -41,48 +46,46 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       icon: Icon(Icons.camera_alt, color: Colors.blue),
                       onPressed: () {},
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
-            SizedBox(height: 16),
-            buildTextField("الاسم الكامل", "أدخل اسمك الكامل", nameController),
+            SizedBox(height: 20),
+            buildTextField("الاسم الكامل", "أدخل اسمك الكامل", fullNameController),
             buildTextField("البريد الإلكتروني", "example@example.com", emailController),
-            SizedBox(height: 10),
             Text("النوع", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                genderButton("ذكر"),
-                genderButton("أنثى"),
-                genderButton("أفضل عدم الإجابة"),
+                buildGenderButton("ذكر"),
+                buildGenderButton("أنثى"),
+                buildGenderButton("أفضل عدم الإجابة"),
               ],
             ),
             buildTextField("العنوان", "أدخل عنوانك", addressController),
-            buildTextField("رقم الجوال", "أدخل رقم جوالك", phoneController),
+            buildTextField("رقم الجوال", "أدخل رقم الجوال", phoneController),
+            buildTextField("موديل السيارة", "أدخل موديل السيارة", carModelController),
+            buildTextField("رقم اللوحة", "أدخل رقم اللوحة", plateNumberController),
             SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                    child: Text("حفظ"),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    child: Text("إلغاء", style: TextStyle(color: Colors.white)),
                   ),
                 ),
                 SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-                    child: Text("إلغاء"),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                    child: Text("حفظ", style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Divider(),
-            accountDetails(),
           ],
         ),
       ),
@@ -91,17 +94,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Widget buildTextField(String label, String hint, TextEditingController controller) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          SizedBox(height: 5),
           TextField(
             controller: controller,
-            textAlign: TextAlign.right,
             decoration: InputDecoration(
               hintText: hint,
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
         ],
@@ -109,35 +112,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget genderButton(String gender) {
+  Widget buildGenderButton(String gender) {
     return Expanded(
-      child: OutlinedButton(
-        onPressed: () => setState(() => selectedGender = gender),
-        style: OutlinedButton.styleFrom(
-          backgroundColor: selectedGender == gender ? Colors.orange : Colors.white,
+      child: ElevatedButton(
+        onPressed: () {
+          setState(() {
+            selectedGender = gender;
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: selectedGender == gender ? Colors.orange : Colors.grey[300],
         ),
-        child: Text(gender, style: TextStyle(color: selectedGender == gender ? Colors.white : Colors.black)),
+        child: Text(gender, style: TextStyle(color: Colors.black)),
       ),
-    );
-  }
-
-  Widget accountDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text("تفاصيل الحساب", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        SizedBox(height: 10),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text("555-123-4567"),
-          subtitle: Text("رقم الجوال"),
-        ),
-        ListTile(
-          leading: Icon(Icons.email),
-          title: Text("example@example.com"),
-          subtitle: Text("البريد الإلكتروني"),
-        ),
-      ],
     );
   }
 }
