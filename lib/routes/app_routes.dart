@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../Screens/app_navigation_screen/app_navigation_screen.dart';
-import '../Screens/k0_screen/LoginPage.dart';
-import '../Screens/k1_screen/RegistrationPage.dart';
+// import '../Screens/app_navigation_screen/app_navigation_screen.dart';
+import '../Screens/LoginPage.dart';
+import '../Screens/RegistrationPage.dart';
 
 // ignore_for_file: must_be_immutable
 class AppRoutes {
@@ -16,7 +16,7 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     k0Screen: (context) => K0Screen(),
     k1Screen: (context) => K1Screen(),
-    appNavigationScreen: (context) => AppNavigationScreen(),
+    // appNavigationScreen: (context) => AppNavigationScreen(),
     initialRoute: (context) => K0Screen()
   };
 }

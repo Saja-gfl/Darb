@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:reem_s_application9/Screens/userhome_page/userhome_page.dart';
 import 'core/app_export.dart';
 import 'Screens/otp.dart';
 
@@ -20,17 +21,19 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'darb',
           debugShowCheckedModeBanner: false,
-          // home: OTPVerificationScreen(),
-          initialRoute: AppRoutes.initialRoute,
-          routes: AppRoutes.routes,
-          builder: (context, child) {
-            return MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                textScaler: TextScaler.linear(1.0),
-              ),
-              child: child!,
-            );
-          },
+          home: UserHomePage(),
+
+
+          // initialRoute: AppRoutes.initialRoute,
+          // routes: AppRoutes.routes,
+          // builder: (context, child) {
+          //   return MediaQuery(
+          //     data: MediaQuery.of(context).copyWith(
+          //       textScaler: TextScaler.linear(1.0),
+          //     ),
+          //     child: child!,
+          //   );
+          // },
         );
       },
     );
