@@ -1,0 +1,2 @@
+C:/Users/maith/Desktop/Darb/android/app/.cxx/Debug/414n4p93/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/maith/Desktop/Darb/android/app/.cxx/Debug/414n4p93/x86_64/CMakeFiles/rebuild_cache.dir

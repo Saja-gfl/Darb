@@ -1,0 +1,2 @@
+C:/Users/maith/Desktop/Darb/android/app/.cxx/Debug/2b2b6e3e/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/maith/Desktop/Darb/android/app/.cxx/Debug/2b2b6e3e/armeabi-v7a/CMakeFiles/rebuild_cache.dir
