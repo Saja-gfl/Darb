@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:darb/presentation/k1_screen/auth.dart';
+//import 'package:Darb/lib/Screens/auth.dart';
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 import '../theme/custom_button_style.dart';
@@ -13,13 +13,15 @@ class K1Screen extends StatelessWidget {
   K1Screen({super.key});
   //final _auth = auth1();
 
-
   TextEditingController usernameInputController = TextEditingController();
   TextEditingController passwordInputController = TextEditingController();
-  TextEditingController confirmPasswordInputController = TextEditingController();
+  TextEditingController confirmPasswordInputController =
+      TextEditingController();
   TextEditingController phoneNumberInputController = TextEditingController();
-  TextEditingController carTypeInputController = TextEditingController(); // New controller for car type
-  TextEditingController plateNumberInputController = TextEditingController(); // New controller for plate number
+  TextEditingController carTypeInputController =
+      TextEditingController(); // New controller for car type
+  TextEditingController plateNumberInputController =
+      TextEditingController(); // New controller for plate number
 
   bool isDriver = false; // Toggle state for driver/client
 
@@ -318,3 +320,4 @@ class K1Screen extends StatelessWidget {
   onTapBtnRefreshone(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.k0Screen);
   }
+}
