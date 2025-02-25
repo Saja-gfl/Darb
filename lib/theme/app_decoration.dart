@@ -3,7 +3,6 @@ import '../core/app_export.dart';
 
 class AppDecoration {
   static var outlineBlueGray;
-
   static var outlineBluegray100;
 
     // Fill decorations

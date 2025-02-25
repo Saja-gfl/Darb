@@ -4,7 +4,7 @@ import '../core/app_export.dart';
 // ignore_for_file: must_be_immutable
 class CustomRadioButton extends StatelessWidget {
   CustomRadioButton(
-      {Key? key,
+      {super.key,
       required this.onChange,
       this.decoration,
       this.alignment,
@@ -20,10 +20,7 @@ class CustomRadioButton extends StatelessWidget {
       this.textAlignment,
       this.gradient,
       this.backgroundColor,
-      this.isExpandedText = false})
-      : super(
-          key: key,
-        );
+      this.isExpandedText = false});
 
   final BoxDecoration? decoration;
 
@@ -110,7 +107,7 @@ class CustomRadioButton extends StatelessWidget {
         height: iconSize,
         width: iconSize,
         child: Radio<String>(
-          visualDensity: VisualDensity(
+          visualDensity: const VisualDensity(
             vertical: -4,
             horizontal: -4,
           ),

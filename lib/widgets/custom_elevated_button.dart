@@ -8,26 +8,15 @@ class CustomElevatedButton extends BaseButton {
       this.decoration,
       this.leftIcon,
       this.rightIcon,
-      EdgeInsetsGeometry? margin,
-      VoidCallback? onPressed,
-      ButtonStyle? buttonStyle,
-      AlignmentGeometry? alignment,
-      TextStyle? buttonTextStyle,
-      bool? isDisabled,
-      double? height,
-      double? width,
-      required String text})
-      : super(
-          text: text,
-          onPressed: onPressed,
-          buttonStyle: buttonStyle,
-          isDisabled: isDisabled,
-          buttonTextStyle: buttonTextStyle,
-          height: height,
-          width: width,
-          alignment: alignment,
-          margin: margin,
-        );
+      super.margin,
+      super.onPressed,
+      super.buttonStyle,
+      super.alignment,
+      super.buttonTextStyle,
+      super.isDisabled,
+      super.height,
+      super.width,
+      required super.text});
 
   final BoxDecoration? decoration;
 
@@ -45,8 +34,8 @@ class CustomElevatedButton extends BaseButton {
   }
 
   Widget get buildElevatedButtonWidget => Container(
-        height: this.height ?? 40.h,
-        width: this.width ?? double.maxFinite,
+        height: height ?? 40.h,
+        width: width ?? double.maxFinite,
         margin: margin,
         decoration: decoration,
         child: ElevatedButton(

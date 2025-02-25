@@ -8,6 +8,7 @@ ThemeData get theme => ThemeHelper().themeData();
 /// Helper class for managing themes and colors.
 // ignore_for_file: must_be_immutable
 class ThemeHelper {
+
     // A map of custom color themes supported by the app
     Map<String, LightCodeColors> _supportedCustomColor = {
         'lightCode': LightCodeColors()
@@ -161,6 +162,7 @@ class TextThemes {
 
 /// Class containing the supported color schemes.
 class ColorSchemes {
+
     static final lightCodeColorScheme = ColorScheme.light(
         primary: Color(0XFFD4D4DA),
         primaryContainer: Color(0XFF404040),
@@ -175,6 +177,7 @@ class ColorSchemes {
 
 /// Class containing custom colors for a lightCode theme.
 class LightCodeColors {
+
     // Amber
     Color get amberA400 => Color(0XFFFFC600);
 

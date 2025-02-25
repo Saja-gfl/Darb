@@ -1,21 +1,36 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 import '../widgets/custom_checkbox_button.dart';
 import '../widgets/custom_elevated_button.dart';
 import '../widgets/custom_text_form_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'auth.dart';
+import '../core/utils/show_toast.dart';
+
+
 
 // ignore_for_file: must_be_immutable
-class K0Screen extends StatelessWidget {
-  K0Screen({Key? key})
-      : super(
-          key: key,
-        );
+class K0Screen extends StatefulWidget {
+  @override
+  _K0ScreenState createState() => _K0ScreenState();
+}
 
-  TextEditingController inputoneController = TextEditingController();
+class _K0ScreenState extends State<K0Screen> {
+  final FirebaseAuthServises _auth = FirebaseAuthServises();
 
-  TextEditingController inputthreeController = TextEditingController();
+  TextEditingController usernameInputController = TextEditingController();
+
+  TextEditingController passwordInputController = TextEditingController();
 
   bool tf = false;
+  bool _isSigning = false;
+  @override
+  void dispose() {
+    usernameInputController.dispose();
+    passwordInputController.dispose();
+    super.dispose();
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +90,7 @@ class K0Screen extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           CustomTextFormField(
-            controller: inputoneController,
+            controller: usernameInputController,
             hintText: "ادخل اسم المستخدم",
             contentPadding: EdgeInsets.fromLTRB(12.h, 10.h, 12.h, 6.h),
           ),
@@ -89,7 +104,7 @@ class K0Screen extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           CustomTextFormField(
-            controller: inputthreeController,
+            controller: passwordInputController,
             hintText: "أدخل كلمة السر هنا",
             textInputAction: TextInputAction.done,
             contentPadding: EdgeInsets.fromLTRB(12.h, 10.h, 12.h, 6.h),
@@ -99,12 +114,15 @@ class K0Screen extends StatelessWidget {
             text: "عرض كلمة المرور",
             value: tf,
             onChange: (value) {
-              tf = value;
+              setState(() {
+                tf = value;
+              });
             },
           ),
           SizedBox(height: 44.h),
           CustomElevatedButton(
             text: "تسجيل دخول",
+            onPressed: _login,
           ),
           SizedBox(height: 8.h),
           GestureDetector(
@@ -125,4 +143,27 @@ class K0Screen extends StatelessWidget {
   onTapTxttf(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.k1Screen);
   }
+   void _login() async {
+    setState(() {
+      _isSigning = true;
+    });
+
+    String email = usernameInputController.text;
+    String password = passwordInputController.text;
+
+    User? user = await _auth.login(email, password);
+
+    setState(() {
+      _isSigning = false;
+    });
+
+    if (user != null) {
+      showToast(message: "User is successfully signed in");
+      Navigator.pushNamed(context, "/home");
+    } else {
+      showToast(message: "some error occured");
+    }
+  }
+
 }
+ 
