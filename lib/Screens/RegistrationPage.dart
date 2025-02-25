@@ -1,17 +1,27 @@
 import 'dart:developer';
 
 //import 'package:Darb/lib/Screens/auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 import '../widgets/custom_elevated_button.dart';
 import '../widgets/custom_icon_button.dart';
 import '../widgets/custom_text_form_field.dart';
+import 'auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../core/utils/show_toast.dart';
 
 // ignore_for_file: must_be_immutable
-class K1Screen extends StatelessWidget {
+class K1Screen extends StatefulWidget {
   K1Screen({super.key});
-  //final _auth = auth1();
+  @override
+  K1ScreenState createState() => K1ScreenState();
+}
 
+class K1ScreenState extends State<K1Screen> {
+  final FirebaseAuthServises _auth = FirebaseAuthServises();
+  //final _auth = auth1();
+  TextEditingController emailInputController = TextEditingController();
   TextEditingController usernameInputController = TextEditingController();
   TextEditingController passwordInputController = TextEditingController();
   TextEditingController confirmPasswordInputController =
@@ -23,6 +33,19 @@ class K1Screen extends StatelessWidget {
       TextEditingController(); // New controller for plate number
 
   bool isDriver = false; // Toggle state for driver/client
+  bool isSigningUp = false;
+  
+  @override
+  void dispose() {
+    emailInputController.dispose();
+    usernameInputController.dispose();
+    passwordInputController.dispose();
+    confirmPasswordInputController.dispose();
+    phoneNumberInputController.dispose();
+    carTypeInputController.dispose();
+    plateNumberInputController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -288,9 +311,9 @@ class K1Screen extends StatelessWidget {
           Switch(
             value: isDriver,
             onChanged: (value) {
-              isDriver = value;
-              // Force rebuild to update the UI
-              (context as Element).markNeedsBuild();
+              setState(() {
+                isDriver = value;
+              });
             },
           ),
         ],
@@ -318,5 +341,32 @@ class K1Screen extends StatelessWidget {
   /// Navigates to the k0Screen when the action is triggered.
   onTapBtnRefreshone(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.k0Screen);
+  }
+
+  void _signup() async {
+    setState(() {
+      isSigningUp = true;
+    });
+
+    try {
+      String username = usernameInputController.text;
+      String email = emailInputController.text;
+      String password = passwordInputController.text;
+
+      User? user = await _auth.signup(email, password);
+
+      if (user != null) {
+        showToast(message: "تم إنشاء الحساب بنجاح");
+        Navigator.pushNamed(context, "/home");
+      } else {
+        showToast(message: "حدث خطأ أثناء التسجيل");
+      }
+    } catch (e) {
+      showToast(message: "خطأ: ${e.toString()}");
+    } finally {
+      setState(() {
+        isSigningUp = false;
+      });
+    }
   }
 }

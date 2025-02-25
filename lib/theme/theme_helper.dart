@@ -162,13 +162,7 @@ class TextThemes {
 
 /// Class containing the supported color schemes.
 class ColorSchemes {
-<<<<<<< HEAD
-  static final lightCodeColorScheme = const ColorScheme.light(
-    primary: Color(0X99FBB03B),
-    onPrimary: Color(0XFF757575),
-    onPrimaryContainer: Color(0XFFFFFFFF),
-  );
-=======
+
     static final lightCodeColorScheme = ColorScheme.light(
         primary: Color(0XFFD4D4DA),
         primaryContainer: Color(0XFF404040),
@@ -179,22 +173,11 @@ class ColorSchemes {
         onPrimary: Color(0XFF2C2C2C),
         onPrimaryContainer: Color(0XFFFFFFFF),
     );
->>>>>>> 5feb9f2e8ed2f2de2bf7ec83a0c42cacbd1da33e
 }
 
 /// Class containing custom colors for a lightCode theme.
 class LightCodeColors {
-<<<<<<< HEAD
-  // BlueGray
-  Color get blueGray100 => const Color(0XFFD9D9D9);
-// Gray
-  Color get gray100 => const Color(0XFFF5F5F5);
-  Color get gray300 => const Color(0XFFE3E4E8);
-  Color get gray400 => const Color(0XFFB3B3B3);
-// Yellow
-  Color get yellow900 => const Color(0XFFF7931E);
-}
-=======
+
     // Amber
     Color get amberA400 => Color(0XFFFFC600);
 
@@ -241,4 +224,3 @@ class LightCodeColors {
     Color get red400 => Color(0XFFF14848);
     Color get red500 => Color(0XFFEF4444);
 }
->>>>>>> 5feb9f2e8ed2f2de2bf7ec83a0c42cacbd1da33e

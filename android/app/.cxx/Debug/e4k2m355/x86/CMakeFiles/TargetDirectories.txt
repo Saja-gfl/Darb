@@ -1,0 +1,2 @@
+D:/proj/Darb/android/app/.cxx/Debug/e4k2m355/x86/CMakeFiles/edit_cache.dir
+D:/proj/Darb/android/app/.cxx/Debug/e4k2m355/x86/CMakeFiles/rebuild_cache.dir
