@@ -23,6 +23,17 @@ class MyApp extends StatelessWidget {
           title: 'darb',
           debugShowCheckedModeBanner: false,
           home: K0Screen(),
+          
+                    // initialRoute: AppRoutes.initialRoute,
+          // routes: AppRoutes.routes,
+          // builder: (context, child) {
+          //   return MediaQuery(
+          //     data: MediaQuery.of(context).copyWith(
+          //       textScaler: TextScaler.linear(1.0),
+          //     ),
+          //     child: child!,
+          //   );
+          // },
         );
       },
     );
