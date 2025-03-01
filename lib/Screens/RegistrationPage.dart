@@ -1,6 +1,4 @@
 import 'dart:developer';
-
-//import 'package:Darb/lib/Screens/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
@@ -10,6 +8,7 @@ import '../widgets/custom_text_form_field.dart';
 import 'auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../core/utils/show_toast.dart';
+import 'otp.dart';
 
 // ignore_for_file: must_be_immutable
 class K1Screen extends StatefulWidget {
@@ -20,21 +19,19 @@ class K1Screen extends StatefulWidget {
 
 class K1ScreenState extends State<K1Screen> {
   final FirebaseAuthServises _auth = FirebaseAuthServises();
-  //final _auth = auth1();
   TextEditingController emailInputController = TextEditingController();
   TextEditingController usernameInputController = TextEditingController();
   TextEditingController passwordInputController = TextEditingController();
   TextEditingController confirmPasswordInputController =
       TextEditingController();
   TextEditingController phoneNumberInputController = TextEditingController();
-  TextEditingController carTypeInputController =
-      TextEditingController(); // New controller for car type
-  TextEditingController plateNumberInputController =
-      TextEditingController(); // New controller for plate number
+  TextEditingController carTypeInputController = TextEditingController();
+  TextEditingController plateNumberInputController = TextEditingController();
 
-  bool isDriver = false; // Toggle state for driver/client
+  bool isDriver = false;
   bool isSigningUp = false;
-  
+  String? verificationId;
+
   @override
   void dispose() {
     emailInputController.dispose();
@@ -121,6 +118,21 @@ class K1ScreenState extends State<K1Screen> {
                             ),
                             SizedBox(height: 8.h),
                             _buildConfirmPasswordInput(context)
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 14.h),
+                      SizedBox(
+                        width: double.maxFinite,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              ": رقم الهاتف",
+                              style: theme.textTheme.bodyLarge,
+                            ),
+                            SizedBox(height: 8.h),
+                            _buildPhoneInput(context)
                           ],
                         ),
                       ),
@@ -268,6 +280,16 @@ class K1ScreenState extends State<K1Screen> {
   }
 
   /// Section Widget
+  Widget _buildPhoneInput(BuildContext context) {
+    return CustomTextFormField(
+      controller: phoneNumberInputController,
+      hintText: "أدخل رقم الهاتف",
+      textInputAction: TextInputAction.done,
+      contentPadding: EdgeInsets.fromLTRB(12.h, 6.h, 12.h, 2.h),
+    );
+  }
+
+  /// Section Widget
   Widget _buildEmailInput(BuildContext context) {
     return CustomTextFormField(
       controller: emailInputController,
@@ -352,12 +374,14 @@ class K1ScreenState extends State<K1Screen> {
       String username = usernameInputController.text;
       String email = emailInputController.text;
       String password = passwordInputController.text;
+      String phoneNumber = phoneNumberInputController.text;
 
+      // تحقق من صحة البريد الإلكتروني وكلمة المرور
       User? user = await _auth.signup(email, password);
 
       if (user != null) {
-        showToast(message: "تم إنشاء الحساب بنجاح");
-        Navigator.pushNamed(context, "/home");
+        // إذا تم إنشاء الحساب بنجاح، تحقق من رقم الهاتف
+        await _verifyPhoneNumber(phoneNumber);
       } else {
         showToast(message: "حدث خطأ أثناء التسجيل");
       }
@@ -368,5 +392,46 @@ class K1ScreenState extends State<K1Screen> {
         isSigningUp = false;
       });
     }
+  }
+
+  Future<void> _verifyPhoneNumber(String phoneNumber) async {
+    // تحقق من تنسيق رقم الهاتف
+    if (!RegExp(r'^\+\d{1,3}\d{1,14}$').hasMatch(phoneNumber)) {
+      showToast(
+          message:
+              "تنسيق رقم الهاتف غير صحيح. يرجى إدخال الرقم بالتنسيق E.164.");
+      return;
+    }
+
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // Auto-retrieval or instant verification
+        await FirebaseAuth.instance.signInWithCredential(credential);
+        showToast(message: "تم التحقق بنجاح");
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        showToast(message: "حدث خطأ أثناء التحقق: ${e.message}");
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        setState(() {
+          this.verificationId = verificationId;
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OTPVerificationScreen(
+              verificationId: verificationId,
+              phoneNumber: phoneNumber,
+            ),
+          ),
+        );
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        setState(() {
+          this.verificationId = verificationId;
+        });
+      },
+    );
   }
 }

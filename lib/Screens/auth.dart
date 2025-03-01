@@ -36,6 +36,30 @@ class FirebaseAuthServises{
       print(e);
     }
   }
+    Future<void> signOut() async {
+    await _auth.signOut();
+  }
+
+  Future<void> verifyPhoneNumber(String phoneNumber, Function(String) codeSent, {required Null Function(FirebaseAuthException e) verificationFailed}) async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await _auth.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        print('Verification failed: ${e.message}');
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        codeSent(verificationId);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
+
+  Future<void> signInWithPhoneNumber(String verificationId, String smsCode) async {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode);
+    await _auth.signInWithCredential(credential);
+  }
 }
 
-// باقي sign out
+

@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../core/utils/show_toast.dart';
 
 class OTPVerificationScreen extends StatelessWidget {
+  final String verificationId;
+  final String phoneNumber;
+  final FirebaseAuthServises _auth = FirebaseAuthServises();
+  final TextEditingController otpController = TextEditingController();
+
+  OTPVerificationScreen(
+      {required this.verificationId, required this.phoneNumber});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,15 +25,11 @@ class OTPVerificationScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo
               Image.asset(
-                "assets/images/img_5935976241859510486.png", // Replace with your logo asset
+                "assets/images/img_5935976241859510486.png",
                 height: 80,
               ),
-
               SizedBox(height: 8),
-
-              // "تسجيل" (Registration)
               Text(
                 "تسجيل",
                 style: GoogleFonts.tajawal(
@@ -31,10 +38,7 @@ class OTPVerificationScreen extends StatelessWidget {
                   color: Color(0xFFFFB300),
                 ),
               ),
-
               SizedBox(height: 20),
-
-              // OTP Container
               Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -50,7 +54,6 @@ class OTPVerificationScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    // OTP Label
                     Text(
                       "OTP",
                       style: GoogleFonts.tajawal(
@@ -59,30 +62,16 @@ class OTPVerificationScreen extends StatelessWidget {
                         color: Color(0xFFFFB300),
                       ),
                     ),
-
                     SizedBox(height: 16),
-
-                    // OTP Input Fields
-                    PinCodeTextField(
-                      length: 4,
-                      obscureText: false,
-                      animationType: AnimationType.fade,
-                      keyboardType: TextInputType.number,
-                      textStyle: TextStyle(fontSize: 20),
-                      pinTheme: PinTheme(
-                        shape: PinCodeFieldShape.underline,
-                        fieldWidth: 40,
-                        inactiveColor: Colors.grey.shade400,
-                        activeColor: Color(0xFFFFB300),
-                        selectedColor: Color(0xFFFFB300),
+                    TextField(
+                      controller: otpController,
+                      decoration: InputDecoration(
+                        hintText: "رمز التحقق",
+                        border: OutlineInputBorder(),
                       ),
-                      onChanged: (value) {},
-                      appContext: context,
+                      keyboardType: TextInputType.number,
                     ),
-
                     SizedBox(height: 8),
-
-                    // Resend OTP Option
                     Text(
                       "لم تستلم رمز التأكيد؟",
                       style: GoogleFonts.tajawal(
@@ -103,15 +92,31 @@ class OTPVerificationScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     SizedBox(height: 16),
-
-                    // Confirm Button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          print("Confirm button pressed");
+                        onPressed: () async {
+                          String otp = otpController.text.trim();
+                          if (otp.isNotEmpty) {
+                            try {
+                              PhoneAuthCredential credential =
+                                  PhoneAuthProvider.credential(
+                                verificationId: verificationId,
+                                smsCode: otp,
+                              );
+                              UserCredential userCredential = await FirebaseAuth
+                                  .instance
+                                  .signInWithCredential(credential);
+                              if (userCredential.user != null) {
+                                showToast(message: "تم التحقق بنجاح");
+                              }
+                            } catch (e) {
+                              showToast(message: "حدث خطأ أثناء التحقق: $e");
+                            }
+                          } else {
+                            showToast(message: "يرجى إدخال رمز التحقق");
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFFFFB300),
