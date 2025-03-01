@@ -3,6 +3,10 @@ import '../core/app_export.dart';
 
 class AppDecoration {
   static var outlineBlueGray;
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
   static var outlineBluegray100;
 
     // Fill decorations

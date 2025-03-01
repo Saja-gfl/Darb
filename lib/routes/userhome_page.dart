@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
-<<<<<<< Updated upstream
-import 'ChatPage.dart';
-import 'DriverInfoPage.dart';
-import 'CustomBottomNavBar.dart';
-=======
-import 'ChatPage';
-import 'DriverInfoPage.dart';
->>>>>>> Stashed changes
+import '../core/app_export.dart';
+import '../Screens/ChatPage';
+import '../Screens/UserProfilePage.dart';
 
-class DriverHomePage extends StatefulWidget {
-  DriverHomePage({Key? key}) : super(key: key);
+// ignore_for_file: must_be_immutable
+class UserHomePage extends StatefulWidget {
+  UserHomePage({Key? key}) : super(key: key);
 
   @override
-  _DriverHomePageState createState() => _DriverHomePageState();
+  _UserHomePageState createState() => _UserHomePageState();
 }
 
-class _DriverHomePageState extends State<DriverHomePage> {
-<<<<<<< Updated upstream
-  int _currentIndex = 0; // Track the selected index
+class _UserHomePageState extends State<UserHomePage> {
+  TextEditingController usernameInputController = TextEditingController();
+  TextEditingController passwordInputController = TextEditingController();
+  TextEditingController confirmPasswordInputController =
+      TextEditingController();
+  TextEditingController phoneNumberInputController = TextEditingController();
+  TextEditingController carTypeController = TextEditingController();
+  TextEditingController plateNumberController = TextEditingController();
 
-=======
->>>>>>> Stashed changes
+  String radioGroup = "";
+  bool isDriver = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,25 +42,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
           ),
         ),
       ),
-<<<<<<< Updated upstream
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          if (index == 1) {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ChatPage()));
-          } else if (index == 2) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => DriverInfoPage()));
-          }
-        },
-      ),
-=======
       bottomNavigationBar: _buildBottomNavBar(),
->>>>>>> Stashed changes
     );
   }
 
@@ -93,17 +76,11 @@ class _DriverHomePageState extends State<DriverHomePage> {
         children: [
           Text("الإشعارات", style: theme.textTheme.titleLarge),
           SizedBox(height: 8.h),
-<<<<<<< Updated upstream
-          Text("تم استلام طلب اشتراك جديد من المستخدم خالد",
+          Text("تم قبول طلب اشتراكك من قبل السائق أحمد",
               style: theme.textTheme.bodyMedium),
           SizedBox(height: 4.h),
-          Text("منذ ساعة واحدة",
+          Text("منذ ساعتين",
               style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
-=======
-          Text("تم استلام طلب اشتراك جديد من المستخدم خالد", style: theme.textTheme.bodyMedium),
-          SizedBox(height: 4.h),
-          Text("منذ ساعة واحدة", style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
->>>>>>> Stashed changes
         ],
       ),
     );
@@ -115,41 +92,29 @@ class _DriverHomePageState extends State<DriverHomePage> {
       children: [
         Text("الخدمات", style: theme.textTheme.titleLarge),
         SizedBox(height: 16.h),
-<<<<<<< Updated upstream
-        _buildServiceItem("عرض الاشتراكات الحالية",
-            "متابعة جدول اشتراكاتك الحالية", Icons.list, () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DriverActiveSubscriptionsPage()));
-        }),
-        SizedBox(height: 16.h),
         _buildServiceItem(
-            "طلبات اشتراك جديدة", "طلبات الاشتراك المتاحة", Icons.shopping_cart,
-            () {
+            "عرض الاشتراكات الجارية",
+            "استعراض جميع الاشتراكات الجارية مع السائقين",
+            Icons.calendar_today, () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DriverSubscriptionRequestsPage()));
-=======
-        _buildServiceItem("عرض الاشتراكات الحالية", "متابعة جدول اشتراكاتك الحالية", Icons.list, () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => DriverActiveSubscriptionsPage()));
+                  builder: (context) => ActiveSubscriptionsPage()));
         }),
         SizedBox(height: 16.h),
-        _buildServiceItem("طلبات اشتراك جديدة", "طلبات الاشتراك المتاحة", Icons.shopping_cart, () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => DriverSubscriptionRequestsPage()));
->>>>>>> Stashed changes
+        _buildServiceItem("إدارة طلبات الاشتراك",
+            "استعراض ومعالجة طلبات الاشتراك الجديدة", Icons.settings, () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SubscriptionRequestsPage()));
         }),
       ],
     );
   }
 
-<<<<<<< Updated upstream
   Widget _buildServiceItem(
       String title, String description, IconData icon, VoidCallback onTap) {
-=======
-  Widget _buildServiceItem(String title, String description, IconData icon, VoidCallback onTap) {
->>>>>>> Stashed changes
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -184,8 +149,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
       ),
     );
   }
-<<<<<<< Updated upstream
-=======
 
   Widget _buildBottomNavBar() {
     return BottomNavigationBar(
@@ -198,32 +161,33 @@ class _DriverHomePageState extends State<DriverHomePage> {
       unselectedItemColor: Colors.grey,
       onTap: (index) {
         if (index == 1) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage()));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => ChatPage()));
         } else if (index == 2) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => DriverInfoPage()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => UserProfilePage()));
         }
       },
     );
   }
->>>>>>> Stashed changes
 }
 
-class DriverActiveSubscriptionsPage extends StatelessWidget {
+class ActiveSubscriptionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("الاشتراكات الجارية")),
-      body: Center(child: Text("محتوى صفحة الاشتراكات الجارية للسائق")),
+      body: Center(child: Text("محتوى صفحة الاشتراكات الجارية")),
     );
   }
 }
 
-class DriverSubscriptionRequestsPage extends StatelessWidget {
+class SubscriptionRequestsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("طلبات الاشتراك")),
-      body: Center(child: Text("محتوى صفحة طلبات الاشتراك للسائق")),
+      body: Center(child: Text("محتوى صفحة طلبات الاشتراك")),
     );
   }
 }
