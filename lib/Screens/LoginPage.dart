@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 import '../widgets/custom_checkbox_button.dart';

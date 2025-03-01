@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:reem_s_application9/Screens/RegistrationPage.dart'; 
-import 'package:firebase_core/firebase_core.dart';  //  مكتبة Firebase
+//  مكتبة Firebase
 import 'core/app_export.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();

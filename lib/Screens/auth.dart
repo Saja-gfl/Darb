@@ -19,6 +19,7 @@ class FirebaseAuthServises{
     } catch (e) {
       print(e); 
     }
+    return null;
   }
 
   Future<User?> login(String email, String password) async {
@@ -35,6 +36,7 @@ class FirebaseAuthServises{
     } catch (e) {
       print(e);
     }
+    return null;
   }
     Future<void> signOut() async {
     await _auth.signOut();
