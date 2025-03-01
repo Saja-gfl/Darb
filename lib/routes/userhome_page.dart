@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
-import 'ChatPage.dart';
-import 'DriverInfoPage.dart';
-import 'CustomBottomNavBar.dart';
+import '../core/app_export.dart';
+import '../Screens/ChatPage';
+import '../Screens/UserProfilePage.dart';
 
-class DriverHomePage extends StatefulWidget {
-  DriverHomePage({Key? key}) : super(key: key);
+// ignore_for_file: must_be_immutable
+class UserHomePage extends StatefulWidget {
+  UserHomePage({Key? key}) : super(key: key);
 
   @override
-  _DriverHomePageState createState() => _DriverHomePageState();
+  _UserHomePageState createState() => _UserHomePageState();
 }
 
-class _DriverHomePageState extends State<DriverHomePage> {
-  int _currentIndex = 0; // Track the selected index
+class _UserHomePageState extends State<UserHomePage> {
+  TextEditingController usernameInputController = TextEditingController();
+  TextEditingController passwordInputController = TextEditingController();
+  TextEditingController confirmPasswordInputController =
+      TextEditingController();
+  TextEditingController phoneNumberInputController = TextEditingController();
+  TextEditingController carTypeController = TextEditingController();
+  TextEditingController plateNumberController = TextEditingController();
+
+  String radioGroup = "";
+  bool isDriver = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,21 +42,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          if (index == 1) {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ChatPage()));
-          } else if (index == 2) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => DriverInfoPage()));
-          }
-        },
-      ),
+      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
@@ -81,10 +76,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
         children: [
           Text("الإشعارات", style: theme.textTheme.titleLarge),
           SizedBox(height: 8.h),
-          Text("تم استلام طلب اشتراك جديد من المستخدم خالد",
+          Text("تم قبول طلب اشتراكك من قبل السائق أحمد",
               style: theme.textTheme.bodyMedium),
           SizedBox(height: 4.h),
-          Text("منذ ساعة واحدة",
+          Text("منذ ساعتين",
               style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
         ],
       ),
@@ -97,21 +92,22 @@ class _DriverHomePageState extends State<DriverHomePage> {
       children: [
         Text("الخدمات", style: theme.textTheme.titleLarge),
         SizedBox(height: 16.h),
-        _buildServiceItem("عرض الاشتراكات الحالية",
-            "متابعة جدول اشتراكاتك الحالية", Icons.list, () {
+        _buildServiceItem(
+            "عرض الاشتراكات الجارية",
+            "استعراض جميع الاشتراكات الجارية مع السائقين",
+            Icons.calendar_today, () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DriverActiveSubscriptionsPage()));
+                  builder: (context) => ActiveSubscriptionsPage()));
         }),
         SizedBox(height: 16.h),
-        _buildServiceItem(
-            "طلبات اشتراك جديدة", "طلبات الاشتراك المتاحة", Icons.shopping_cart,
-            () {
+        _buildServiceItem("إدارة طلبات الاشتراك",
+            "استعراض ومعالجة طلبات الاشتراك الجديدة", Icons.settings, () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DriverSubscriptionRequestsPage()));
+                  builder: (context) => SubscriptionRequestsPage()));
         }),
       ],
     );
@@ -153,24 +149,45 @@ class _DriverHomePageState extends State<DriverHomePage> {
       ),
     );
   }
-}
 
-class DriverActiveSubscriptionsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("الاشتراكات الجارية")),
-      body: Center(child: Text("محتوى صفحة الاشتراكات الجارية للسائق")),
+  Widget _buildBottomNavBar() {
+    return BottomNavigationBar(
+      items: [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: "الرئيسية"),
+        BottomNavigationBarItem(icon: Icon(Icons.message), label: "الرسائل"),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: "الحساب"),
+      ],
+      selectedItemColor: Colors.orange,
+      unselectedItemColor: Colors.grey,
+      onTap: (index) {
+        if (index == 1) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => ChatPage()));
+        } else if (index == 2) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => UserProfilePage()));
+        }
+      },
     );
   }
 }
 
-class DriverSubscriptionRequestsPage extends StatelessWidget {
+class ActiveSubscriptionsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("الاشتراكات الجارية")),
+      body: Center(child: Text("محتوى صفحة الاشتراكات الجارية")),
+    );
+  }
+}
+
+class SubscriptionRequestsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("طلبات الاشتراك")),
-      body: Center(child: Text("محتوى صفحة طلبات الاشتراك للسائق")),
+      body: Center(child: Text("محتوى صفحة طلبات الاشتراك")),
     );
   }
 }

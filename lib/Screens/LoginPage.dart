@@ -7,8 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'auth.dart';
 import '../core/utils/show_toast.dart';
 
-
-
 // ignore_for_file: must_be_immutable
 class K0Screen extends StatefulWidget {
   @override
@@ -29,7 +27,7 @@ class _K0ScreenState extends State<K0Screen> {
     usernameInputController.dispose();
     passwordInputController.dispose();
     super.dispose();
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,12 +68,12 @@ class _K0ScreenState extends State<K0Screen> {
         vertical: 12.h,
       ),
       decoration: AppDecoration.outlineBlueGray?.copyWith(
-  borderRadius: BorderRadiusStyle.roundedBorder8,
-) ?? BoxDecoration(
-  borderRadius: BorderRadiusStyle.roundedBorder8,
-  // Add other default properties if needed
-),
-
+            borderRadius: BorderRadiusStyle.roundedBorder8,
+          ) ??
+          BoxDecoration(
+            borderRadius: BorderRadiusStyle.roundedBorder8,
+            // Add other default properties if needed
+          ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -142,7 +140,8 @@ class _K0ScreenState extends State<K0Screen> {
   onTapTxttf(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.k1Screen);
   }
-   void _login() async {
+
+  void _login() async {
     setState(() {
       _isSigning = true;
     });
@@ -163,6 +162,4 @@ class _K0ScreenState extends State<K0Screen> {
       showToast(message: "some error occured");
     }
   }
-
 }
- 
