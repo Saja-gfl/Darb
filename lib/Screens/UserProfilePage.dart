@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-<<<<<<< Updated upstream
 import 'package:google_fonts/google_fonts.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
 
-=======
-
-class UserProfilePage extends StatefulWidget {
->>>>>>> Stashed changes
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
@@ -18,25 +13,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-<<<<<<< Updated upstream
   String selectedGender = ""; // Track the selected gender
-=======
-  String? selectedGender;
->>>>>>> Stashed changes
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-<<<<<<< Updated upstream
       backgroundColor: Colors.white,
-=======
->>>>>>> Stashed changes
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-<<<<<<< Updated upstream
         iconTheme: IconThemeData(
           color: Color(0xFFFFB300), // Set the color of the back arrow icon
         ),
@@ -96,78 +83,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
             // Account Details
             _buildAccountDetails(),
-=======
-        title: Text("تحديث بيانات الحساب"),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Center(
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.grey.shade300,
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: Icon(Icons.camera_alt, color: Colors.blue),
-                      onPressed: () {},
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-            buildTextField("الاسم الكامل", "أدخل اسمك الكامل", nameController),
-            buildTextField("البريد الإلكتروني", "example@example.com", emailController),
-            SizedBox(height: 10),
-            Text("النوع", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                genderButton("ذكر"),
-                genderButton("أنثى"),
-                genderButton("أفضل عدم الإجابة"),
-              ],
-            ),
-            buildTextField("العنوان", "أدخل عنوانك", addressController),
-            buildTextField("رقم الجوال", "أدخل رقم جوالك", phoneController),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                    child: Text("حفظ"),
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-                    child: Text("إلغاء"),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Divider(),
-            accountDetails(),
->>>>>>> Stashed changes
           ],
         ),
       ),
     );
   }
 
-<<<<<<< Updated upstream
   // Profile Section
   Widget _buildProfileSection() {
     return Column(
@@ -333,29 +254,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
         ),
-=======
-  Widget buildTextField(String label, String hint, TextEditingController controller) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          TextField(
-            controller: controller,
-            textAlign: TextAlign.right,
-            decoration: InputDecoration(
-              hintText: hint,
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ],
->>>>>>> Stashed changes
       ),
     );
   }
 
-<<<<<<< Updated upstream
   // Action Buttons
   Widget _buildActionButtons() {
     return Row(
@@ -457,35 +359,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             color: Colors.orange,
             size: 20,
           ),
-=======
-  Widget genderButton(String gender) {
-    return Expanded(
-      child: OutlinedButton(
-        onPressed: () => setState(() => selectedGender = gender),
-        style: OutlinedButton.styleFrom(
-          backgroundColor: selectedGender == gender ? Colors.orange : Colors.white,
-        ),
-        child: Text(gender, style: TextStyle(color: selectedGender == gender ? Colors.white : Colors.black)),
-      ),
-    );
-  }
-
-  Widget accountDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text("تفاصيل الحساب", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        SizedBox(height: 10),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text("555-123-4567"),
-          subtitle: Text("رقم الجوال"),
-        ),
-        ListTile(
-          leading: Icon(Icons.email),
-          title: Text("example@example.com"),
-          subtitle: Text("البريد الإلكتروني"),
->>>>>>> Stashed changes
         ),
       ],
     );

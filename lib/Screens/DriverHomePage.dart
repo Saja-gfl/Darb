@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
-<<<<<<< Updated upstream
 import 'ChatPage.dart';
 import 'DriverInfoPage.dart';
 import 'CustomBottomNavBar.dart';
-=======
-import 'ChatPage';
-import 'DriverInfoPage.dart';
->>>>>>> Stashed changes
 
 class DriverHomePage extends StatefulWidget {
   DriverHomePage({Key? key}) : super(key: key);
@@ -17,11 +12,8 @@ class DriverHomePage extends StatefulWidget {
 }
 
 class _DriverHomePageState extends State<DriverHomePage> {
-<<<<<<< Updated upstream
   int _currentIndex = 0; // Track the selected index
 
-=======
->>>>>>> Stashed changes
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +33,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
           ),
         ),
       ),
-<<<<<<< Updated upstream
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -57,9 +48,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
           }
         },
       ),
-=======
-      bottomNavigationBar: _buildBottomNavBar(),
->>>>>>> Stashed changes
     );
   }
 
@@ -93,17 +81,11 @@ class _DriverHomePageState extends State<DriverHomePage> {
         children: [
           Text("الإشعارات", style: theme.textTheme.titleLarge),
           SizedBox(height: 8.h),
-<<<<<<< Updated upstream
           Text("تم استلام طلب اشتراك جديد من المستخدم خالد",
               style: theme.textTheme.bodyMedium),
           SizedBox(height: 4.h),
           Text("منذ ساعة واحدة",
               style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
-=======
-          Text("تم استلام طلب اشتراك جديد من المستخدم خالد", style: theme.textTheme.bodyMedium),
-          SizedBox(height: 4.h),
-          Text("منذ ساعة واحدة", style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
->>>>>>> Stashed changes
         ],
       ),
     );
@@ -115,7 +97,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
       children: [
         Text("الخدمات", style: theme.textTheme.titleLarge),
         SizedBox(height: 16.h),
-<<<<<<< Updated upstream
         _buildServiceItem("عرض الاشتراكات الحالية",
             "متابعة جدول اشتراكاتك الحالية", Icons.list, () {
           Navigator.push(
@@ -131,25 +112,13 @@ class _DriverHomePageState extends State<DriverHomePage> {
               context,
               MaterialPageRoute(
                   builder: (context) => DriverSubscriptionRequestsPage()));
-=======
-        _buildServiceItem("عرض الاشتراكات الحالية", "متابعة جدول اشتراكاتك الحالية", Icons.list, () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => DriverActiveSubscriptionsPage()));
-        }),
-        SizedBox(height: 16.h),
-        _buildServiceItem("طلبات اشتراك جديدة", "طلبات الاشتراك المتاحة", Icons.shopping_cart, () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => DriverSubscriptionRequestsPage()));
->>>>>>> Stashed changes
         }),
       ],
     );
   }
 
-<<<<<<< Updated upstream
   Widget _buildServiceItem(
       String title, String description, IconData icon, VoidCallback onTap) {
-=======
-  Widget _buildServiceItem(String title, String description, IconData icon, VoidCallback onTap) {
->>>>>>> Stashed changes
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -184,28 +153,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
       ),
     );
   }
-<<<<<<< Updated upstream
-=======
-
-  Widget _buildBottomNavBar() {
-    return BottomNavigationBar(
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: "الرئيسية"),
-        BottomNavigationBarItem(icon: Icon(Icons.message), label: "الرسائل"),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: "الحساب"),
-      ],
-      selectedItemColor: Colors.orange,
-      unselectedItemColor: Colors.grey,
-      onTap: (index) {
-        if (index == 1) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage()));
-        } else if (index == 2) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => DriverInfoPage()));
-        }
-      },
-    );
-  }
->>>>>>> Stashed changes
 }
 
 class DriverActiveSubscriptionsPage extends StatelessWidget {

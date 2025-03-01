@@ -7,12 +7,9 @@ import '../core/app_export.dart';
 import '../widgets/custom_elevated_button.dart';
 import '../widgets/custom_icon_button.dart';
 import '../widgets/custom_text_form_field.dart';
-<<<<<<< Updated upstream
 import 'auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../core/utils/show_toast.dart';
-=======
->>>>>>> Stashed changes
 
 // ignore_for_file: must_be_immutable
 class K1Screen extends StatefulWidget {
@@ -27,7 +24,6 @@ class K1ScreenState extends State<K1Screen> {
   TextEditingController emailInputController = TextEditingController();
   TextEditingController usernameInputController = TextEditingController();
   TextEditingController passwordInputController = TextEditingController();
-<<<<<<< Updated upstream
   TextEditingController confirmPasswordInputController =
       TextEditingController();
   TextEditingController phoneNumberInputController = TextEditingController();
@@ -50,14 +46,12 @@ class K1ScreenState extends State<K1Screen> {
     plateNumberInputController.dispose();
     super.dispose();
   }
-=======
   TextEditingController confirmPasswordInputController = TextEditingController();
   TextEditingController phoneNumberInputController = TextEditingController();
   TextEditingController carTypeInputController = TextEditingController(); // New controller for car type
   TextEditingController plateNumberInputController = TextEditingController(); // New controller for plate number
 
   bool isDriver = false; // Toggle state for driver/client
->>>>>>> Stashed changes
 
   @override
   Widget build(BuildContext context) {
