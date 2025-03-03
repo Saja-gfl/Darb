@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:reem_s_application9/core/app_export.dart';
+// import 'package:reem_s_application9/core/app_export.dart';
+import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
+import 'package:rem_s_appliceation9/theme/custom_text_style.dart';
+import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 
 class ServicesListItemWidget extends StatelessWidget {
   final String title;

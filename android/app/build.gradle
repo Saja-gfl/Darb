@@ -36,11 +36,7 @@ android {
 
     defaultConfig {
         applicationId "com.reemsapplication.app"
-<<<<<<< Updated upstream
         minSdkVersion 23  
-=======
-        minSdkVersion 21  
->>>>>>> Stashed changes
         targetSdkVersion 34  
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
