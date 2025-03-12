@@ -3,9 +3,9 @@ import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
-import '../../core/app_export.dart';
-import '../ChatPage';
-import '../UserProfilePage.dart';
+import '../core/app_export.dart';
+import 'ChatPage.dart';
+import 'UserProfilePage.dart';
 
 // ignore_for_file: must_be_immutable
 class UserHomePage extends StatefulWidget {
@@ -18,7 +18,8 @@ class UserHomePage extends StatefulWidget {
 class _UserHomePageState extends State<UserHomePage> {
   TextEditingController usernameInputController = TextEditingController();
   TextEditingController passwordInputController = TextEditingController();
-  TextEditingController confirmPasswordInputController = TextEditingController();
+  TextEditingController confirmPasswordInputController =
+      TextEditingController();
   TextEditingController phoneNumberInputController = TextEditingController();
   TextEditingController carTypeController = TextEditingController();
   TextEditingController plateNumberController = TextEditingController();
@@ -55,7 +56,7 @@ class _UserHomePageState extends State<UserHomePage> {
       child: CustomImageView(
         height: 56.h,
         width: 116.h,
-        imagePath:ImageConstant.img5935976241859510486 ,
+        imagePath: ImageConstant.img5935976241859510486,
       ),
     );
   }
@@ -79,9 +80,11 @@ class _UserHomePageState extends State<UserHomePage> {
         children: [
           Text("الإشعارات", style: theme.textTheme.titleLarge),
           SizedBox(height: 8.h),
-          Text("تم قبول طلب اشتراكك من قبل السائق أحمد", style: theme.textTheme.bodyMedium),
+          Text("تم قبول طلب اشتراكك من قبل السائق أحمد",
+              style: theme.textTheme.bodyMedium),
           SizedBox(height: 4.h),
-          Text("منذ ساعتين", style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
+          Text("منذ ساعتين",
+              style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
         ],
       ),
     );
@@ -93,18 +96,29 @@ class _UserHomePageState extends State<UserHomePage> {
       children: [
         Text("الخدمات", style: theme.textTheme.titleLarge),
         SizedBox(height: 16.h),
-        _buildServiceItem("عرض الاشتراكات الجارية", "استعراض جميع الاشتراكات الجارية مع السائقين", Icons.calendar_today, () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ActiveSubscriptionsPage()));
+        _buildServiceItem(
+            "عرض الاشتراكات الجارية",
+            "استعراض جميع الاشتراكات الجارية مع السائقين",
+            Icons.calendar_today, () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ActiveSubscriptionsPage()));
         }),
         SizedBox(height: 16.h),
-        _buildServiceItem("إدارة طلبات الاشتراك", "استعراض ومعالجة طلبات الاشتراك الجديدة", Icons.settings, () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => SubscriptionRequestsPage()));
+        _buildServiceItem("إدارة طلبات الاشتراك",
+            "استعراض ومعالجة طلبات الاشتراك الجديدة", Icons.settings, () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SubscriptionRequestsPage()));
         }),
       ],
     );
   }
 
-  Widget _buildServiceItem(String title, String description, IconData icon, VoidCallback onTap) {
+  Widget _buildServiceItem(
+      String title, String description, IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -141,24 +155,25 @@ class _UserHomePageState extends State<UserHomePage> {
   }
 
   Widget _buildBottomNavBar() {
-  return BottomNavigationBar(
-    items: [
-      BottomNavigationBarItem(icon: Icon(Icons.home), label: "الرئيسية"),
-      BottomNavigationBarItem(icon: Icon(Icons.message), label: "الرسائل"),
-      BottomNavigationBarItem(icon: Icon(Icons.person), label: "الحساب"),
-    ],
-    selectedItemColor: Colors.orange,
-    unselectedItemColor: Colors.grey,
-    onTap: (index) {
-      if (index == 1) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage()));
-      } else if (index == 2) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfilePage()));
-      }
-    },
-  );
-}
-
+    return BottomNavigationBar(
+      items: [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: "الرئيسية"),
+        BottomNavigationBarItem(icon: Icon(Icons.message), label: "الرسائل"),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: "الحساب"),
+      ],
+      selectedItemColor: Colors.orange,
+      unselectedItemColor: Colors.grey,
+      onTap: (index) {
+        if (index == 1) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => ChatPage()));
+        } else if (index == 2) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => UserProfilePage()));
+        }
+      },
+    );
+  }
 }
 
 class ActiveSubscriptionsPage extends StatelessWidget {
