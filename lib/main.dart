@@ -6,6 +6,7 @@ import 'package:rem_s_appliceation9/Screens/DriverInfoPage.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'core/app_export.dart';
+import 'Screens/FindDriverPage.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'darb',
           debugShowCheckedModeBanner: false,
-          home: DriverInfoPage(),
+          home: FindDriverPage(),
 
           // initialRoute: AppRoutes.initialRoute,
           // routes: AppRoutes.routes,
