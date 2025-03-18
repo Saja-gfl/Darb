@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart'; //  مكتبة Firebase
 import 'package:rem_s_appliceation9/Screens/DriverInfoPage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
 import 'package:rem_s_appliceation9/Screens/RegistrationPage.dart';
 import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'darb',
           debugShowCheckedModeBanner: false,
-          home: DriverInfoPage(),
+          home: K1Screen(),
 
           // initialRoute: AppRoutes.initialRoute,
           // routes: AppRoutes.routes,
