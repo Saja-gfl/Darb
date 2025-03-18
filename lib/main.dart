@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'darb',
           debugShowCheckedModeBanner: false,
-          home: K1Screen(),
+          home: DriverInfoPage(),
 
           // initialRoute: AppRoutes.initialRoute,
           // routes: AppRoutes.routes,

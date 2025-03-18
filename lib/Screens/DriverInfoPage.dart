@@ -9,6 +9,12 @@ class DriverInfoPage extends StatefulWidget {
 }
 
 class _DriverInfoPageState extends State<DriverInfoPage> {
+  // Adding controllers for all text fields
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController carModelController = TextEditingController();
+  TextEditingController plateNumberController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
   String selectedGender = ""; // Track the selected gender
 
   @override
@@ -28,6 +34,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             _buildInputField(
               label: "الاسم الكامل",
               hint: "ادخل اسمك الكامل",
+              controller: nameController,
               validationMessage: "يجب ادخال الاسم بالكامل",
             ),
             const SizedBox(height: 16),
@@ -36,6 +43,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             _buildInputField(
               label: "البريد الإلكتروني",
               hint: "example@example.com",
+              controller: emailController,
               validationMessage: "قم بإدخال بريدك الإلكتروني",
             ),
             const SizedBox(height: 16),
@@ -48,6 +56,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             _buildInputField(
               label: "نوع السيارة",
               hint: "أدخل نوع سيارتك",
+              controller: carModelController,
               validationMessage: "يجب أدخال نوع سيارتك",
             ),
             const SizedBox(height: 16),
@@ -56,6 +65,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             _buildInputField(
               label: "رقم اللوحة",
               hint: "ادخل رقم لوحة سيارتك",
+              controller: plateNumberController,
               validationMessage: "يجب ادخال رقم لوحة السيارة",
             ),
             const SizedBox(height: 16),
@@ -64,6 +74,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             _buildInputField(
               label: "رقم الجوال",
               hint: "ادخل رقم جوالك",
+              controller: phoneController,
               validationMessage: "يجب ادخال رقم الجوال",
             ),
             const SizedBox(height: 24),
@@ -129,10 +140,11 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
     );
   }
 
-  // Input Field
+  // Updated Input Field with controller parameter
   Widget _buildInputField({
     required String label,
     required String hint,
+    required TextEditingController controller,
     required String validationMessage,
   }) {
     return Column(
@@ -149,6 +161,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
         ),
         const SizedBox(height: 8),
         TextField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
@@ -283,6 +296,11 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             onPressed: () {
               // Save action
               print("Selected Gender: $selectedGender");
+              print("Name: ${nameController.text}");
+              print("Email: ${emailController.text}");
+              print("Car Model: ${carModelController.text}");
+              print("Plate Number: ${plateNumberController.text}");
+              print("Phone: ${phoneController.text}");
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
