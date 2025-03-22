@@ -13,6 +13,8 @@ import 'auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../core/utils/show_toast.dart';
 import 'otp.dart';
+import 'package:provider/provider.dart';
+import '../Screens/UserProvider .dart';
 
 // ignore_for_file: must_be_immutable
 class K1Screen extends StatefulWidget {
@@ -50,6 +52,7 @@ class K1ScreenState extends State<K1Screen> {
 
   @override
   Widget build(BuildContext context) {
+    String? uid = Provider.of<UserProvider>(context).uid;
     return Scaffold(
       backgroundColor: theme.colorScheme.onPrimaryContainer,
       body: SizedBox(

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/Screens/UserProvider .dart';
+
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -15,8 +19,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
   TextEditingController phoneController = TextEditingController();
   String selectedGender = ""; // Track the selected gender
 
+    @override
+  void initState() {
+    super.initState();
+  }
+
+  
+
   @override
   Widget build(BuildContext context) {
+    String? uid = Provider.of<UserProvider>(context).uid;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -284,7 +296,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           child: ElevatedButton(
             onPressed: () {
               // Save action
-              print("Selected Gender: $selectedGender");
+              //print("Selected Gender: $selectedGender");
+              //_saveUserData,
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,

@@ -12,6 +12,8 @@ import '../widgets/custom_text_form_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth.dart';
 import '../core/utils/show_toast.dart';
+import 'package:provider/provider.dart';
+import '../Screens/UserProvider .dart';
 
 // ignore_for_file: must_be_immutable
 class K0Screen extends StatefulWidget {
@@ -23,11 +25,22 @@ class _K0ScreenState extends State<K0Screen> {
   final FirebaseAuthServises _auth = FirebaseAuthServises();
 
   TextEditingController usernameInputController = TextEditingController();
-
   TextEditingController passwordInputController = TextEditingController();
+  TextEditingController phoneInputController = TextEditingController();
+
 
   bool tf = false;
   bool _isSigning = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // استدعاء الدالة للتحقق من حالة تسجيل الدخول بعد بناء الـ Widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkLoginStatus();
+    });
+  }
+
   @override
   void dispose() {
     usernameInputController.dispose();
@@ -78,7 +91,6 @@ class _K0ScreenState extends State<K0Screen> {
           ) ??
           BoxDecoration(
             borderRadius: BorderRadiusStyle.roundedBorder8,
-            // Add other default properties if needed
           ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -125,8 +137,9 @@ class _K0ScreenState extends State<K0Screen> {
           SizedBox(height: 44.h),
           CustomElevatedButton(
             text: "تسجيل دخول",
-            onPressed: _login,
-          ),
+            onPressed: () {
+              _login();
+              })  ,
           SizedBox(height: 8.h),
           GestureDetector(
             onTap: () {
@@ -162,10 +175,52 @@ class _K0ScreenState extends State<K0Screen> {
     });
 
     if (user != null) {
+      // هنا يتم حفظ الـ UID في الـ Provider بعد التحقق من تسجيل الدخول
+      Provider.of<UserProvider>(context, listen: false).setUid(user.uid);
+      
       showToast(message: "User is successfully signed in");
       Navigator.pushNamed(context, "/home");
     } else {
       showToast(message: "some error occured");
     }
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // هنا ستقوم بتخزين الـ UID في Provider بعد التحقق من حالة المستخدم
+      Provider.of<UserProvider>(context, listen: false).setUid(user.uid);
+    }
+  }
+}
+
+
+// تعريف الـ CustomElevatedButton مع required parameters
+class CustomElevatedButton extends StatelessWidget {
+  final String text;  // required text parameter
+  final VoidCallback onPressed;  // required onPressed callback
+
+  // constructor with required parameters
+  CustomElevatedButton({
+    required this.text,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.orange, // يمكنك تغيير اللون أو إضافة المزيد من الخصائص
+        padding: EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      child: Text(
+        text, // تمرير النص هنا
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ),
+    );
   }
 }
