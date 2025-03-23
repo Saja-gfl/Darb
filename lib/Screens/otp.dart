@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'auth.dart';
+import '../services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../core/utils/show_toast.dart';
 
