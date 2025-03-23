@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:rem_s_appliceation9/Screens/UserProvider .dart';
+import 'package:rem_s_appliceation9/Screens/UserProvider.dart';
 
 
 class UserProfilePage extends StatefulWidget {
