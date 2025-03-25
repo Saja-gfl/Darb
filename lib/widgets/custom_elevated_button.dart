@@ -5,7 +5,7 @@ import '../core/app_export.dart';
 import 'base_button.dart';
 
 class CustomElevatedButton extends BaseButton {
-  CustomElevatedButton(
+  CustomElevatedButton(required String text, 
       {Key? key,
       this.decoration,
       this.leftIcon,

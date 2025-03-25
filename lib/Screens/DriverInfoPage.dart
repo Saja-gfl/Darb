@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rem_s_appliceation9/Screens/UserProvider.dart';
+import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
+import 'package:rem_s_appliceation9/widgets/app_bar/custom_dropdown.dart';
 
 class DriverInfoPage extends StatefulWidget {
   const DriverInfoPage({super.key});
@@ -18,7 +21,123 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
   TextEditingController carModelController = TextEditingController();
   TextEditingController plateNumberController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
+  TextEditingController passengerCountController = TextEditingController();
+  //TextEditingController subscriptionTypeController = TextEditingController();
   String selectedGender = ""; // Track the selected gender
+
+  String? selectedLocation; // الموقع الجغرافي
+  String? selectedSubscriptionType; // نوع الاشتراك
+  String? acceptedLocationsController;
+
+  final List<String> locations = [
+    'بريدة', 'الرس', 'عنيزة', 'البكيرية', 'المذنب', 'البدائع' // قائمة المحاظفات
+  ];
+
+  final List<String> subscriptionTypes = ['شهري', 'أسبوعي'];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDriverData(); // Load the user data
+  }
+
+  // لتحميل بيانات السائق من Firestore
+  Future<void> _loadDriverData() async {
+    // Load the driver data from Firestore
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        // Fetch driver data from Firestore
+        DocumentSnapshot driverData = await FirebaseFirestore.instance
+            .collection('driverdata') // تغيير المسار إلى driverdata
+            .doc(user.uid)
+            .get();
+
+        if (driverData.exists) {
+          // Update the text controllers with the driver data
+          setState(() {
+            nameController.text = driverData['name'] ?? '';
+            emailController.text = driverData['email'] ?? '';
+            plateNumberController.text =
+                driverData['plateNumber'] ?? ''; // رقم اللوحة
+            carModelController.text =
+                driverData['carType'] ?? ''; // نوع السيارة
+            phoneController.text = driverData['phone'] ?? '';
+            priceController.text =
+                driverData['price']?.toString() ?? ''; // السعر
+            acceptedLocationsController =
+                driverData['acceptedLocations']??''; // الأماكن المقبولة
+            selectedGender = driverData['gender'] ?? ''; // تحديد الجنس
+            selectedLocation = driverData['location'] ?? '';
+            selectedSubscriptionType = driverData['subscriptionType'] ?? '';
+            passengerCountController.text =
+                driverData['passengerCount']?.toString() ?? '';
+          });
+        }
+      } catch (e) {
+        print("خطأ في تحميل بيانات السائق: $e");
+      }
+    }
+  }
+
+// لحفظ بيانات السائق إلى Firestore
+  Future<void> _saveDriverData() async {
+    // Save the driver data to Firestore
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      showToast(message: "المستخدم غير مسجل الدخول");
+      return;
+    }
+
+    // التحقق من ملء جميع الحقول
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        plateNumberController.text.isEmpty ||
+        carModelController.text.isEmpty ||
+        phoneController.text.isEmpty ||
+        priceController.text.isEmpty ||
+        acceptedLocationsController == null ||
+        selectedGender.isEmpty ||
+        selectedLocation == null ||
+        passengerCountController.text.isEmpty ||
+        selectedSubscriptionType == null) {
+      showToast(message: "يرجى ملء جميع الحقول");
+      return;
+    }
+
+    try {
+      // تحديث البيانات في Firestore
+      await FirebaseFirestore.instance
+          .collection('driverdata')
+          .doc(user.uid)
+          .update({
+        'name': nameController.text,
+        'email': emailController.text,
+        'plateNumber': plateNumberController.text, // حفظ رقم اللوحة
+        'carType': carModelController.text, // حفظ نوع السيارة
+        'phone': phoneController.text,
+        'price': double.tryParse(priceController.text) ?? 0.0, // حفظ السعر
+        'acceptedLocations': acceptedLocationsController,
+        'gender': selectedGender,
+        'location': selectedLocation, // حفظ الموقع الجغرافي المحدد
+        'subscriptionType': selectedSubscriptionType, // حفظ نوع الاشتراك
+        'passengerCount':
+            int.tryParse(passengerCountController.text) ?? 0, // حفظ عدد الركاب
+      });
+      showToast(message: "تم حفظ البيانات بنجاح");
+    } catch (e) {
+      print("خطأ في حفظ بيانات السائق: $e");
+      showToast(message: "حدث خطأ أثناء حفظ البيانات");
+    }
+  }
+
+  void showToast({required String message}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +201,66 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             ),
             const SizedBox(height: 24),
 
+            // Location Dropdown
+            CustomDropdown(
+              label: "الموقع الجغرافي",
+              hint: "اختر موقعك من القائمة",
+              value: selectedLocation,
+              items: locations,
+              onChanged: (value) {
+                setState(() {
+                  selectedLocation = value;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Accepted Locations Field
+            CustomDropdown(
+              label: "الأماكن التي تقبل الذهاب إليها",
+              hint: "أدخل الأماكن التي يمكن أن تذهب إليها )",
+              value: acceptedLocationsController,
+              items: locations,
+              onChanged: (value) {
+                setState(() {
+                  acceptedLocationsController = value;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Price Field
+            _buildInputField(
+              label: "نطاق السعر",
+              hint: "أدخل سعر الرحلة",
+              controller: priceController,
+              validationMessage: "يجب إدخال السعر",
+            ),
+            const SizedBox(height: 16),
+
+            // Passenger Count Field
+            _buildInputField(
+              label: "عدد الركاب",
+              hint: "أدخل عدد الركاب المتاحين",
+              controller: passengerCountController,
+              validationMessage: "يجب إدخال عدد الركاب",
+            ),
+            const SizedBox(height: 16),
+
+            // Subscription Type Dropdown
+            CustomDropdown(
+              label: "نوع الاشتراك",
+              hint: "اختر نوع الاشتراك",
+              value: selectedSubscriptionType,
+              items: subscriptionTypes,
+              onChanged: (value) {
+                setState(() {
+                  selectedSubscriptionType = value;
+                });
+              },
+            ),
+            const SizedBox(height: 24),
+
             // Action Buttons
             _buildActionButtons(),
             const SizedBox(height: 24),
@@ -100,7 +279,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
-          "السائق",
+          "معلومات السائق",
           style: GoogleFonts.getFont(
             'Inter',
             color: Colors.black,
@@ -297,13 +476,14 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
+              _saveDriverData();
               // Save action
-              print("Selected Gender: $selectedGender");
-              print("Name: ${nameController.text}");
-              print("Email: ${emailController.text}");
-              print("Car Model: ${carModelController.text}");
-              print("Plate Number: ${plateNumberController.text}");
-              print("Phone: ${phoneController.text}");
+              //print("Selected Gender: $selectedGender");
+              //print("Name: ${nameController.text}");
+              //print("Email: ${emailController.text}");
+              //print("Car Model: ${carModelController.text}");
+              //print("Plate Number: ${plateNumberController.text}");
+              //print("Phone: ${phoneController.text}");
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rem_s_appliceation9/Screens/UserProvider.dart';
+import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
 
 
 class UserProfilePage extends StatefulWidget {
@@ -22,7 +24,73 @@ class _UserProfilePageState extends State<UserProfilePage> {
     @override
   void initState() {
     super.initState();
+    _loadUserData(); // Load the user data
   }
+  Future<void> _loadUserData() async {
+    // Load the user data from Firestore
+       final user = FirebaseAuth.instance.currentUser;
+       if (user !=null){
+        try {
+        // Fetch user data from Firestore
+        DocumentSnapshot userData = await FirebaseFirestore.instance
+            .collection('userdata')
+            .doc(user.uid)
+            .get();
+
+        if (userData.exists) {
+          // Update the text controllers with the user data
+          setState(() {
+          nameController.text = userData['name'] ??'';
+          emailController.text = userData['email']??'';
+          addressController.text = userData['address']??'';
+          phoneController.text = userData['phone']??'';
+          selectedGender = userData['gender']??'';
+          });
+       }
+      } catch (e) {
+        print("خطأ في تحميل بيانات المستخدم: $e");
+      }
+    }
+  }
+
+  //save user data
+  Future<void> _saveUserData() async {
+    // Save the user data to Firestore
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+    showToast(message: "المستخدم غير مسجل الدخول");
+    return;
+  }
+
+  if (nameController.text.isEmpty ||
+      emailController.text.isEmpty ||
+      addressController.text.isEmpty ||
+      phoneController.text.isEmpty ||
+      selectedGender.isEmpty) {
+    showToast(message: "يرجى ملء جميع الحقول");
+    return;
+  }
+      try {
+        await FirebaseFirestore.instance.collection('userdata').doc(user.uid).update({
+          'name': nameController.text,
+          'email': emailController.text,
+          'address': addressController.text,
+          'phone': phoneController.text,
+          'gender': selectedGender,
+        });
+        showToast(message: "تم حفظ البيانات بنجاح");
+      } catch (e) {
+        print("خطأ في حفظ بيانات المستخدم: $e");
+        showToast(message: "حدث خطأ أثناء حفظ البيانات");
+      }
+    }
+  
+  void showToast({required String message}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
 
   
 
@@ -294,11 +362,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
         const SizedBox(width: 16),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: _saveUserData, 
               // Save action
               //print("Selected Gender: $selectedGender");
               //_saveUserData,
-            },
+            
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,

@@ -5,15 +5,13 @@ import 'package:rem_s_appliceation9/routes/app_routes.dart';
 import 'package:rem_s_appliceation9/theme/app_decoration.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
-import '../core/app_export.dart';
 import '../widgets/custom_checkbox_button.dart';
-import '../widgets/custom_elevated_button.dart';
 import '../widgets/custom_text_form_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'auth.dart';
+import '../services/auth.dart';
 import '../core/utils/show_toast.dart';
 import 'package:provider/provider.dart';
-import 'UserProvider.dart';
+import '../Screens/UserProvider.dart';
 
 // ignore_for_file: must_be_immutable
 class K0Screen extends StatefulWidget {

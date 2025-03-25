@@ -5,16 +5,17 @@ import 'package:rem_s_appliceation9/routes/app_routes.dart';
 import 'package:rem_s_appliceation9/theme/app_decoration.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
-import '../core/app_export.dart';
 import '../widgets/custom_elevated_button.dart';
 import '../widgets/custom_icon_button.dart';
 import '../widgets/custom_text_form_field.dart';
-import 'auth.dart';
+import '../services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../core/utils/show_toast.dart';
 import 'otp.dart';
 import 'package:provider/provider.dart';
-import 'UserProvider.dart';
+import '../Screens/UserProvider.dart';
+import '../Screens/UserProvider.dart';
+
 
 // ignore_for_file: must_be_immutable
 class K1Screen extends StatefulWidget {
@@ -25,6 +26,7 @@ class K1Screen extends StatefulWidget {
 
 class K1ScreenState extends State<K1Screen> {
   final FirebaseAuthServises _auth = FirebaseAuthServises();
+
   TextEditingController emailInputController = TextEditingController();
   TextEditingController usernameInputController = TextEditingController();
   TextEditingController passwordInputController = TextEditingController();
@@ -381,10 +383,34 @@ class K1ScreenState extends State<K1Screen> {
       String username = usernameInputController.text;
       String email = emailInputController.text;
       String password = passwordInputController.text;
+      String confirmPassword = confirmPasswordInputController.text;
       String phoneNumber = phoneNumberInputController.text;
 
-      // تحقق من صحة البريد الإلكتروني وكلمة المرور
-      User? user = await _auth.signup(email, password);
+      if (username.isEmpty ||
+          email.isEmpty ||
+          password.isEmpty ||
+          confirmPassword.isEmpty ||
+          phoneNumber.isEmpty) {
+        showToast(message: "الرجاء ملء جميع الحقول");
+        return;
+      }
+     if (password != confirmPassword) {
+        showToast(message: "كلمة المرور وتأكيدها غير متطابقين");
+        return;
+      }
+
+      //signup outh
+
+      User? user = await _auth.signup(
+      email: email,
+      password: password,
+      username: username,
+      address: "null", // اليوزر يعدله من صفحة البيانات 
+      phone: phoneNumber,
+      isDriver: isDriver,
+      carType: isDriver ? carTypeInputController.text : null,
+      plateNumber: isDriver ? plateNumberInputController.text : null,
+    );
 
       if (user != null) {
         // إذا تم إنشاء الحساب بنجاح، تحقق من رقم الهاتف
