@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rem_s_appliceation9/Screens/number_sub.dart';
 
 class CreateSubscriptionPage extends StatefulWidget {
   const CreateSubscriptionPage({super.key});
@@ -9,56 +10,88 @@ class CreateSubscriptionPage extends StatefulWidget {
 }
 
 class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
-  String selectedSubscriptionType = "شهري"; // Weekly or Monthly
+  String selectedSubscriptionType = "شهري";
   DateTime? subscriptionStartDate;
   String? fromLocation;
   String? toLocation;
   String? homeLocation;
   String? workLocation;
-  List<String> selectedDays = [];
-  TimeOfDay? pickupTime;
-  TimeOfDay? dropoffTime;
-  double priceRange = 50;
+  List<Map<String, dynamic>> scheduleDays = [];
+  double price = 0;
   String driverNotes = "";
+  TextEditingController priceController = TextEditingController();
+
+  // Design constants
+  final Color primaryColor = Color(0xFFFFB300);
+  final Color secondaryColor = Color(0xFF76CB54);
+  final Color backgroundColor = Colors.white;
+  final Color textColor = Colors.black;
+  final Color hintColor = Colors.grey;
+  final double borderRadius = 12.0;
+  final double padding = 16.0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: primaryColor),
           onPressed: () => Navigator.pop(context),
         ),
-        iconTheme: IconThemeData(
-          color: Color(0xFFFFB300),
-        ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NumberSubPage()),
+                );
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: primaryColor,
+              ),
+              child: Text(
+                'لدي رقم الرحلة',
+                style: GoogleFonts.tajawal(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+        backgroundColor: backgroundColor,
+        elevation: 0,
         title: Text(
           'إنشاء اشتراك جديد',
-          style: GoogleFonts.getFont(
-            'Inter',
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+          style: GoogleFonts.tajawal(
+            color: textColor,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
         ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(padding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             // Subscription Type
+            _buildSectionTitle("نوع الاشتراك"),
             _buildSubscriptionTypeSelection(),
-            const SizedBox(height: 24),
+            SizedBox(height: padding),
 
             // Start Date
+            _buildSectionTitle("تاريخ بدء الاشتراك"),
             _buildDateSelection(),
-            const SizedBox(height: 24),
+            SizedBox(height: padding),
 
             // From Location
+            _buildSectionTitle("موقع المغادرة"),
             _buildLocationSelection(
-              label: "من",
               locations: [
                 "عيون الجوا",
                 "البكيرية",
@@ -69,17 +102,14 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
                 "عنيزة",
                 "بريدة"
               ],
-              onSelected: (location) {
-                setState(() {
-                  fromLocation = location;
-                });
-              },
+              onSelected: (location) => setState(() => fromLocation = location),
+              selectedLocation: fromLocation,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: padding),
 
             // To Location
+            _buildSectionTitle("موقع الوصول"),
             _buildLocationSelection(
-              label: "الى",
               locations: [
                 "عيون الجوا",
                 "البكيرية",
@@ -90,53 +120,58 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
                 "عنيزة",
                 "بريدة"
               ],
-              onSelected: (location) {
-                setState(() {
-                  toLocation = location;
-                });
-              },
+              onSelected: (location) => setState(() => toLocation = location),
+              selectedLocation: toLocation,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: padding),
 
             // Home Location
-            _buildLocationInputField(
-              label: "موقعك",
-              hint: "الرجاء ادخال رابط صحيح لموقع منزلك او نقطة التقاء مع السائق",
-              onChanged: (value) {
-                setState(() {
-                  homeLocation = value;
-                });
-              },
+            _buildSectionTitle("موقع المنزل"),
+            _buildInputField(
+              hintText: "أدخل رابط موقع منزلك أو نقطة اللقاء",
+              onChanged: (value) => setState(() => homeLocation = value),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: padding),
 
             // Work Location
-            _buildLocationInputField(
-              label: "موقع العمل",
-              hint: "الرجاء ادخال رابط صحيح لموقع العمل او نقطة الوصول",
-              onChanged: (value) {
-                setState(() {
-                  workLocation = value;
-                });
-              },
+            _buildSectionTitle("موقع العمل"),
+            _buildInputField(
+              hintText: "أدخل رابط موقع العمل أو نقطة الوصول",
+              onChanged: (value) => setState(() => workLocation = value),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: padding),
 
-            // Delivery Days
-            _buildDeliveryDaysSelection(),
-            const SizedBox(height: 16),
+            // Price Input
+            _buildSectionTitle("السعر (ريال سعودي)"),
+            _buildInputField(
+              controller: priceController,
+              keyboardType: TextInputType.number,
+              hintText: "أدخل المبلغ",
+              suffixText: "ريال",
+              onChanged: (value) =>
+                  setState(() => price = double.tryParse(value) ?? 0),
+            ),
+            SizedBox(height: padding),
 
-            // Time Selection
-            _buildTimeSelection(),
-            const SizedBox(height: 16),
+            // Schedule Days Section
+            if (scheduleDays.isNotEmpty) ...[
+              _buildSectionTitle("أيام الجدول الزمني"),
+              _buildScheduleDaysTable(),
+              SizedBox(height: padding),
+            ],
 
-            // Price Range
-            _buildPriceRangeSelector(),
-            const SizedBox(height: 16),
+            // Add Day Button
+            _buildAddDayButton(),
+            SizedBox(height: padding),
 
             // Driver Notes
-            _buildDriverNotesField(),
-            const SizedBox(height: 24),
+            _buildSectionTitle("ملاحظات للسائق"),
+            _buildInputField(
+              hintText: "أدخل أي ملاحظات تريد إضافتها للسائق",
+              maxLines: 3,
+              onChanged: (value) => setState(() => driverNotes = value),
+            ),
+            SizedBox(height: padding * 2),
 
             // Submit Button
             _buildSubmitButton(),
@@ -146,58 +181,73 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
     );
   }
 
-  // Subscription Type Selection
-  Widget _buildSubscriptionTypeSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          "نوع الاشتراك",
-          style: TextStyle(
-            color: Color(0xFFFFB300),
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: GoogleFonts.tajawal(
+          color: primaryColor,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
         ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: _buildSubscriptionTypeButton("أسبوعي", selectedSubscriptionType == "أسبوعي"),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _buildSubscriptionTypeButton("شهري", selectedSubscriptionType == "شهري"),
-            ),
-          ],
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildSubscriptionTypeButton(String text, bool isSelected) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedSubscriptionType = text;
-        });
-      },
+  Widget _buildSubscriptionTypeSelection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildChoiceButton(
+              text: "أسبوعي",
+              isSelected: selectedSubscriptionType == "أسبوعي",
+              onTap: () => setState(() => selectedSubscriptionType = "أسبوعي"),
+            ),
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: _buildChoiceButton(
+              text: "شهري",
+              isSelected: selectedSubscriptionType == "شهري",
+              onTap: () => setState(() => selectedSubscriptionType = "شهري"),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChoiceButton({
+    required String text,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(borderRadius),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFFFFB300) : Colors.black.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected ? Border.all(color: Colors.black, width: 2) : Border.all(color: Colors.grey.shade400),
+          color: isSelected ? primaryColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(
+            color: isSelected ? primaryColor : Colors.grey[300]!,
+            width: 1.5,
+          ),
         ),
         child: Center(
           child: Text(
             text,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black,
+            style: GoogleFonts.tajawal(
+              color: isSelected ? Colors.white : textColor,
               fontSize: 16,
-              fontFamily: 'Roboto',
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -205,409 +255,260 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
     );
   }
 
-  // Date Selection
   Widget _buildDateSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          "حدد تاريخ بدء الاشتراك",
-          style: TextStyle(
-            color: Color(0xFFFFB300),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: () async {
-            final DateTime? picked = await showDatePicker(
-              context: context,
-              initialDate: DateTime.now(),
-              firstDate: DateTime.now(),
-              lastDate: DateTime(DateTime.now().year + 1),
+    return InkWell(
+      onTap: () async {
+        final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(DateTime.now().year + 1),
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: ColorScheme.light(
+                  primary: primaryColor,
+                  onPrimary: Colors.white,
+                  onSurface: textColor,
+                ),
+              ),
+              child: child!,
             );
-            if (picked != null) {
-              setState(() {
-                subscriptionStartDate = picked;
-              });
-            }
           },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.calendar_today, size: 18, color: Color(0xFFFFB300)),
-                const SizedBox(width: 8),
-                Text(
-                  subscriptionStartDate != null
-                      ? "${subscriptionStartDate!.day}/${subscriptionStartDate!.month}/${subscriptionStartDate!.year}"
-                      : "اختر التاريخ",
-                  style: TextStyle(
-                    color: subscriptionStartDate != null ? Colors.black : Colors.grey,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
+        );
+        if (picked != null) {
+          setState(() => subscriptionStartDate = picked);
+        }
+      },
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(color: Colors.grey[300]!),
         ),
-      ],
-    );
-  }
-
-  // Location Selection
-  Widget _buildLocationSelection({
-    required String label,
-    required List<String> locations,
-    required Function(String) onSelected,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: Color(0xFFFFB300),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-          ),
-        const SizedBox(height: 8),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: locations.map((location) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: ChoiceChip(
-                  label: Text(location),
-                  selected: (label == "من" && fromLocation == location) || 
-                           (label == "الى" && toLocation == location),
-                  onSelected: (selected) {
-                    onSelected(location);
-                  },
-                  selectedColor: Color(0xFFFFB300),
-                  labelStyle: TextStyle(
-                    color: (label == "من" && fromLocation == location) || 
-                           (label == "الى" && toLocation == location)
-                        ? Colors.white
-                        : Colors.black,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Location Input Field
-  Widget _buildLocationInputField({
-    required String label,
-    required String hint,
-    required Function(String) onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: Color(0xFFFFB300),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          onChanged: onChanged,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(
-              color: Colors.black.withOpacity(0.5),
-              fontSize: 14,
-              fontFamily: 'Roboto',
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: Colors.grey.shade400,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: Color(0xFFFFB300),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Delivery Days Selection
-  Widget _buildDeliveryDaysSelection() {
-    List<String> days = ["الاحد", "الاثنين", "الثلاثاء", "الاربعاء", "الخميس"];
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          "ايام التوصيل",
-          style: TextStyle(
-            color: Color(0xFFFFB300),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 8),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: days.map((day) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: ChoiceChip(
-                  label: Text(day),
-                  selected: selectedDays.contains(day),
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        selectedDays.add(day);
-                      } else {
-                        selectedDays.remove(day);
-                      }
-                    });
-                  },
-                  selectedColor: Color(0xFFFFB300),
-                  labelStyle: TextStyle(
-                    color: selectedDays.contains(day) ? Colors.white : Colors.black,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Time Selection
-  Widget _buildTimeSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          "الوقت",
-          style: TextStyle(
-            color: Color(0xFFFFB300),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            _buildTimePickerButton(
-              label: "الى",
-              time: dropoffTime,
-              onPressed: () async {
-                final TimeOfDay? picked = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.now(),
-                );
-                if (picked != null) {
-                  setState(() {
-                    dropoffTime = picked;
-                  });
-                }
-              },
-            ),
-            const SizedBox(width: 16),
-            _buildTimePickerButton(
-              label: "من",
-              time: pickupTime,
-              onPressed: () async {
-                final TimeOfDay? picked = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.now(),
-                );
-                if (picked != null) {
-                  setState(() {
-                    pickupTime = picked;
-                  });
-                }
-              },
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTimePickerButton({
-    required String label,
-    required TimeOfDay? time,
-    required Function() onPressed,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: Color(0xFFFFB300),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 4),
-        ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey.shade100,
-            foregroundColor: Colors.black,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: Text(
-            time != null ? "${time.hour}:${time.minute}" : "اختر الوقت",
-            style: TextStyle(
-              color: time != null ? Colors.black : Colors.grey,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Price Range Selector
-  Widget _buildPriceRangeSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          "المبلغ المستعد لدفعه",
-          style: TextStyle(
-            color: Color(0xFFFFB300),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 8),
-        Slider(
-          value: priceRange,
-          min: 0,
-          max: 100,
-          divisions: 10,
-          label: "${priceRange.round()} ريال",
-          activeColor: Color(0xFFFFB300),
-          inactiveColor: Colors.grey.shade300,
-          onChanged: (value) {
-            setState(() {
-              priceRange = value;
-            });
-          },
-        ),
-        Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("0 ريال"),
-            Text("100 ريال"),
+            Icon(Icons.calendar_today, color: primaryColor, size: 20),
+            Text(
+              subscriptionStartDate != null
+                  ? "${subscriptionStartDate!.day}/${subscriptionStartDate!.month}/${subscriptionStartDate!.year}"
+                  : "اختر التاريخ",
+              style: GoogleFonts.tajawal(
+                color: subscriptionStartDate != null ? textColor : hintColor,
+                fontSize: 16,
+              ),
+            ),
           ],
         ),
-      ],
+      ),
     );
   }
 
-  // Driver Notes Field
-  Widget _buildDriverNotesField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          "ملاحظات للسائق",
-          style: TextStyle(
-            color: Color(0xFFFFB300),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
+  Widget _buildLocationSelection({
+    required List<String> locations,
+    required Function(String) onSelected,
+    required String? selectedLocation,
+  }) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: locations.map((location) {
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: ChoiceChip(
+              label: Text(
+                location,
+                style: GoogleFonts.tajawal(
+                  color:
+                      selectedLocation == location ? Colors.white : textColor,
+                ),
+              ),
+              selected: selectedLocation == location,
+              onSelected: (selected) => onSelected(location),
+              selectedColor: primaryColor,
+              backgroundColor: Colors.grey[50],
+              side: BorderSide(color: Colors.grey[300]!),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(borderRadius),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    TextEditingController? controller,
+    String? hintText,
+    String? suffixText,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    required Function(String) onChanged,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
+      style: GoogleFonts.tajawal(color: textColor),
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: GoogleFonts.tajawal(color: hintColor),
+        suffixText: suffixText,
+        suffixStyle: GoogleFonts.tajawal(color: textColor),
+        filled: true,
+        fillColor: Colors.grey[50],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: Colors.grey[300]!),
         ),
-        const SizedBox(height: 8),
-        TextField(
-          onChanged: (value) {
-            setState(() {
-              driverNotes = value;
-            });
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: primaryColor, width: 1.5),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+    );
+  }
+
+  Widget _buildScheduleDaysTable() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Table(
+          columnWidths: const {
+            0: FlexColumnWidth(2),
+            1: FlexColumnWidth(2),
+            2: FlexColumnWidth(1)
           },
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText: "الرجاء ادخال اي ملاحظات تريد اضافتها للسائق",
-            hintStyle: TextStyle(
-              color: Colors.black.withOpacity(0.5),
-              fontSize: 14,
-              fontFamily: 'Roboto',
+          border: TableBorder.all(color: Colors.grey[200]!),
+          children: [
+            TableRow(
+              decoration: BoxDecoration(color: Colors.grey[100]),
+              children: [
+                _buildTableHeader("اليوم"),
+                _buildTableHeader("الوقت"),
+                _buildTableHeader("إجراء"),
+              ],
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: Colors.grey.shade400,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: Color(0xFFFFB300),
-              ),
-            ),
-          ),
+            ...scheduleDays.map((day) {
+              return TableRow(
+                decoration: BoxDecoration(color: Colors.white),
+                children: [
+                  _buildTableCell(day['day']),
+                  _buildTableCell(day['time']),
+                  IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red[400]),
+                    onPressed: () => setState(() => scheduleDays.remove(day)),
+                  ),
+                ],
+              );
+            }).toList(),
+          ],
         ),
-      ],
+      ),
     );
   }
 
-  // Submit Button
+  Widget _buildTableHeader(String text) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.tajawal(
+          fontWeight: FontWeight.bold,
+          color: textColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTableCell(String text) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.tajawal(color: textColor),
+      ),
+    );
+  }
+
+  Widget _buildAddDayButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () async {
+          final result = await showDialog<Map<String, dynamic>>(
+            context: context,
+            builder: (context) => AddDayDialog(primaryColor: primaryColor),
+          );
+          if (result != null) {
+            setState(() => scheduleDays.add(result));
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor.withOpacity(0.1),
+          foregroundColor: primaryColor,
+          elevation: 0,
+          padding: EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+            side: BorderSide(color: primaryColor, width: 1.5),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add, size: 20),
+            SizedBox(width: 8),
+            Text(
+              "إضافة يوم",
+              style: GoogleFonts.tajawal(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSubmitButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          // Handle form submission
-          _submitSubscription();
-        },
+        onPressed: _submitSubscription,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF76CB54),
+          backgroundColor: secondaryColor,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
+          elevation: 2,
+          shadowColor: secondaryColor.withOpacity(0.3),
         ),
         child: Text(
-          "رفع الطلب",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+          "تأكيد الاشتراك",
+          style: GoogleFonts.tajawal(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -615,26 +516,28 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
   }
 
   void _submitSubscription() {
-    // Validate all required fields
     if (selectedSubscriptionType.isEmpty ||
         subscriptionStartDate == null ||
         fromLocation == null ||
         toLocation == null ||
         homeLocation == null ||
         workLocation == null ||
-        selectedDays.isEmpty ||
-        pickupTime == null ||
-        dropoffTime == null) {
+        scheduleDays.isEmpty ||
+        price <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("الرجاء ملء جميع الحقول المطلوبة"),
           backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
         ),
       );
       return;
     }
 
-    // Process the subscription data
+    // Process data
     final subscriptionData = {
       "type": selectedSubscriptionType,
       "startDate": subscriptionStartDate,
@@ -642,24 +545,185 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       "to": toLocation,
       "homeLocation": homeLocation,
       "workLocation": workLocation,
-      "days": selectedDays,
-      "pickupTime": pickupTime,
-      "dropoffTime": dropoffTime,
-      "priceRange": priceRange,
+      "schedule": scheduleDays,
+      "price": price,
       "notes": driverNotes,
     };
 
     print("Subscription Data: $subscriptionData");
-    
-    // Show success message
+
+    // Show success
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("تم إرسال طلب الاشتراك بنجاح"),
-        backgroundColor: Colors.green,
+        content: Text("تم إنشاء الاشتراك بنجاح"),
+        backgroundColor: secondaryColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
       ),
     );
-    
-    // Navigate back or to confirmation page
+
     Navigator.pop(context);
+  }
+}
+
+class AddDayDialog extends StatefulWidget {
+  final Color primaryColor;
+
+  const AddDayDialog({required this.primaryColor, super.key});
+
+  @override
+  _AddDayDialogState createState() => _AddDayDialogState();
+}
+
+class _AddDayDialogState extends State<AddDayDialog> {
+  String? selectedDay;
+  TimeOfDay? selectedTime;
+  final List<String> days = [
+    "الاحد",
+    "الاثنين",
+    "الثلاثاء",
+    "الاربعاء",
+    "الخميس"
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      elevation: 0,
+      backgroundColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              "إضافة يوم جديد",
+              style: GoogleFonts.tajawal(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: widget.primaryColor,
+              ),
+            ),
+            SizedBox(height: 24),
+
+            // Day Dropdown
+            Directionality(
+              textDirection: TextDirection.rtl,
+              child: DropdownButtonFormField<String>(
+                value: selectedDay,
+                decoration: InputDecoration(
+                  labelText: "اليوم",
+                  labelStyle: GoogleFonts.tajawal(color: Colors.grey[600]),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                items: days.map((day) {
+                  return DropdownMenuItem(
+                    value: day,
+                    child: Text(day, style: GoogleFonts.tajawal()),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => selectedDay = value),
+                style: GoogleFonts.tajawal(color: Colors.black),
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Time Picker Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: ColorScheme.light(
+                            primary: widget.primaryColor,
+                            onPrimary: Colors.white,
+                            onSurface: Colors.black,
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
+                  );
+                  if (time != null) {
+                    setState(() => selectedTime = time);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[50],
+                  foregroundColor: Colors.black,
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Colors.grey[300]!),
+                  ),
+                ),
+                child: Text(
+                  selectedTime != null
+                      ? "${selectedTime!.hour}:${selectedTime!.minute.toString().padLeft(2, '0')}"
+                      : "اختر الوقت",
+                  style: GoogleFonts.tajawal(),
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+
+            // Action Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey[600],
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  child: Text("إلغاء", style: GoogleFonts.tajawal()),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (selectedDay != null && selectedTime != null) {
+                      Navigator.pop(context, {
+                        'day': selectedDay!,
+                        'time':
+                            "${selectedTime!.hour}:${selectedTime!.minute.toString().padLeft(2, '0')}",
+                      });
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: widget.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text("إضافة", style: GoogleFonts.tajawal()),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
