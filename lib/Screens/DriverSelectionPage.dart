@@ -1,25 +1,5 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Driver Selection App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Cairo', // Arabic-friendly font
-      ),
-      home: const DriverSelectionPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Driver {
   final String name;
@@ -42,13 +22,27 @@ class Driver {
 }
 
 class DriverSelectionPage extends StatefulWidget {
-  const DriverSelectionPage({Key? key}) : super(key: key);
+  final String fromLocation;
+  final String toLocation;
+  final String subscriptionType;
+  final double priceRange;
+  final List<String> selectedDays;
+
+    const DriverSelectionPage({
+    Key? key,
+    required this.fromLocation,
+    required this.toLocation,
+    required this.subscriptionType,
+    required this.priceRange,
+    required this.selectedDays,
+  }) : super(key: key);
 
   @override
   State<DriverSelectionPage> createState() => _DriverSelectionPageState();
 }
 
 class _DriverSelectionPageState extends State<DriverSelectionPage> {
+List<Driver> filteredDrivers = [];  
   final List<Driver> drivers = [
     Driver(
       name: 'مهند',
@@ -69,6 +63,49 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
       avatarUrl: '',
     ),
   ];
+
+    @override
+  void initState() {
+    super.initState();
+    filterDrivers(); // استدعاء الفلترة عند تحميل الصفحة
+  }
+
+Future<void> filterDrivers() async {
+  try {
+    Query query = FirebaseFirestore.instance.collection('driverdata');
+
+    if (widget.fromLocation.isNotEmpty) {
+      query = query.where('location', isEqualTo: widget.fromLocation);
+    }
+    if (widget.toLocation.isNotEmpty) {
+      query = query.where('acceptedLocations', arrayContains: widget.toLocation);
+    }
+    if (widget.subscriptionType.isNotEmpty) {
+      query = query.where('subscriptionType', isEqualTo: widget.subscriptionType);
+    }
+
+    QuerySnapshot snapshot = await query.get();
+    List<Driver> filtered = snapshot.docs.map((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      return Driver(
+        name: data['name'] ?? 'غير معروف',
+        status: data['status'] ?? 'غير متوفر',
+        positiveRating: data['positiveRating'] ?? 0,
+        positiveComment: data['positiveComment'] ?? 'لا توجد تعليقات',
+        negativeRating: data['negativeRating'] ?? 0,
+        negativeComment: data['negativeComment'] ?? 'لا توجد تعليقات',
+        avatarUrl: data['avatarUrl'] ?? '',
+      );
+    }).toList();
+
+    setState(() {
+      filteredDrivers = filtered;
+    });
+  } catch (e) {
+    print("خطأ أثناء جلب البيانات: $e");
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -316,14 +353,14 @@ class DriverCard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: const Color.fromARGB(255, 221, 145, 21),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: const Text(
-                      'الغاء',
+                      'اشتراك',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
