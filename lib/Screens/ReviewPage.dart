@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ReviewPage extends StatelessWidget {
+class ReviewPage extends StatefulWidget {
+  @override
+  _ReviewPageState createState() => _ReviewPageState();
+}
+
+class _ReviewPageState extends State<ReviewPage> {
+  final Color primaryColor = Color(0xFFFFB300);
+  final Color secondaryColor = Color(0xFF76CB54);
+  final Color backgroundColor = Colors.white;
+  final Color textColor = Colors.black;
+  final double borderRadius = 12.0;
+
+  int _rating = 0;
+  final Set<String> _selectedTags = {};
+
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = Color(0xFFFFB300);
-    final Color secondaryColor = Color(0xFF76CB54);
-    final Color backgroundColor = Colors.white;
-    final Color textColor = Colors.black;
-    final double borderRadius = 12.0;
-
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -107,21 +115,29 @@ class ReviewPage extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
 
-                    // Star Rating
+                    // Star Rating - Now interactive
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                          5,
-                          (index) => Icon(
-                                Icons.star,
-                                size: 40,
-                                color:
-                                    index < 4 ? primaryColor : Colors.grey[300],
-                              )),
+                      children: List.generate(5, (index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _rating = index + 1;
+                            });
+                          },
+                          child: Icon(
+                            Icons.star,
+                            size: 40,
+                            color: index < _rating
+                                ? primaryColor
+                                : Colors.grey[300],
+                          ),
+                        );
+                      }),
                     ),
                     SizedBox(height: 24),
 
-                    // Rating Tags
+                    // Rating Tags - Now selectable
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -180,7 +196,9 @@ class ReviewPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle review submission
+                  // Handle review submission with _rating and _selectedTags
+                  print('Rating: $_rating');
+                  print('Selected tags: $_selectedTags');
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
@@ -209,16 +227,34 @@ class ReviewPage extends StatelessWidget {
   }
 
   Widget _buildRatingTag(String text) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Text(
-        text,
-        style: GoogleFonts.tajawal(),
+    final bool isSelected = _selectedTags.contains(text);
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            _selectedTags.remove(text);
+          } else {
+            _selectedTags.add(text);
+          }
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? primaryColor.withOpacity(0.2) : Colors.grey[50],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? primaryColor : Colors.grey[300]!,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Text(
+          text,
+          style: GoogleFonts.tajawal(
+            color: isSelected ? primaryColor : Colors.black,
+          ),
+        ),
       ),
     );
   }
