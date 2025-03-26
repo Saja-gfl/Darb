@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
 
 class FindDriverPage extends StatefulWidget {
   @override
@@ -158,11 +159,25 @@ class _FindDriverPageState extends State<FindDriverPage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // This is where you will integrate Firebase to find a matching driver
-              },
-              child: Text("رفع الطلب"),
-            ),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DriverSelectionPage(
+        fromLocation: fromLocation, // المدينة التي ينطلق منها المستخدم
+        toLocation: toLocation, // المدينة الوجهة
+        subscriptionType: subscriptionType, // نوع الاشتراك (شهري / أسبوعي)
+        priceRange: priceRange, // مجال السعر المحدد
+        selectedDays: selectedDays, // الأيام المختارة
+        //startTime: startTime, // وقت البداية
+        //endTime: endTime, // وقت النهاية
+        ),
+      ),
+    );
+  },
+  child: Text("رفع الطلب"),
+),
+
           ],
         ),
       ),
