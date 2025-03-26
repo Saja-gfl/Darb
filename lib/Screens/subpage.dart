@@ -279,6 +279,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
             fontWeight: FontWeight.w500,
             fontFamily: 'Roboto',
           ),
+          ),
         const SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
