@@ -1,15 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rem_s_appliceation9/widgets/subscription_card.dart';
+import 'package:rem_s_appliceation9/widgets/custom_text_form_field.dart';
 
-class NumberSubPage extends StatelessWidget {
+class NumberSubPage extends StatefulWidget {
+  @override
+  _NumberSubPageState createState() => _NumberSubPageState();
+}
+
+class _NumberSubPageState extends State<NumberSubPage> {
+  final TextEditingController _subscriptionController = TextEditingController();
+  bool _isLoading = false;
+  Map<String, dynamic>? _subscriptionData;
+
+  final Color primaryColor = Color(0xFFFFB300);
+  final Color secondaryColor = Color(0xFF76CB54);
+  final Color backgroundColor = Colors.white;
+  final Color textColor = Colors.black;
+  final double borderRadius = 12.0;
+
+  @override
+  void dispose() {
+    _subscriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchSubscription() async {
+    if (_subscriptionController.text.isEmpty) return;
+
+    setState(() {
+      _isLoading = true;
+      _subscriptionData = null;
+    });
+
+    // Simulate API call delay
+    await Future.delayed(Duration(seconds: 1));
+
+    // Mock database
+    final mockDatabase = {
+      '12345': {
+        'type': 'شهري',
+        'route': 'عنيزة → بريدة',
+        'pickup': 'الموقع الرئيسي',
+        'dropoff': 'موقع العمل',
+        'schedule': '7:00 صباحاً - الأحد إلى الخميس',
+        'price': '500 ريال/شهرياً',
+        'driver': 'أحمد محمد',
+        'status': 'نشط',
+      },
+      '67890': {
+        'type': 'يومي',
+        'route': 'الرياض → الخرج',
+        'pickup': 'الموقع المركزي',
+        'dropoff': 'الموقع الفرعي',
+        'schedule': '8:00 صباحاً - الأحد إلى الخميس',
+        'price': '50 ريال/يومياً',
+        'driver': 'خالد علي',
+        'status': 'نشط',
+      },
+    };
+
+    setState(() {
+      _subscriptionData = mockDatabase[_subscriptionController.text];
+      _isLoading = false;
+    });
+  }
+
+  void _textDriver() {
+    if (_subscriptionData == null) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('سيتم التواصل مع السائق ${_subscriptionData!['driver']}'),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = Color(0xFFFFB300);
-    final Color secondaryColor = Color(0xFF76CB54);
-    final Color backgroundColor = Colors.white;
-    final Color textColor = Colors.black;
-    final double borderRadius = 12.0;
-
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -20,9 +88,9 @@ class NumberSubPage extends StatelessWidget {
         backgroundColor: backgroundColor,
         elevation: 0,
         title: Text(
-          'رقم الاشتراك',
+          'البحث برقم الاشتراك',
           style: GoogleFonts.tajawal(
-            color: textColor,
+            color: primaryColor,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
@@ -33,175 +101,121 @@ class NumberSubPage extends StatelessWidget {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            // Subscription Info Card
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(borderRadius),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
+            // Solution 1: Using Directionality with TextAlign in TextStyle
+            Directionality(
+              textDirection: TextDirection.rtl,
+              child: CustomTextFormField(
+                controller: _subscriptionController,
+                hintText: 'أدخل رقم الاشتراك',
+                textInputType: TextInputType.number,
+                suffix: Icon(Icons.search, color: primaryColor),
+                textStyle: GoogleFonts.tajawal().copyWith(
+                    // textAlign: TextAlign.right, // This works with Directionality
+                    ),
+                onTap: _fetchSubscription,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // Subscription Number
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFF5F5F5),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          'شهري',
-                          style: GoogleFonts.tajawal(
-                            color: textColor,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        'اشتراك #12345',
+            ),
+
+            // OR Solution 2: Using textAlign directly in CustomTextFormField (if you modify it)
+            /*
+            CustomTextFormField(
+              controller: _subscriptionController,
+              hintText: 'أدخل رقم الاشتراك',
+              textInputType: TextInputType.number,
+              suffix: Icon(Icons.search, color: primaryColor),
+              textAlign: TextAlign.right, // If you add this parameter to your widget
+              onTap: _fetchSubscription,
+            ),
+            */
+
+            SizedBox(height: 16),
+
+            // Search Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _fetchSubscription,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(borderRadius),
+                  ),
+                ),
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Text(
+                        'بحث',
                         style: GoogleFonts.tajawal(
-                          color: textColor,
-                          fontSize: 16,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
-                  ),
-                  Divider(height: 24, color: Colors.grey[300]),
-
-                  // Route Info
-                  _buildInfoRow(Icons.place, 'عنيزة → بريدة'),
-                  SizedBox(height: 12),
-                  _buildInfoRow(
-                      Icons.location_on, 'نقطة الانطلاق: الموقع الرئيسي'),
-                  SizedBox(height: 12),
-                  _buildInfoRow(Icons.location_on, 'نقطة الوصول: موقع العمل'),
-                  SizedBox(height: 12),
-                  _buildInfoRow(
-                      Icons.access_time, '7:00 صباحاً - الأحد إلى الخميس'),
-                  SizedBox(height: 12),
-                  _buildInfoRow(Icons.attach_money, '500 ريال/شهرياً'),
-                  SizedBox(height: 12),
-                  _buildInfoRow(Icons.person, 'السائق: أحمد محمد'),
-                ],
               ),
             ),
-
             SizedBox(height: 24),
 
-            // Subscription Status
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF9F9F9),
-                borderRadius: BorderRadius.circular(borderRadius),
+            // Subscription Card or Not Found Message
+            if (_isLoading)
+              CircularProgressIndicator(color: primaryColor)
+            else if (_subscriptionData != null)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: SubscriptionCard(
+                    subscriptionNumber: _subscriptionController.text,
+                    type: _subscriptionData!['type'],
+                    route: _subscriptionData!['route'],
+                    pickup: _subscriptionData!['pickup'],
+                    dropoff: _subscriptionData!['dropoff'],
+                    schedule: _subscriptionData!['schedule'],
+                    price: _subscriptionData!['price'],
+                    driver: _subscriptionData!['driver'],
+                    status: _subscriptionData!['status'],
+                    onSharePressed: () {
+                      // Handle share functionality
+                    },
+                    onRatePressed: () {
+                      // Handle rate action
+                    },
+                  ),
+                ),
+              )
+            else if (_subscriptionController.text.isNotEmpty && !_isLoading)
+              Text(
+                'لا يوجد اشتراك بهذا الرقم',
+                style: GoogleFonts.tajawal(
+                  color: Colors.red,
+                  fontSize: 16,
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'حالة الاشتراك:',
+
+            // Text Driver Button
+            if (_subscriptionData != null) ...[
+              SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _textDriver,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: secondaryColor,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(borderRadius),
+                    ),
+                  ),
+                  child: Text(
+                    'تواصل مع السائق',
                     style: GoogleFonts.tajawal(
-                      color: textColor,
-                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: secondaryColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'نشط',
-                      style: GoogleFonts.tajawal(
-                        color: secondaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-
-            Spacer(),
-
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      side: BorderSide(color: primaryColor),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(borderRadius),
-                      ),
-                    ),
-                    child: Text(
-                      'تعديل',
-                      style: GoogleFonts.tajawal(
-                        color: primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(borderRadius),
-                      ),
-                    ),
-                    child: Text(
-                      'إلغاء الاشتراك',
-                      style: GoogleFonts.tajawal(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            ],
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String text) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          text,
-          style: GoogleFonts.tajawal(
-            color: Colors.black,
-            fontSize: 16,
-          ),
-        ),
-        SizedBox(width: 8),
-        Icon(icon, size: 20, color: Color(0xFFFFB300)),
-      ],
     );
   }
 }
