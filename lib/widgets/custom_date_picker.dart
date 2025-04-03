@@ -11,12 +11,12 @@ class CustomDatePicker extends StatelessWidget {
   final Widget? suffixIcon;
 
   const CustomDatePicker({
-    super.key,
+    Key? key,
     required this.label,
     required this.value,
     required this.onTap,
     this.suffixIcon,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,34 +27,47 @@ class CustomDatePicker extends StatelessWidget {
           label,
           style: TextStyle(
             color: const Color(0xFFFFB300),
-            fontSize: 14.fSize,
+            fontSize: 14, // Or 14.fSize if size_utils is properly set
             fontWeight: FontWeight.w500,
             fontFamily: 'Roboto',
           ),
         ),
-        SizedBox(height: 8.v),
+        const SizedBox(height: 8), // Or 8.v if size_utils is set
         GestureDetector(
           onTap: onTap,
-          child: CustomTextFormField(
-            hintText: value ?? "اختر التاريخ",
-            hintStyle: value != null
-                ? CustomTextStyles.bodyLargeBlack900
-                : CustomTextStyles.bodyLargeGray400,
-            textStyle: CustomTextStyles.bodyLargeBlack900,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 12.h,
-              vertical: 10.v,
-            ),
-            filled: true,
-            fillColor: theme.colorScheme.onPrimaryContainer,
-            readOnly: true,
-            suffix: suffixIcon ??
-                const Icon(Icons.calendar_today, color: Color(0xFFFFB300)),
-            borderDecoration: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.h),
-              borderSide: BorderSide(
-                color: appTheme.black900.withOpacity(0.1),
-                width: 1,
+          child: AbsorbPointer(
+            child: CustomTextFormField(
+              controller: TextEditingController(text: value),
+              hintText: value?.isEmpty ?? true ? "اختر التاريخ" : null,
+              hintStyle: value?.isEmpty ?? true
+                  ? TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16) // Or CustomTextStyles.bodyLargeGray400
+                  : TextStyle(
+                      color: Colors.black,
+                      fontSize: 16), // Or CustomTextStyles.bodyLargeBlack900
+              textStyle:
+                  TextStyle(color: Colors.black, fontSize: 16), // Fallback
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 12, // Or 12.h
+                vertical: 10, // Or 10.v
+              ),
+              filled: true,
+              fillColor: Theme.of(context)
+                  .colorScheme
+                  .surface, // Fallback if theme is missing
+              readOnly: true,
+              suffix: suffixIcon ??
+                  const Icon(
+                    Icons.calendar_today,
+                    color: Color(0xFFFFB300),
+                  ),
+              borderDecoration: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8), // Or 8.h
+                borderSide: BorderSide(
+                  color: Colors.black.withOpacity(0.1), // Fallback
+                  width: 1,
+                ),
               ),
             ),
           ),
