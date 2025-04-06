@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
 import 'package:rem_s_appliceation9/Screens/number_sub.dart';
 
 class CreateSubscriptionPage extends StatefulWidget {
@@ -536,7 +537,6 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       );
       return;
     }
-
     // Process data
     final subscriptionData = {
       "type": selectedSubscriptionType,
@@ -549,6 +549,23 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       "price": price,
       "notes": driverNotes,
     };
+    //move to DriverSelectionPage
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DriverSelectionPage(
+          fromLocation: fromLocation!,
+          toLocation: toLocation!,
+          subscriptionType: selectedSubscriptionType,
+          priceRange: price,
+          selectedDays: scheduleDays
+              .where((day) => day.containsKey('day'))
+              .map((day) => day['day'] as String)
+              .toList(),
+          subscriptionData: subscriptionData,
+        ),
+      ),
+    );
 
     print("Subscription Data: $subscriptionData");
 
@@ -564,7 +581,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       ),
     );
 
-    Navigator.pop(context);
+    // Navigator.pop(context);
   }
 }
 

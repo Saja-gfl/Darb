@@ -27,6 +27,8 @@ class DriverSelectionPage extends StatefulWidget {
   final String subscriptionType;
   final double priceRange;
   final List<String> selectedDays;
+  final Map<String, dynamic> subscriptionData; // بيانات الاشتراك
+
 
     const DriverSelectionPage({
     Key? key,
@@ -35,6 +37,7 @@ class DriverSelectionPage extends StatefulWidget {
     required this.subscriptionType,
     required this.priceRange,
     required this.selectedDays,
+    required this.subscriptionData,
   }) : super(key: key);
 
   @override
@@ -101,12 +104,30 @@ Future<void> filterDrivers() async {
     setState(() {
       filteredDrivers = filtered;
     });
+   print("تم جلب ${filteredDrivers.length} سائقين");
+
   } catch (e) {
     print("خطأ أثناء جلب البيانات: $e");
   }
 }
+ Future<void> saveSubscription(String driverId) async {
+    try {
+        // إضافة معرف السائق إلى بيانات الاشتراك
+      final subscriptionData = {
+        ...widget.subscriptionData,
+        "driverId": driverId ?? null,
+        "status": driverId ==null? "معلق" : "نشط",
+        "createdAt": Timestamp.now(),
+      };
+      await FirebaseFirestore.instance.collection('subscriptions').add(subscriptionData);
 
-
+       if (driverId != null) {
+      Navigator.pop(context); // العودة إلى الصفحة السابقة إذا تم اختيار سائق
+    }
+    } catch (e) {
+      print("خطأ أثناء حفظ الاشتراك: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,16 +146,27 @@ Future<void> filterDrivers() async {
           onPressed: () {},
         ),
       ),
-      body: Column(
+      body: filteredDrivers.isEmpty ? const Center(
+        child: Text(
+          'لا توجد بيانات للسائقين المتاحين',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      )
+       :Column(
         children: [
           Expanded(
             child: ListView.builder(
               itemCount: drivers.length,
               itemBuilder: (context, index) {
-                return DriverCard(driver: drivers[index]);
+                 return DriverCard(
+                  driver: filteredDrivers[index],
+                  onSubscribe: (driverId) => saveSubscription(driverId),
+                );
+                //return DriverCard(driver: drivers[index]);
               },
             ),
           ),
+          
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -164,8 +196,10 @@ Future<void> filterDrivers() async {
 
 class DriverCard extends StatelessWidget {
   final Driver driver;
+    final Function(String) onSubscribe; // وظيفة يتم استدعاؤها عند الاشتراك
 
-  const DriverCard({Key? key, required this.driver}) : super(key: key);
+
+  const DriverCard({Key? key, required this.driver ,required this.onSubscribe }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -351,7 +385,7 @@ class DriverCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => onSubscribe(driver.name),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 221, 145, 21),
                       padding: const EdgeInsets.symmetric(vertical: 12),
