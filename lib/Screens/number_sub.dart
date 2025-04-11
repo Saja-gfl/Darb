@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NumberSubPage extends StatelessWidget {
+  final Map<String, dynamic> subscriptionData;
+  NumberSubPage({required this.subscriptionData});
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = Color(0xFFFFB300);
