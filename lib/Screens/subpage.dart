@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
 import 'package:rem_s_appliceation9/Screens/number_sub.dart';
+import 'package:geolocator/geolocator.dart';
 
 class CreateSubscriptionPage extends StatefulWidget {
   const CreateSubscriptionPage({super.key});
@@ -506,7 +507,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
           shadowColor: secondaryColor.withOpacity(0.3),
         ),
         child: Text(
-          "تأكيد الاشتراك",
+          "رفع طلب اشتراك",
           style: GoogleFonts.tajawal(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -550,22 +551,24 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       "notes": driverNotes,
     };
     //move to DriverSelectionPage
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DriverSelectionPage(
-          fromLocation: fromLocation!,
-          toLocation: toLocation!,
-          subscriptionType: selectedSubscriptionType,
-          priceRange: price,
-          selectedDays: scheduleDays
-              .where((day) => day.containsKey('day'))
-              .map((day) => day['day'] as String)
-              .toList(),
-          subscriptionData: subscriptionData,
-        ),
-      ),
-    );
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => DriverSelectionPage(
+      fromLocation: fromLocation!,
+      toLocation: toLocation!,
+      subscriptionType: selectedSubscriptionType,
+      priceRange: price,
+      selectedDays: scheduleDays
+          .where((day) => day.containsKey('day'))
+          .map((day) => day['day'] as String)
+          .toList(),
+      subscriptionData: subscriptionData,
+    ),
+  ),
+
+);
+
 
     print("Subscription Data: $subscriptionData");
 

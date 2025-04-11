@@ -19,6 +19,8 @@ class Driver {
     required this.negativeComment,
     required this.avatarUrl,
   });
+
+
 }
 
 class DriverSelectionPage extends StatefulWidget {
@@ -29,8 +31,7 @@ class DriverSelectionPage extends StatefulWidget {
   final List<String> selectedDays;
   final Map<String, dynamic> subscriptionData; // بيانات الاشتراك
 
-
-    const DriverSelectionPage({
+  const DriverSelectionPage({
     Key? key,
     required this.fromLocation,
     required this.toLocation,
@@ -45,7 +46,7 @@ class DriverSelectionPage extends StatefulWidget {
 }
 
 class _DriverSelectionPageState extends State<DriverSelectionPage> {
-List<Driver> filteredDrivers = [];  
+  List<Driver> filteredDrivers = [];
   final List<Driver> drivers = [
     Driver(
       name: 'مهند',
@@ -67,28 +68,39 @@ List<Driver> filteredDrivers = [];
     ),
   ];
 
-    @override
+  @override
   void initState() {
     super.initState();
-    filterDrivers(); // استدعاء الفلترة عند تحميل الصفحة
+    // استدعاء الدالة غير المتزامنة هنا باستخدام Future.delayed
+    Future.delayed(Duration.zero, () async {
+      await FilterDrivers(
+        fromLocation: widget.fromLocation,
+        subscriptionType: widget.subscriptionType,
+        toLocation: widget.toLocation,
+        price: widget.priceRange,
+      );
+    });
   }
-
-Future<void> filterDrivers() async {
+// استدعاء الفلترة عند تحميل الصفحة
+Future<List<Driver>> FilterDrivers({
+  required String fromLocation,
+  required String subscriptionType,
+  required String toLocation,
+  required double price,
+}) async {
   try {
-    Query query = FirebaseFirestore.instance.collection('driverdata');
+    // استعلام لتصفية السائقين في Firestore بناءً على المعايير المدخلة
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('driverdata')
+        .where('location', isEqualTo: fromLocation) // تصفية حسب الموقع
+        .where('subscriptionType', isEqualTo: subscriptionType)
+        .where('acceptedLocations', isEqualTo: toLocation) // تصفية حسب الموقع
+        .where('price', isLessThanOrEqualTo: price) // تصفية حسب السعر
+        .get();
+        print('Query Results: ${snapshot.docs.length}'); // طباعة عدد الوثائق المسترجعة
 
-    if (widget.fromLocation.isNotEmpty) {
-      query = query.where('location', isEqualTo: widget.fromLocation);
-    }
-    if (widget.toLocation.isNotEmpty) {
-      query = query.where('acceptedLocations', arrayContains: widget.toLocation);
-    }
-    if (widget.subscriptionType.isNotEmpty) {
-      query = query.where('subscriptionType', isEqualTo: widget.subscriptionType);
-    }
-
-    QuerySnapshot snapshot = await query.get();
-    List<Driver> filtered = snapshot.docs.map((doc) {
+    // تحويل المستندات إلى قائمة من السائقين
+    List<Driver> filteredDrivers = snapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
       return Driver(
         name: data['name'] ?? 'غير معروف',
@@ -101,16 +113,51 @@ Future<void> filterDrivers() async {
       );
     }).toList();
 
-    setState(() {
-      filteredDrivers = filtered;
-    });
-   print("تم جلب ${filteredDrivers.length} سائقين");
-
+    return filteredDrivers;
   } catch (e) {
-    print("خطأ أثناء جلب البيانات: $e");
+    print("خطأ في تصفية السائقين: $e");
+    return [];
   }
 }
- Future<void> saveSubscription(String driverId) async {
+
+  Future<void> filterDrivers() async {
+    try {
+      Query query = FirebaseFirestore.instance.collection('driverdata');
+
+      if (widget.fromLocation.isNotEmpty) {
+        query = query.where('location', isEqualTo: widget.fromLocation);
+      }
+      if (widget.toLocation.isNotEmpty) {
+      query = query.where('acceptedLocations', arrayContains: widget.toLocation);
+      }
+      if (widget.subscriptionType.isNotEmpty) {
+      query = query.where('subscriptionType', isEqualTo: widget.subscriptionType);
+      }
+
+      QuerySnapshot snapshot = await query.get();
+      List<Driver> filtered = snapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return Driver(
+          name: data['name'] ?? 'غير معروف',
+          status: data['status'] ?? 'غير متوفر',
+          positiveRating: data['positiveRating'] ?? 0,
+          positiveComment: data['positiveComment'] ?? 'لا توجد تعليقات',
+          negativeRating: data['negativeRating'] ?? 0,
+          negativeComment: data['negativeComment'] ?? 'لا توجد تعليقات',
+          avatarUrl: data['avatarUrl'] ?? '',
+        );
+      }).toList();
+
+      setState(() {
+        filteredDrivers = filtered;
+      });
+      print("تم جلب ${filteredDrivers.length} سائقين");
+
+    } catch (e) {
+      print("خطأ أثناء جلب البيانات: $e");
+    }
+  }
+  Future<void> saveSubscription(String driverId) async {
     try {
         // إضافة معرف السائق إلى بيانات الاشتراك
       final subscriptionData = {

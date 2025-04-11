@@ -158,25 +158,14 @@ class _FindDriverPageState extends State<FindDriverPage> {
               decoration: InputDecoration(border: OutlineInputBorder(), hintText: "اكتب ملاحظات"),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
+           ElevatedButton(
   onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DriverSelectionPage(
-        fromLocation: fromLocation, // المدينة التي ينطلق منها المستخدم
-        toLocation: toLocation, // المدينة الوجهة
-        subscriptionType: subscriptionType, // نوع الاشتراك (شهري / أسبوعي)
-        priceRange: priceRange, // مجال السعر المحدد
-        selectedDays: selectedDays, // الأيام المختارة
-        //startTime: startTime, // وقت البداية
-        //endTime: endTime, // وقت النهاية
-        ),
-      ),
-    );
+    // لا تفعل شيء هنا
   },
   child: Text("رفع الطلب"),
 ),
+
+
 
           ],
         ),
