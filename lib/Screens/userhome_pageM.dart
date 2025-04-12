@@ -4,7 +4,9 @@ import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'ChatPage.dart';
-import 'UserProfilePage.dart';
+import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
+
+import 'package:rem_s_appliceation9/Screens/UserProfilePage.dart';
 import 'package:rem_s_appliceation9/Screens/subpage.dart'; // Import for SubPage
 
 // ignore_for_file: must_be_immutable
@@ -110,7 +112,7 @@ class _UserHomePageState extends State<UserHomePage> {
           Icons.calendar_today,
           () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ActiveSubscriptionsPage()),
+            MaterialPageRoute(builder: (context) => OngoingSubPage()),
           ),
         ),
         SizedBox(height: 16.h),
