@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rem_s_appliceation9/Screens/UserProvider.dart';
-import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
 import 'package:rem_s_appliceation9/widgets/app_bar/custom_dropdown.dart';
 
 class DriverInfoPage extends StatefulWidget {
@@ -68,7 +65,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             priceController.text =
                 driverData['price']?.toString() ?? ''; // السعر
             acceptedLocationsController =
-                driverData['acceptedLocations'] ?? ''; // الأماكن المقبولة
+                driverData['acceptedLocations']??''; // الأماكن المقبولة
             selectedGender = driverData['gender'] ?? ''; // تحديد الجنس
             selectedLocation = driverData['location'] ?? '';
             selectedSubscriptionType = driverData['subscriptionType'] ?? '';
@@ -141,8 +138,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    String? uid = Provider.of<UserProvider>(context).uid;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

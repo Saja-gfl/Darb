@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rem_s_appliceation9/Screens/UserProvider.dart';
+import 'package:rem_s_appliceation9/services/UserProvider.dart';
 
 
 class UserProfilePage extends StatefulWidget {

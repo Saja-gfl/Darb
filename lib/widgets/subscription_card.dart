@@ -10,13 +10,13 @@ class SubscriptionCard extends StatelessWidget {
   final String dropoff;
   final String schedule;
   final String price;
-  final String driver;
-  final String status;
-  final VoidCallback? onSharePressed;
-  final VoidCallback? onRatePressed;
+  final String driverId; // إضافة driverId
+  final String sub_status;
+  final VoidCallback onSharePressed;
+  final VoidCallback onRatePressed;
+  final Widget actionButton;
 
-  const SubscriptionCard({
-    Key? key,
+  SubscriptionCard({
     required this.subscriptionNumber,
     required this.type,
     required this.route,
@@ -24,11 +24,12 @@ class SubscriptionCard extends StatelessWidget {
     required this.dropoff,
     required this.schedule,
     required this.price,
-    required this.driver,
-    required this.status,
-    this.onSharePressed,
-    this.onRatePressed,
-  }) : super(key: key);
+    required this.driverId, // تمرير driverId
+    required this.sub_status,
+    required this.onSharePressed,
+    required this.onRatePressed,
+    required this.actionButton,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +85,8 @@ class SubscriptionCard extends StatelessWidget {
             SizedBox(height: 12),
             _buildInfoRow(Icons.attach_money, price),
             SizedBox(height: 12),
-            _buildInfoRow(Icons.person, 'السائق: $driver'),
-            SizedBox(height: 16),
+            // _buildInfoRow(Icons.person, 'السائق: $driver'),
+            // SizedBox(height: 16),
 
             // Status and Actions
             Row(
@@ -98,7 +99,7 @@ class SubscriptionCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      status,
+                      sub_status,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.tajawal(
                         color: secondaryColor,
@@ -117,7 +118,9 @@ class SubscriptionCard extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ReviewPage()),
+                      MaterialPageRoute(
+                        builder: (context) => ReviewPage(driverId: driverId,), // تمرير اسم السائق
+                      ),
                     );
                   },
                 ),

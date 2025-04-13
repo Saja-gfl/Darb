@@ -52,10 +52,10 @@ class AppRoutes {
     userHomePage: (context) => UserHomePage(),
     userProfilePage: (context) => UserProfilePage(),
     subPage: (context) => CreateSubscriptionPage(),
-    numberSub: (context) => NumberSubPage(),
+    //numberSub: (context) => NumberSubPage(),
     chatPage: (context) => ChatPage(),
-    findDriverPage: (context) => FindDriverPage(),
-    reviewPage: (context) => ReviewPage(),
+    //findDriverPage: (context) => FindDriverPage(),
+    //reviewPage: (context) => ReviewPage(),
     // otpPage: (context) => OTPVerificationScreen(),
     ongoingSubPage: (context) => OngoingSubPage(),
   };
