@@ -4,6 +4,8 @@ import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'ChatPage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
+import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
 import 'DriverInfoPage.dart';
 import 'CustomBottomNavBar.dart';
 
@@ -102,10 +104,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
         SizedBox(height: 16.h),
         _buildServiceItem("عرض الاشتراكات الحالية",
             "متابعة جدول اشتراكاتك الحالية", Icons.list, () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DriverActiveSubscriptionsPage()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => DriverOngoingSubPage()));
         }),
         SizedBox(height: 16.h),
         _buildServiceItem(
@@ -114,7 +114,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DriverSubscriptionRequestsPage()));
+                  builder: (context) => AvailableSubscriptionsPage()));
         }),
       ],
     );
