@@ -68,7 +68,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             priceController.text =
                 driverData['price']?.toString() ?? ''; // السعر
             acceptedLocationsController =
-                driverData['acceptedLocations']??''; // الأماكن المقبولة
+                driverData['acceptedLocations'] ?? ''; // الأماكن المقبولة
             selectedGender = driverData['gender'] ?? ''; // تحديد الجنس
             selectedLocation = driverData['location'] ?? '';
             selectedSubscriptionType = driverData['subscriptionType'] ?? '';
@@ -141,8 +141,21 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    String? uid = Provider.of<UserProvider>(context).uid;
+
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        iconTheme: IconThemeData(
+          color: Color(0xFFFFB300),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
