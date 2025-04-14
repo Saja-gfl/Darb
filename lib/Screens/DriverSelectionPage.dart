@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
+import '../services/chatService.dart';
+
 
 class Driver {
   final String id;
@@ -144,6 +146,14 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
           .collection('subscriptions')
           .doc(widget.tripId) // استخدم معرف الاشتراك
           .update(updatedData);
+
+       // إنشاء غرفة دردشة جديدة
+      final ChatService chatService = ChatService();
+      await chatService.createChatRoom(
+      widget.tripId,
+      driverId,
+      [], // الركاب سيتم إضافتهم لاحقًا
+    );
 
       Navigator.pop(context); // العودة إلى الصفحة السابقة إذا تم اختيار سائق
     } catch (e) {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rem_s_appliceation9/widgets/subscription_card.dart';
-import 'package:rem_s_appliceation9/widgets/custom_text_form_field.dart';
+import 'ChatPage.dart';
 
 class NumberSubPage extends StatelessWidget {
   final Map<String, dynamic> subscriptionData;
@@ -185,6 +184,38 @@ class NumberSubPage extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+
+            SizedBox(height: 16),
+
+            // Chat Button
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                      tripId: subscriptionData['tripId'],
+                      userId: subscriptionData['userId'],
+                      userName: subscriptionData['userName'],
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                padding: EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                ),
+              ),
+              child: Text(
+                'الدردشة الجماعية',
+                style: GoogleFonts.tajawal(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),

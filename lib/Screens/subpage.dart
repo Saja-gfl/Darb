@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
 import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
 import 'package:rem_s_appliceation9/services/request.dart';
+import '../services/chatService.dart';
 import 'package:geolocator/geolocator.dart'; //gor location
 
 class CreateSubscriptionPage extends StatefulWidget {
@@ -624,6 +625,10 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       //استدعاء submitSubscription من ملف request.dart
       String tripId =
           await submitRequest("", userId, subscriptionData,homeLocation);
+
+      // إضافة الراكب إلى غرفة الدردشة
+      final ChatService chatService = ChatService();
+      await chatService.addPassengerToChatRoom(tripId, userId);
 
       // Move to DriverSelectionPage
       Navigator.push(
