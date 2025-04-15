@@ -3,21 +3,26 @@ import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
-import 'ChatPage.dart';
+import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
 import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
-import 'DriverInfoPage.dart';
-import 'CustomBottomNavBar.dart';
+import 'package:rem_s_appliceation9/Screens/DriverInfoPage.dart';
+import 'package:rem_s_appliceation9/Screens/CustomBottomNavBar.dart';
 
 class DriverHomePage extends StatefulWidget {
-  DriverHomePage({Key? key}) : super(key: key);
+  const DriverHomePage({Key? key}) : super(key: key);
 
   @override
   _DriverHomePageState createState() => _DriverHomePageState();
 }
 
 class _DriverHomePageState extends State<DriverHomePage> {
-  int _currentIndex = 0; // Track the selected index
+  int _currentIndex = 0;
+
+  // Mock data for chat parameters
+  final String mockTripId = 'trip_123456';
+  final String mockUserId = 'driver_789';
+  final String mockUserName = 'السائق أحمد';
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +51,16 @@ class _DriverHomePageState extends State<DriverHomePage> {
           });
           if (index == 1) {
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ChatPage()));
+              context,
+              MaterialPageRoute(
+                builder: (context) => MessagesHomePage(),
+              ),
+            );
           } else if (index == 2) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => DriverInfoPage()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DriverInfoPage()),
+            );
           }
         },
       ),
@@ -154,26 +165,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class DriverActiveSubscriptionsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("الاشتراكات الجارية")),
-      body: Center(child: Text("محتوى صفحة الاشتراكات الجارية للسائق")),
-    );
-  }
-}
-
-class DriverSubscriptionRequestsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("طلبات الاشتراك")),
-      body: Center(child: Text("محتوى صفحة طلبات الاشتراك للسائق")),
     );
   }
 }
