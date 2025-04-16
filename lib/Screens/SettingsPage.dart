@@ -75,16 +75,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() => _notificationsEnabled = value),
               ),
               _buildDivider(),
-              _buildSwitchItem(
-                icon: Icons.dark_mode_outlined,
-                title: "الوضع الليلي",
-                value: _darkModeEnabled,
-                onChanged: (value) {
-                  setState(() => _darkModeEnabled = value);
-                  // Implement theme switching logic here
-                  // You'll need to add theme management to your app
-                },
-              ),
             ]),
             SizedBox(height: 24.h),
 
@@ -277,37 +267,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-    );
-  }
-}
-
-// Placeholder pages for support section (create these as separate files)
-class HelpPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("المساعدة")),
-      body: Center(child: Text("صفحة المساعدة")),
-    );
-  }
-}
-
-class PrivacyPolicyPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("سياسة الخصوصية")),
-      body: Center(child: Text("صفحة سياسة الخصوصية")),
-    );
-  }
-}
-
-class TermsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("شروط الخدمة")),
-      body: Center(child: Text("صفحة شروط الخدمة")),
     );
   }
 }
