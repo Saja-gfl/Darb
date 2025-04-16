@@ -8,6 +8,7 @@ import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
 
 import 'package:rem_s_appliceation9/Screens/UserProfilePage.dart';
 import 'package:rem_s_appliceation9/Screens/subpage.dart'; // Import for SubPage
+import 'package:rem_s_appliceation9/Screens/ChatPage.dart';
 
 // ignore_for_file: must_be_immutable
 class UserHomePage extends StatefulWidget {
@@ -190,14 +191,10 @@ class _UserHomePageState extends State<UserHomePage> {
       selectedItemColor: Colors.orange,
       unselectedItemColor: Colors.grey,
       onTap: (index) {
-        if (index == 1) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ChatPage()));
-        } else if (index == 2) {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => UserProfilePage()));
         }
-      },
+      
     );
   }
 }

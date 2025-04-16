@@ -6,6 +6,12 @@ import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
 import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
+import 'DriverInfoPage.dart';
+import 'CustomBottomNavBar.dart';
+import 'DriverOngoingSubsPage.dart';
+import 'DriverSubscriptionsPage.dart';
+
+// كومنت مهم تحت !!
 import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
 import 'package:rem_s_appliceation9/Screens/CustomBottomNavBar.dart';
 
@@ -51,16 +57,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
           });
           if (index == 1) {
             Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MessagesHomePage(),
-              ),
-            );
+                context, MaterialPageRoute(builder: (context) => ChatPage()));
           } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AccountPage()),
-            );
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => DriverInfoPage()));
           }
         },
       ),
@@ -125,7 +125,9 @@ class _DriverHomePageState extends State<DriverHomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => AvailableSubscriptionsPage()));
+                  // builder: (context) => AvailableSubscriptionsPage()));
+                  //اللي فاضيه تنقل الدوال من الصفحة المؤقته الي تحت الكومنت الى الصفحة اللي سوته مرام فوق الكومنت هذا
+                  builder: (context) => DriverSubscriptionsPage()));
         }),
       ],
     );

@@ -16,6 +16,10 @@ import 'Screens/FindDriverPage.dart';
 import 'package:rem_s_appliceation9/services/UserProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/Screens/subpage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverSubscriptionsPage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverOngoingSubsPage.dart';
 
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -46,7 +50,7 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'darb',
           debugShowCheckedModeBanner: false,
-          home:CreateSubscriptionPage(),
+          home: DriverHomePage(),
 
           // initialRoute: AppRoutes.initialRoute,
           // routes: AppRoutes.routes,
@@ -56,9 +60,9 @@ class MyApp extends StatelessWidget {
           //       textScaler: TextScaler.linear(1.0),
           //     ),
           //     child: child!,
-          //   );
+             );
           // },
-        );
+      
       },
     );
   }

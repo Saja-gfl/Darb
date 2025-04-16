@@ -7,7 +7,7 @@ class FirebaseAuthServises {
   final _firestore = FirebaseFirestore.instance;
 
   Future<User?> signup({
-     required String email,
+    required String email,
     required String password,
     required String username,
     required String address,
