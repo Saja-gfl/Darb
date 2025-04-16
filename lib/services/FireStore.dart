@@ -88,4 +88,21 @@ class FirestoreService {
       print("❌ خطأ أثناء حفظ البيانات: $e");
     }
   }
+
+//جلب اسم السائق من قاعدة البيانات
+   Future<String?> getDriverName(String driverId) async {
+    try {
+      DocumentSnapshot driverDoc =
+          await _firestore.collection('driverdata').doc(driverId).get();
+      if (driverDoc.exists) {
+        return driverDoc['name'] as String?;
+      } else {
+        print("❌ السائق غير موجود في قاعدة البيانات");
+        return null;
+      }
+    } catch (e) {
+      print("❌ خطأ أثناء جلب اسم السائق: $e");
+      return null;
+    }
+  }
 }

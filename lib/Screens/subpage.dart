@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
-import 'package:rem_s_appliceation9/Screens/number_sub.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
+import 'package:rem_s_appliceation9/services/request.dart';
+import 'package:geolocator/geolocator.dart'; //gor location
+import 'package:rem_s_appliceation9/Screens/UserProvider.dart';
 
 class CreateSubscriptionPage extends StatefulWidget {
   const CreateSubscriptionPage({super.key});
@@ -33,6 +36,85 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
   final double padding = 16.0;
 
   @override
+  void initState() {
+    super.initState();
+   // _fetchHomeLocation(); // Fetch home location when the page is initialized
+  }
+
+  // Fetch home location using Geolocator
+   Future<void> _FetchHomeLocation() async {
+    try {
+      Position position = await _determinePosition();
+      setState(() {
+        homeLocation =
+            "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
+      });
+    } catch (e) {
+      print("Error fetching location: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("تعذر الحصول على الموقع: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _fetchHomeLocation() async {
+  try {
+    Position position = await _determinePosition();
+    setState(() {
+      homeLocation =
+          "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
+    });
+  } catch (e) {
+    print("Error fetching location: $e");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("تعذر تحديد الموقع، أدخله يدويًا"),
+        backgroundColor: Colors.red,
+      ),
+    );
+
+    _showManualLocationInput();
+  }
+}
+
+void _showManualLocationInput() {
+  final TextEditingController locationController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text("أدخل موقعك"),
+      content: TextField(
+        controller: locationController,
+        decoration: InputDecoration(
+          hintText: "مثال: حي الروابي، بريدة",
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text("إلغاء"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              homeLocation = locationController.text;
+            });
+            Navigator.of(context).pop();
+          },
+          child: Text("حفظ"),
+        ),
+      ],
+    ),
+  );
+}
+
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -48,7 +130,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NumberSubPage()),
+                  MaterialPageRoute(builder: (context) => OngoingSubPage()),
                 );
               },
               style: TextButton.styleFrom(
@@ -129,10 +211,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
 
             // Home Location
             _buildSectionTitle("موقع المنزل"),
-            _buildInputField(
-              hintText: "أدخل رابط موقع منزلك أو نقطة اللقاء",
-              onChanged: (value) => setState(() => homeLocation = value),
-            ),
+            _buildHomeLocationField(),
             SizedBox(height: padding),
 
             // Work Location
@@ -182,6 +261,34 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       ),
     );
   }
+
+Widget _buildHomeLocationField() {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    decoration: BoxDecoration(
+      color: Colors.grey[50],
+      borderRadius: BorderRadius.circular(12.0),
+      border: Border.all(color: Colors.grey[300]!),
+    ),
+    child: TextField(
+      onChanged: (value) {
+        setState(() {
+          homeLocation = value; // تخزين الموقع في المتغير
+        });
+      },
+      decoration: InputDecoration(
+        hintText: "أدخل موقع المنزل",
+        border: InputBorder.none,
+        suffixIcon: Icon(Icons.location_on, color: Colors.blue),
+      ),
+      style: GoogleFonts.tajawal(
+        color: Colors.black,
+        fontSize: 16,
+      ),
+    ),
+  );
+}
+
 
   Widget _buildSectionTitle(String title) {
     return Padding(
@@ -517,12 +624,12 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
     );
   }
 
-  void _submitSubscription() {
+  Future<void> _submitSubscription() async {
     if (selectedSubscriptionType.isEmpty ||
         subscriptionStartDate == null ||
         fromLocation == null ||
         toLocation == null ||
-        homeLocation == null ||
+        // homeLocation == null ||
         workLocation == null ||
         scheduleDays.isEmpty ||
         price <= 0) {
@@ -538,53 +645,124 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       );
       return;
     }
-    // Process data
-    final subscriptionData = {
-      "type": selectedSubscriptionType,
-      "startDate": subscriptionStartDate,
-      "from": fromLocation,
-      "to": toLocation,
-      "homeLocation": homeLocation,
-      "workLocation": workLocation,
-      "schedule": scheduleDays,
-      "price": price,
-      "notes": driverNotes,
-    };
-    //move to DriverSelectionPage
-Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => DriverSelectionPage(
-      fromLocation: fromLocation!,
-      toLocation: toLocation!,
-      subscriptionType: selectedSubscriptionType,
-      priceRange: price,
-      selectedDays: scheduleDays
-          .where((day) => day.containsKey('day'))
-          .map((day) => day['day'] as String)
-          .toList(),
-      subscriptionData: subscriptionData,
-    ),
-  ),
+    try {
+          print("✅ تحقق أولي ناجح، جاري تحديد الموقع...");
+      //استدعاء submitRequest من ملف request.dart
+      //final user = FirebaseAuth.instance.currentUser;
+      //if (user == null) {
+        //throw Exception("سجل الدخول أولاً");
+      //}
+      //String userId = user!.uid; // Get the current user's ID
 
-);
+       //to get the current user location
+      // Position position = await Geolocator.getCurrentPosition();
+
+      String userId = "testuser"; // قايز ترا هذا مؤقت لوقت التطوير فقط
+      print("👤 userId: $userId");
+      //data for the location
+      //final homeLocation = {
+        //"latitude": position.latitude,
+        //"longitude": position.longitude,
+        // 'userId': userId,
+      //};
 
 
-    print("Subscription Data: $subscriptionData");
+    // print("🏠 homeLocationData: $homeLocationData");
 
-    // Show success
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("تم إنشاء الاشتراك بنجاح"),
-        backgroundColor: secondaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
+      // Process data
+      final subscriptionData = {
+        "type": selectedSubscriptionType,
+        "startDate": subscriptionStartDate,
+        "from": fromLocation,
+        "to": toLocation,
+        "homeLocation": homeLocation,
+        "workLocation": workLocation,
+        "schedule": scheduleDays.toString(),
+        "price": price,
+        "notes": driverNotes,
+        "sub_status": "معلق",
+        "createdAt": DateTime.now(),
+      };
+          print("📦 subscriptionData: $subscriptionData");
+
+
+      //استدعاء submitSubscription من ملف request.dart
+      String tripId =
+          await submitRequest("", userId, subscriptionData);
+
+    print("🚀 تم إرسال الطلب، tripId: $tripId");
+
+      // Move to DriverSelectionPage
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DriverSelectionPage(
+            fromLocation: fromLocation!,
+            toLocation: toLocation!,
+            subscriptionType: selectedSubscriptionType,
+            priceRange: price,
+            selectedDays: scheduleDays
+                .where((day) => day.containsKey('day'))
+                .map((day) => day['day'] as String)
+                .toList(),
+            subscriptionData: subscriptionData,
+            tripId: tripId, // يجب أن يتم تحديده لاحقًا
+          ),
         ),
-      ),
-    );
+      );
 
-    // Navigator.pop(context);
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("تم إنشاء الاشتراك بنجاح"),
+          backgroundColor: secondaryColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+        ),
+      );
+    } catch (e) {
+      print("Error while saving data: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("حدث خطأ أثناء إنشاء الاشتراك"),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+        ),
+      );
+    }
+  }
+
+  //داله لتحديد الموقع باستخدام geolocator
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('الرجاء تفعيل خدمات الموقع');
+    }
+
+    //تحقق من إذن الموقع
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('الرجاء منح إذن الوصول إلى الموقع');
+      }
+    }
+    /*if (permission == LocationPermission.deniedForever) {
+      throw Exception(' الرجاء منح إذن الوصول إلى الموقع');
+    }*/
+    // When we reach here, permissions are granted and we can continue.
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
   }
 }
 

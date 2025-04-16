@@ -6,6 +6,8 @@ import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'ChatPage.dart';
 import 'DriverInfoPage.dart';
 import 'CustomBottomNavBar.dart';
+import 'DriverOngoingSubsPage.dart';
+import 'DriverSubscriptionsPage.dart';
 
 class DriverHomePage extends StatefulWidget {
   DriverHomePage({Key? key}) : super(key: key);
@@ -105,7 +107,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DriverActiveSubscriptionsPage()));
+                  builder: (context) => DriverOngoingSubsPage()));
+  
         }),
         SizedBox(height: 16.h),
         _buildServiceItem(
@@ -114,7 +117,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DriverSubscriptionRequestsPage()));
+                  builder: (context) => DriverSubscriptionsPage()));
         }),
       ],
     );
