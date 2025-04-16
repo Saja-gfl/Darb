@@ -8,6 +8,10 @@ import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
 import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
 import 'DriverInfoPage.dart';
 import 'CustomBottomNavBar.dart';
+import 'DriverOngoingSubsPage.dart';
+import 'DriverSubscriptionsPage.dart';
+
+// كومنت مهم تحت !! 
 
 class DriverHomePage extends StatefulWidget {
   DriverHomePage({Key? key}) : super(key: key);
@@ -111,7 +115,9 @@ class _DriverHomePageState extends State<DriverHomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => AvailableSubscriptionsPage()));
+                 // builder: (context) => AvailableSubscriptionsPage()));
+                 //اللي فاضيه تنقل الدوال من الصفحة المؤقته الي تحت الكومنت الى الصفحة اللي سوته مرام فوق الكومنت هذا 
+                  builder: (context) => DriverSubscriptionsPage()));
         }),
       ],
     );
