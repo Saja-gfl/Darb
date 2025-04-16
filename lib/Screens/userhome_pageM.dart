@@ -4,7 +4,11 @@ import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'ChatPage.dart';
-import 'UserProfilePage.dart';
+import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
+
+import 'package:rem_s_appliceation9/Screens/UserProfilePage.dart';
+import 'package:rem_s_appliceation9/Screens/subpage.dart'; // Import for SubPage
+import 'package:rem_s_appliceation9/Screens/ChatPage.dart';
 
 // ignore_for_file: must_be_immutable
 class UserHomePage extends StatefulWidget {
@@ -95,24 +99,48 @@ class _UserHomePageState extends State<UserHomePage> {
       children: [
         Text("الخدمات", style: theme.textTheme.titleLarge),
         SizedBox(height: 16.h),
+        // New subscription creation service
         _buildServiceItem(
-            "عرض الاشتراكات الجارية",
-            "استعراض جميع الاشتراكات الجارية مع السائقين",
-            Icons.calendar_today, () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ActiveSubscriptionsPage()));
-        }),
+          "إنشاء اشتراك جديد",
+          "إضافة اشتراك جديد مع السائق المفضل",
+          Icons.add_circle_outline,
+          () => _navigateToSubPage(),
+        ),
         SizedBox(height: 16.h),
-        _buildServiceItem("إدارة طلبات الاشتراك",
-            "استعراض ومعالجة طلبات الاشتراك الجديدة", Icons.settings, () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => SubscriptionRequestsPage()));
-        }),
+        _buildServiceItem(
+          "عرض الاشتراكات الجارية",
+          "استعراض جميع الاشتراكات الجارية مع السائقين",
+          Icons.calendar_today,
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => OngoingSubPage()),
+          ),
+        ),
+        SizedBox(height: 16.h),
+        _buildServiceItem(
+          "إدارة طلبات الاشتراك",
+          "استعراض ومعالجة طلبات الاشتراك الجديدة",
+          Icons.settings,
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SubscriptionRequestsPage()),
+          ),
+        ),
       ],
+    );
+  }
+
+  void _navigateToSubPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateSubscriptionPage(
+            // Add any required parameters here
+            // For example:
+            // userId: '123',
+            // isNewSubscription: true,
+            ),
+      ),
     );
   }
 
@@ -163,14 +191,10 @@ class _UserHomePageState extends State<UserHomePage> {
       selectedItemColor: Colors.orange,
       unselectedItemColor: Colors.grey,
       onTap: (index) {
-        if (index == 1) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ChatPage()));
-        } else if (index == 2) {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => UserProfilePage()));
         }
-      },
+      
     );
   }
 }

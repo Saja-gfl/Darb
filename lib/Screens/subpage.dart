@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
 import 'package:rem_s_appliceation9/Screens/number_sub.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
+import 'package:rem_s_appliceation9/services/request.dart';
+import '../services/chatService.dart';
+import 'package:geolocator/geolocator.dart'; //gor location
 
 class CreateSubscriptionPage extends StatefulWidget {
   const CreateSubscriptionPage({super.key});
@@ -33,6 +37,31 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
   final double padding = 16.0;
 
   @override
+  void initState() {
+    super.initState();
+    _fetchHomeLocation(); // Fetch home location when the page is initialized
+  }
+
+  // Fetch home location using Geolocator
+   Future<void> _fetchHomeLocation() async {
+    try {
+      Position position = await _determinePosition();
+      setState(() {
+        homeLocation =
+            "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
+      });
+    } catch (e) {
+      print("Error fetching location: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("تعذر الحصول على الموقع: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -48,7 +77,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NumberSubPage()),
+                  MaterialPageRoute(builder: (context) => OngoingSubPage()),
                 );
               },
               style: TextButton.styleFrom(
@@ -129,10 +158,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
 
             // Home Location
             _buildSectionTitle("موقع المنزل"),
-            _buildInputField(
-              hintText: "أدخل رابط موقع منزلك أو نقطة اللقاء",
-              onChanged: (value) => setState(() => homeLocation = value),
-            ),
+            _buildHomeLocationField(),
             SizedBox(height: padding),
 
             // Work Location
@@ -182,7 +208,34 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       ),
     );
   }
-
+  Widget _buildHomeLocationField() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              homeLocation ?? "جاري الحصول على الموقع...",
+              style: GoogleFonts.tajawal(
+                color: homeLocation != null ? Colors.black : Colors.grey,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.my_location, color: Colors.blue),
+            onPressed: _fetchHomeLocation, // تحديث الموقع عند الضغط
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: EdgeInsets.only(bottom: 8),
@@ -517,12 +570,12 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
     );
   }
 
-  void _submitSubscription() {
+  Future<void> _submitSubscription() async {
     if (selectedSubscriptionType.isEmpty ||
         subscriptionStartDate == null ||
         fromLocation == null ||
         toLocation == null ||
-        homeLocation == null ||
+       // homeLocation == null ||
         workLocation == null ||
         scheduleDays.isEmpty ||
         price <= 0) {
@@ -538,53 +591,90 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       );
       return;
     }
+    try {
     // Process data
     final subscriptionData = {
       "type": selectedSubscriptionType,
       "startDate": subscriptionStartDate,
       "from": fromLocation,
       "to": toLocation,
-      "homeLocation": homeLocation,
+      //"homeLocation": homeLocation,
       "workLocation": workLocation,
       "schedule": scheduleDays,
       "price": price,
       "notes": driverNotes,
     };
+
     //move to DriverSelectionPage
 Navigator.push(
   context,
   MaterialPageRoute(
-    builder: (context) => DriverSelectionPage(
+    builder: (context) => DriverSelectionPage( 
       fromLocation: fromLocation!,
       toLocation: toLocation!,
       subscriptionType: selectedSubscriptionType,
       priceRange: price,
-      selectedDays: scheduleDays
-          .where((day) => day.containsKey('day'))
-          .map((day) => day['day'] as String)
-          .toList(),
+      selectedDays: scheduleDays.map((day) => day['time'] as String).toList(),
       subscriptionData: subscriptionData,
+            tripId: '', // إذا ما عندك tripId الآن,
     ),
   ),
 
 );
 
 
-    print("Subscription Data: $subscriptionData");
-
-    // Show success
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("تم إنشاء الاشتراك بنجاح"),
-        backgroundColor: secondaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("تم إنشاء الاشتراك بنجاح"),
+          backgroundColor: secondaryColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      print("Error while saving data: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("حدث خطأ أثناء إنشاء الاشتراك"),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+        ),
+      );
+    }
+  }
 
-    // Navigator.pop(context);
+  //داله لتحديد الموقع باستخدام geolocator
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('الرجاء تفعيل خدمات الموقع');
+    }
+
+    //تحقق من إذن الموقع
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('الرجاء منح إذن الوصول إلى الموقع');
+      }
+    }
+    /*if (permission == LocationPermission.deniedForever) {
+      throw Exception(' الرجاء منح إذن الوصول إلى الموقع');
+    }*/
+    // When we reach here, permissions are granted and we can continue.
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
   }
 }
 

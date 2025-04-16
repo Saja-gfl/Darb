@@ -1,4 +1,4 @@
-import'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
 import 'dart:math'; // لإضافة مكتبة Random
@@ -10,6 +10,7 @@ String generateShortTripId() {
   return (100000 + random.nextInt(900000))
       .toString(); // رقم عشوائي بين 100000 و999999
 }
+
 
 //اذا اختار اليوزر السائق المناسب
 Future<String> submitRequest(
@@ -104,4 +105,4 @@ Future<Map<String, dynamic>?> getRequestByTripId(String tripId) async {
     print("خطأ في جلب الطلب: $e");
     return null;
   }
-}//
+}

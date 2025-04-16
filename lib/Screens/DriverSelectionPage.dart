@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rem_s_appliceation9/services/rating.dart';
+import '../services/chatService.dart';
+import '../services/request.dart';
 
 class Driver {
+  final String id;
   final String name;
   final String status;
   final int positiveRating;
@@ -9,8 +13,10 @@ class Driver {
   final int negativeRating;
   final String negativeComment;
   final String avatarUrl;
+  final List<Map<String, dynamic>> ratings; // قائمة التقييمات
 
   Driver({
+    required this.id,
     required this.name,
     required this.status,
     required this.positiveRating,
@@ -18,9 +24,22 @@ class Driver {
     required this.negativeRating,
     required this.negativeComment,
     required this.avatarUrl,
+    required this.ratings,
   });
 
-
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'status': status,
+      'positiveRating': positiveRating,
+      'positiveComment': positiveComment,
+      'negativeRating': negativeRating,
+      'negativeComment': negativeComment,
+      'avatarUrl': avatarUrl,
+      'ratings': ratings, // إضافة قائمة التقييمات هنا
+    };
+  }
 }
 
 class DriverSelectionPage extends StatefulWidget {
@@ -30,6 +49,7 @@ class DriverSelectionPage extends StatefulWidget {
   final double priceRange;
   final List<String> selectedDays;
   final Map<String, dynamic> subscriptionData; // بيانات الاشتراك
+  final String tripId; // معرف الاشتراك
 
   const DriverSelectionPage({
     Key? key,
@@ -39,6 +59,7 @@ class DriverSelectionPage extends StatefulWidget {
     required this.priceRange,
     required this.selectedDays,
     required this.subscriptionData,
+    required this.tripId,
   }) : super(key: key);
 
   @override
@@ -49,6 +70,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   List<Driver> filteredDrivers = [];
   final List<Driver> drivers = [
     Driver(
+      id: '1',
       name: 'مهند',
       status: 'متوفر حالياً',
       positiveRating: 5,
@@ -56,8 +78,10 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
       negativeRating: 2,
       negativeComment: 'سعر مرتفع جداً',
       avatarUrl: '',
+      ratings: [],
     ),
     Driver(
+      id: '2',
       name: 'عبدالله المطيري',
       status: 'متوفر حالياً',
       positiveRating: 5,
@@ -65,6 +89,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
       negativeRating: 2,
       negativeComment: 'بطيء في الوصول وضعيف',
       avatarUrl: '',
+      ratings: [],
     ),
   ];
 
@@ -81,63 +106,37 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
       );
     });
   }
+
 // استدعاء الفلترة عند تحميل الصفحة
-Future<List<Driver>> FilterDrivers({
-  required String fromLocation,
-  required String subscriptionType,
-  required String toLocation,
-  required double price,
-}) async {
-  try {
-    // استعلام لتصفية السائقين في Firestore بناءً على المعايير المدخلة
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('driverdata')
-        .where('location', isEqualTo: fromLocation) // تصفية حسب الموقع
-        .where('subscriptionType', isEqualTo: subscriptionType)
-        .where('acceptedLocations', isEqualTo: toLocation) // تصفية حسب الموقع
-        .where('price', isLessThanOrEqualTo: price) // تصفية حسب السعر
-        .get();
-        print('Query Results: ${snapshot.docs.length}'); // طباعة عدد الوثائق المسترجعة
-
-    // تحويل المستندات إلى قائمة من السائقين
-    List<Driver> filteredDrivers = snapshot.docs.map((doc) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      return Driver(
-        name: data['name'] ?? 'غير معروف',
-        status: data['status'] ?? 'غير متوفر',
-        positiveRating: data['positiveRating'] ?? 0,
-        positiveComment: data['positiveComment'] ?? 'لا توجد تعليقات',
-        negativeRating: data['negativeRating'] ?? 0,
-        negativeComment: data['negativeComment'] ?? 'لا توجد تعليقات',
-        avatarUrl: data['avatarUrl'] ?? '',
-      );
-    }).toList();
-
-    return filteredDrivers;
-  } catch (e) {
-    print("خطأ في تصفية السائقين: $e");
-    return [];
-  }
-}
-
-  Future<void> filterDrivers() async {
+  Future<List<Driver>> FilterDrivers({
+    required String fromLocation,
+    required String subscriptionType,
+    required String toLocation,
+    required double price,
+  }) async {
     try {
-      Query query = FirebaseFirestore.instance.collection('driverdata');
+      // استعلام لتصفية السائقين في Firestore بناءً على المعايير المدخلة
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('driverdata')
+          .where('location', isEqualTo: fromLocation) // تصفية حسب الموقع
+          .where('subscriptionType', isEqualTo: subscriptionType)
+          .where('acceptedLocations', isEqualTo: toLocation) // تصفية حسب الموقع
+          .where('price', isLessThanOrEqualTo: price) // تصفية حسب السعر
+          .get();
+      print(
+          'Query Results: ${snapshot.docs.length}'); // طباعة عدد الوثائق المسترجعة
 
-      if (widget.fromLocation.isNotEmpty) {
-        query = query.where('location', isEqualTo: widget.fromLocation);
-      }
-      if (widget.toLocation.isNotEmpty) {
-      query = query.where('acceptedLocations', arrayContains: widget.toLocation);
-      }
-      if (widget.subscriptionType.isNotEmpty) {
-      query = query.where('subscriptionType', isEqualTo: widget.subscriptionType);
-      }
 
-      QuerySnapshot snapshot = await query.get();
-      List<Driver> filtered = snapshot.docs.map((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    // تحويل المستندات إلى قائمة من السائقين مع تقييماتهم
+    List<Driver> filteredDrivers = await Future.wait(snapshot.docs.map((doc) async {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+              // جلب آخر 10 تقييمات للسائق
+      List<Map<String, dynamic>> ratings =
+          await RatingService().getDriverRatings(doc.id);
+
         return Driver(
+          id: doc.id,
           name: data['name'] ?? 'غير معروف',
           status: data['status'] ?? 'غير متوفر',
           positiveRating: data['positiveRating'] ?? 0,
@@ -145,36 +144,93 @@ Future<List<Driver>> FilterDrivers({
           negativeRating: data['negativeRating'] ?? 0,
           negativeComment: data['negativeComment'] ?? 'لا توجد تعليقات',
           avatarUrl: data['avatarUrl'] ?? '',
+          ratings: ratings.take(10).toList(), // أخذ آخر 10 تقييمات فقط
         );
-      }).toList();
+      }).toList());
+    
+      return filteredDrivers;
+    } catch (e) {
+      print("خطأ في تصفية السائقين: $e");
+      return [];
+    }
+  }
+
+  Future<void> saveSubscription(String driverId) async {
+    try {
+      Query query = FirebaseFirestore.instance.collection('driverdata');
+
+      if (widget.fromLocation.isNotEmpty) {
+        query = query.where('location', isEqualTo: widget.fromLocation);
+      }
+      if (widget.toLocation.isNotEmpty) {
+        query =
+            query.where('acceptedLocations', arrayContains: widget.toLocation);
+      }
+      if (widget.subscriptionType.isNotEmpty) {
+        query =
+            query.where('subscriptionType', isEqualTo: widget.subscriptionType);
+      }
+
+      QuerySnapshot snapshot = await query.get();
+      List<Driver> filtered = [];
+
+      for (var doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        String driverId = doc.id;
+
+        // جلب آخر 10 تقييمات للسائق
+        List<Map<String, dynamic>> ratings =
+            await RatingService().getDriverRatings(driverId);
+
+        filtered.add(Driver(
+          id: driverId,
+          name: data['name'] ?? 'غير معروف',
+          status: data['status'] ?? 'غير متوفر',
+          positiveRating: data['positiveRating'] ?? 0,
+          positiveComment: data['positiveComment'] ?? 'لا توجد تعليقات',
+          negativeRating: data['negativeRating'] ?? 0,
+          negativeComment: data['negativeComment'] ?? 'لا توجد تعليقات',
+          avatarUrl: data['avatarUrl'] ?? '',
+          ratings: ratings.take(10).toList(), // أخذ آخر 10 تقييمات فقط
+        ));
+      }
 
       setState(() {
         filteredDrivers = filtered;
       });
       print("تم جلب ${filteredDrivers.length} سائقين");
-
     } catch (e) {
       print("خطأ أثناء جلب البيانات: $e");
     }
   }
-  Future<void> saveSubscription(String driverId) async {
+
+  Future<void> SaveSubscription(String driverId) async {
     try {
-        // إضافة معرف السائق إلى بيانات الاشتراك
-      final subscriptionData = {
-        ...widget.subscriptionData,
-        "driverId": driverId ?? null,
-        "status": driverId ==null? "معلق" : "نشط",
+      // إضافة معرف السائق إلى بيانات الاشتراك
+      final updatedData = {
+        "driverId": driverId,
+        "status": driverId == null ? "معلق" : "نشط",
         "createdAt": Timestamp.now(),
       };
-      await FirebaseFirestore.instance.collection('subscriptions').add(subscriptionData);
+      await FirebaseFirestore.instance
+          .collection('subscriptions')
+          .doc(widget.tripId) // استخدم معرف الاشتراك
+          .update(updatedData);
 
-       if (driverId != null) {
+      // إنشاء غرفة دردشة جديدة
+      final ChatService chatService = ChatService();
+      await chatService.createChatRoom(
+        widget.tripId,
+        driverId,
+        [], // الركاب سيتم إضافتهم لاحقًا
+      );
+
       Navigator.pop(context); // العودة إلى الصفحة السابقة إذا تم اختيار سائق
-    }
     } catch (e) {
       print("خطأ أثناء حفظ الاشتراك: $e");
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,60 +249,61 @@ Future<List<Driver>> FilterDrivers({
           onPressed: () {},
         ),
       ),
-      body: filteredDrivers.isEmpty ? const Center(
-        child: Text(
-          'لا توجد بيانات للسائقين المتاحين',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-      )
-       :Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: drivers.length,
-              itemBuilder: (context, index) {
-                 return DriverCard(
-                  driver: filteredDrivers[index],
-                  onSubscribe: (driverId) => saveSubscription(driverId),
-                );
-                //return DriverCard(driver: drivers[index]);
-              },
-            ),
-          ),
-          
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+      body: filteredDrivers.isEmpty
+          ? const Center(
+              child: Text(
+                'لا توجد بيانات للسائقين المتاحين',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
-              child: const Text(
-                'القبول',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: drivers.length,
+                    itemBuilder: (context, index) {
+                      return DriverCard(
+                        driver: filteredDrivers[index],
+                        onSubscribe: (driverId) => saveSubscription(driverId),
+                      );
+                      //return DriverCard(driver: drivers[index]);
+                    },
+                  ),
                 ),
-              ),
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'القبول',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
 
 class DriverCard extends StatelessWidget {
   final Driver driver;
-    final Function(String) onSubscribe; // وظيفة يتم استدعاؤها عند الاشتراك
+  final Function(String) onSubscribe; // وظيفة يتم استدعاؤها عند الاشتراك
 
-
-  const DriverCard({Key? key, required this.driver ,required this.onSubscribe }) : super(key: key);
+  const DriverCard({Key? key, required this.driver, required this.onSubscribe})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -307,132 +364,51 @@ class DriverCard extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            alignment: Alignment.centerRight,
-            child: const Text(
-              'التقييمات الأخيرة',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+          // عرض التقييمات
+          if (driver.ratings.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              alignment: Alignment.centerRight,
+              child: const Text(
+                'التقييمات الأخيرة',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                textDirection: TextDirection.rtl,
               ),
-              textDirection: TextDirection.rtl,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              textDirection: TextDirection.rtl,
-              children: [
-                // Positive rating
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Row(
-                          textDirection: TextDirection.rtl,
-                          children: [
-                            const Text(
-                              'ايجابي',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Spacer(),
-                            Row(
-                              children: List.generate(
-                                5,
-                                (index) => Icon(
-                                  Icons.star,
-                                  size: 16,
-                                  color: index < driver.positiveRating 
-                                      ? Colors.amber 
-                                      : Colors.grey[300],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          driver.positiveComment,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ],
+          if (driver.ratings.isNotEmpty)
+            ...driver.ratings.map((rating) {
+              return ListTile(
+                title: Text(
+                  rating['comment'] ?? 'لا يوجد تعليق',
+                  textDirection: TextDirection.rtl,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                subtitle: Row(
+                  textDirection: TextDirection.rtl,
+                  children: List.generate(
+                    5,
+                    (index) => Icon(
+                      Icons.star,
+                      size: 16,
+                      color: index < (rating['rating'] ?? 0)
+                          ? Colors.amber
+                          : Colors.grey[300],
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                // Negative rating
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Row(
-                          textDirection: TextDirection.rtl,
-                          children: [
-                            const Text(
-                              'سلبي',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Spacer(),
-                            Row(
-                              children: List.generate(
-                                5,
-                                (index) => Icon(
-                                  Icons.star,
-                                  size: 16,
-                                  color: index < driver.negativeRating 
-                                      ? Colors.amber 
-                                      : Colors.grey[300],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          driver.negativeComment,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              );
+            }).toList(),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => onSubscribe(driver.name),
+                    onPressed: () =>
+                        onSubscribe(driver.id), // تمرير معرف السائق
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 221, 145, 21),
                       padding: const EdgeInsets.symmetric(vertical: 12),
