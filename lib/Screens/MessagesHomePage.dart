@@ -5,7 +5,7 @@ import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'package:rem_s_appliceation9/Screens/ChatPage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
-import 'package:rem_s_appliceation9/Screens/DriverInfoPage.dart';
+import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
 
 class MessagesHomePage extends StatefulWidget {
   const MessagesHomePage({Key? key}) : super(key: key);
@@ -94,7 +94,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
           } else if (index == 2) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => DriverInfoPage()),
+              MaterialPageRoute(builder: (context) => AccountPage()),
             );
           } else {
             setState(() {

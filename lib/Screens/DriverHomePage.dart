@@ -6,7 +6,7 @@ import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
 import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
-import 'package:rem_s_appliceation9/Screens/DriverInfoPage.dart';
+import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
 import 'package:rem_s_appliceation9/Screens/CustomBottomNavBar.dart';
 
 class DriverHomePage extends StatefulWidget {
@@ -59,7 +59,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
           } else if (index == 2) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DriverInfoPage()),
+              MaterialPageRoute(builder: (context) => AccountPage()),
             );
           }
         },
