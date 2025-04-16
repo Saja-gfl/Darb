@@ -56,8 +56,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
             _currentIndex = index;
           });
           if (index == 1) {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ChatPage()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MessagesHomePage()));
           } else if (index == 2) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => DriverInfoPage()));
