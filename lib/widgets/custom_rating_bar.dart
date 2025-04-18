@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
-import '../core/app_export.dart';
 
 // ignore_for_file: must_be_immutable
 class CustomRatingBar extends StatelessWidget {

@@ -10,8 +10,9 @@ import 'DriverInfoPage.dart';
 import 'CustomBottomNavBar.dart';
 import 'DriverOngoingSubsPage.dart';
 import 'DriverSubscriptionsPage.dart';
-
 // كومنت مهم تحت !! 
+import 'package:provider/provider.dart';
+import '../services/UserProvider.dart';
 
 class DriverHomePage extends StatefulWidget {
   DriverHomePage({Key? key}) : super(key: key);
@@ -48,9 +49,21 @@ class _DriverHomePageState extends State<DriverHomePage> {
           setState(() {
             _currentIndex = index;
           });
-             if (index == 2) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => DriverInfoPage()));
+             
+          if (index == 1) {
+            //final userProvider = Provider.of<UserProvider>(context, listen: false);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatPage(
+                ),
+              ),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DriverInfoPage()),
+            );
           }
         },
       ),
@@ -98,21 +111,19 @@ class _DriverHomePageState extends State<DriverHomePage> {
   }
 
   Widget _buildServicesSection() {
+    //final userProvider = Provider.of<UserProvider>(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text("الخدمات", style: theme.textTheme.titleLarge),
         SizedBox(height: 16.h),
-        _buildServiceItem("عرض الاشتراكات الحالية",
-            "متابعة جدول اشتراكاتك الحالية", Icons.list, () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => DriverOngoingSubPage()));
-        }),
-        SizedBox(height: 16.h),
         _buildServiceItem(
-            "طلبات اشتراك جديدة", "طلبات الاشتراك المتاحة", Icons.shopping_cart,
-            () {
-          Navigator.push(
+          "عرض الاشتراكات الحالية",
+          "متابعة جدول اشتراكاتك الحالية",
+          Icons.list,
+          () {
+            Navigator.push(
               context,
               MaterialPageRoute(
                  // builder: (context) => AvailableSubscriptionsPage()));

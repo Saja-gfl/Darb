@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../routes/app_routes.dart';
 import '../services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../core/utils/show_toast.dart';
@@ -109,6 +110,7 @@ class OTPVerificationScreen extends StatelessWidget {
                                   .signInWithCredential(credential);
                               if (userCredential.user != null) {
                                 showToast(message: "تم التحقق بنجاح");
+                                Navigator.pushReplacementNamed(context, AppRoutes.loginPage);
                               }
                             } catch (e) {
                               showToast(message: "حدث خطأ أثناء التحقق: $e");

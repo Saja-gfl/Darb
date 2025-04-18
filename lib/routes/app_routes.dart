@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:rem_s_appliceation9/Screens/Welcomepage.dart';
 import '../Screens/LoginPage.dart';
 import '../Screens/RegistrationPage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverInfoPage.dart';
-import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
-import 'package:rem_s_appliceation9/Screens/RegistrationPage.dart';
 import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
 import 'package:rem_s_appliceation9/Screens/UserProfilePage.dart';
 import 'package:rem_s_appliceation9/Screens/subpage.dart';
-import 'package:rem_s_appliceation9/Screens/number_sub.dart';
 import 'package:rem_s_appliceation9/Screens/chatPage.dart';
-import 'package:rem_s_appliceation9/Screens/FindDriverPage.dart';
-import 'package:rem_s_appliceation9/Screens/ReviewPage.dart';
-import 'package:rem_s_appliceation9/Screens/otp.dart';
 import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
+import 'package:rem_s_appliceation9/Screens/LoginPage.dart';
 
 class AppRoutes {
   // Existing routes
@@ -41,7 +37,7 @@ class AppRoutes {
     // Existing routes
     k0Screen: (context) => K0Screen(),
     k1Screen: (context) => K1Screen(),
-    initialRoute: (context) => K0Screen(),
+    initialRoute: (context) => WelcomePage(),
 
     // New routes
     loginPage: (context) => K0Screen(),

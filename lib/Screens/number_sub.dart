@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/services/UserProvider.dart';
 import 'ChatPage.dart';
 
 class NumberSubPage extends StatelessWidget {
-  final Map<String, dynamic> subscriptionData;
-  NumberSubPage({required this.subscriptionData});
+  //final Map<String, dynamic> subscriptionData;
+  //NumberSubPage({required this.subscriptionData});
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = Color(0xFFFFB300);
@@ -12,6 +14,7 @@ class NumberSubPage extends StatelessWidget {
     final Color backgroundColor = Colors.white;
     final Color textColor = Colors.black;
     final double borderRadius = 12.0;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -195,9 +198,6 @@ class NumberSubPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatPage(
-                      tripId: subscriptionData['tripId'],
-                      userId: subscriptionData['userId'],
-                      userName: subscriptionData['userName'],
                     ),
                   ),
                 );

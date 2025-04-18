@@ -3,7 +3,6 @@ import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
-import 'ChatPage.dart';
 import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
 
 import 'package:rem_s_appliceation9/Screens/UserProfilePage.dart';
@@ -191,10 +190,14 @@ class _UserHomePageState extends State<UserHomePage> {
       selectedItemColor: Colors.orange,
       unselectedItemColor: Colors.grey,
       onTap: (index) {
+        if (index == 1) {
+          Navigator.push(
+             context, MaterialPageRoute(builder: (context) => ChatPage()));
+        } else if (index == 2) {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => UserProfilePage()));
         }
-      
+      },
     );
   }
 }

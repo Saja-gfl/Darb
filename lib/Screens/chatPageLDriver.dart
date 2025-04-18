@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:rem_s_appliceation9/Screens/chatPage.dart';
 
+import '../routes/app_routes.dart';
+
 class ChatHomePage extends StatefulWidget {
   final bool isDriver;
 
@@ -116,17 +118,19 @@ class _ChatHomePageState extends State<ChatHomePage> {
   Widget _buildChatItem(Map<String, dynamic> chat) {
     return InkWell(
       onTap: () {
-        Navigator.push(
+
+        Navigator.pushNamed(context, AppRoutes.chatPage);
+       /* Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChatPage(
-              tripId: chat['tripId'],
-              userId: widget.isDriver ? 'driver1' : chat['userId'],
-              userName: widget.isDriver ? 'السائق' : chat['userName'],
-              isDriver: widget.isDriver,
-            ),
+                // tripId: chat['tripId'],
+                //userId: widget.isDriver ? 'driver1' : chat['userId'],
+                //userName: widget.isDriver ? 'السائق' : chat['userName'],
+                //isDriver: widget.isDriver,
+                ),
           ),
-        );
+        );*/
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

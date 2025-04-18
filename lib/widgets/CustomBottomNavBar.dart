@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
-import '../Screens/ChatPage.dart';
-import '../Screens/DriverInfoPage.dart';
 
 class DriverHomePage extends StatefulWidget {
   const DriverHomePage({Key? key}) : super(key: key);
