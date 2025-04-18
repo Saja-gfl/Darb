@@ -1,80 +1,80 @@
-import 'package:flutter/material.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:rem_s_appliceation9/main.dart';
-// import 'package:reem_s_application9/main.dart';
+// import 'package:flutter/material.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:rem_s_appliceation9/main.dart';
+// // import 'package:reem_s_application9/main.dart';
 
-// For checking internet connectivity
-abstract class NetworkInfoI {
-  Future<bool> isConnected();
+// // For checking internet connectivity
+// abstract class NetworkInfoI {
+//   Future<bool> isConnected();
 
-  Future<List<ConnectivityResult>> get connectivityResult;
+//   Future<List<ConnectivityResult>> get connectivityResult;
 
-  Stream<List<ConnectivityResult>> get onConnectivityChanged;
-}
+//   Stream<List<ConnectivityResult>> get onConnectivityChanged;
+// }
 
-class NetworkInfo implements NetworkInfoI {
-  Connectivity connectivity;
+// class NetworkInfo implements NetworkInfoI {
+//   Connectivity connectivity;
 
-  static final NetworkInfo _networkInfo = NetworkInfo._internal(Connectivity());
+//   static final NetworkInfo _networkInfo = NetworkInfo._internal(Connectivity());
 
-  factory NetworkInfo() {
-    return _networkInfo;
-  }
+//   factory NetworkInfo() {
+//     return _networkInfo;
+//   }
 
-  NetworkInfo._internal(this.connectivity) {
-    connectivity = connectivity;
-  }
+//   NetworkInfo._internal(this.connectivity) {
+//     connectivity = connectivity;
+//   }
 
-  ///checks internet is connected or not
-  ///returns [true] if internet is connected
-  ///else it will return [false]
-  @override
-  Future<bool> isConnected() async {
-    final result = await connectivityResult;
-    return !result.contains(ConnectivityResult.none);
-  }
+//   ///checks internet is connected or not
+//   ///returns [true] if internet is connected
+//   ///else it will return [false]
+//   @override
+//   Future<bool> isConnected() async {
+//     final result = await connectivityResult;
+//     return !result.contains(ConnectivityResult.none);
+//   }
 
-  // to check type of internet connectivity
-  @override
-  Future<List<ConnectivityResult>> get connectivityResult async {
-    return connectivity.checkConnectivity();
-  }
+//   // to check type of internet connectivity
+//   @override
+//   Future<List<ConnectivityResult>> get connectivityResult async {
+//     return connectivity.checkConnectivity();
+//   }
 
-  //check the type on internet connection on changed of internet connection
-  @override
-  Stream<List<ConnectivityResult>> get onConnectivityChanged =>
-      connectivity.onConnectivityChanged;
-}
+//   //check the type on internet connection on changed of internet connection
+//   @override
+//   Stream<List<ConnectivityResult>> get onConnectivityChanged =>
+//       connectivity.onConnectivityChanged;
+// }
 
-abstract class Failure {}
+// abstract class Failure {}
 
-// General failures
-class ServerFailure extends Failure {}
+// // General failures
+// class ServerFailure extends Failure {}
 
-class CacheFailure extends Failure {}
+// class CacheFailure extends Failure {}
 
-class NetworkFailure extends Failure {}
+// class NetworkFailure extends Failure {}
 
-class ServerException implements Exception {}
+// class ServerException implements Exception {}
 
-class CacheException implements Exception {}
+// class CacheException implements Exception {}
 
-class NetworkException implements Exception {}
+// class NetworkException implements Exception {}
 
-///can be used for throwing [NoInternetException]
-class NoInternetException implements Exception {
-  late String _message;
+// ///can be used for throwing [NoInternetException]
+// class NoInternetException implements Exception {
+//   late String _message;
 
-  NoInternetException([String message = 'NoInternetException Occurred']) {
-    if (globalMessengerKey.currentState != null) {
-      globalMessengerKey.currentState!
-          .showSnackBar(SnackBar(content: Text(message)));
-    }
-    _message = message;
-  }
+//   NoInternetException([String message = 'NoInternetException Occurred']) {
+//     if (globalMessengerKey.currentState != null) {
+//       globalMessengerKey.currentState!
+//           .showSnackBar(SnackBar(content: Text(message)));
+//     }
+//     _message = message;
+//   }
 
-  @override
-  String toString() {
-    return _message;
-  }
-}
+//   @override
+//   String toString() {
+//     return _message;
+//   }
+// }
