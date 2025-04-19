@@ -6,9 +6,9 @@ import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'ChatPage.dart';
 import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
 
-import 'package:rem_s_appliceation9/Screens/UserProfilePage.dart';
+import 'package:rem_s_appliceation9/Screens/AccountPageUser.dart';
 import 'package:rem_s_appliceation9/Screens/subpage.dart'; // Import for SubPage
-import 'package:rem_s_appliceation9/Screens/ChatPage.dart';
+import 'package:rem_s_appliceation9/Screens/Requestedsubpage.dart';
 
 // ignore_for_file: must_be_immutable
 class UserHomePage extends StatefulWidget {
@@ -102,7 +102,7 @@ class _UserHomePageState extends State<UserHomePage> {
         // New subscription creation service
         _buildServiceItem(
           "إنشاء اشتراك جديد",
-          "إضافة اشتراك جديد مع السائق المفضل",
+          " مع السائق المفضل",
           Icons.add_circle_outline,
           () => _navigateToSubPage(),
         ),
@@ -123,7 +123,7 @@ class _UserHomePageState extends State<UserHomePage> {
           Icons.settings,
           () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SubscriptionRequestsPage()),
+            MaterialPageRoute(builder: (context) => Requestedsubpage()),
           ),
         ),
       ],
@@ -183,29 +183,17 @@ class _UserHomePageState extends State<UserHomePage> {
 
   Widget _buildBottomNavBar() {
     return BottomNavigationBar(
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: "الرئيسية"),
-        BottomNavigationBarItem(icon: Icon(Icons.message), label: "الرسائل"),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: "الحساب"),
-      ],
-      selectedItemColor: Colors.orange,
-      unselectedItemColor: Colors.grey,
-      onTap: (index) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => UserProfilePage()));
-        }
-      
-    );
-  }
-}
-
-class ActiveSubscriptionsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("الاشتراكات الجارية")),
-      body: Center(child: Text("محتوى صفحة الاشتراكات الجارية")),
-    );
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "الرئيسية"),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: "الرسائل"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "الحساب"),
+        ],
+        selectedItemColor: Colors.orange,
+        unselectedItemColor: Colors.grey,
+        onTap: (index) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => AccountPage()));
+        });
   }
 }
 
