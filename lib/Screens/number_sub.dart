@@ -101,6 +101,7 @@ class NumberSubPage extends StatelessWidget {
                   _buildInfoRow(Icons.attach_money, '500 ريال/شهرياً'),
                   SizedBox(height: 12),
                   _buildInfoRow(Icons.person, 'السائق: أحمد محمد'),
+                  // data
                 ],
               ),
             ),
@@ -197,8 +198,7 @@ class NumberSubPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChatPage(
-                    ),
+                    builder: (context) => ChatPage(),
                   ),
                 );
               },
