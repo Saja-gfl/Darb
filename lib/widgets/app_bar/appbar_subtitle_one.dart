@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rem_s_appliceation9/theme/custom_text_style.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
-import '../../core/app_export.dart';
 
 class AppbarSubtitleOne extends StatelessWidget {
     AppbarSubtitleOne({Key? key, required this.text, this.onTap, this.margin})

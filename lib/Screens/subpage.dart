@@ -7,14 +7,8 @@ import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
 import 'package:rem_s_appliceation9/services/request.dart';
 import '../services/chatService.dart';
 import 'package:geolocator/geolocator.dart'; //gor location
-import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
-import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
-import 'package:rem_s_appliceation9/services/request.dart';
-import 'package:geolocator/geolocator.dart'; //gor location
-//import 'package:rem_s_appliceation9/Screens/UserProvider.dart';
+import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/services/UserProvider.dart';
 
 class CreateSubscriptionPage extends StatefulWidget {
   const CreateSubscriptionPage({super.key});
@@ -685,6 +679,13 @@ Widget _buildHomeLocationField2() {
     try {
           print("✅ تحقق أولي ناجح، جاري تحديد الموقع...");
       //استدعاء submitRequest من ملف request.dart
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.uid; // الحصول على uid من البروفايدر
+
+      if (userId == null) {
+        throw Exception("سجل الدخول أولاً");
+      }
+      
       //final user = FirebaseAuth.instance.currentUser;
       //if (user == null) {
         //throw Exception("سجل الدخول أولاً");
@@ -694,7 +695,7 @@ Widget _buildHomeLocationField2() {
        //to get the current user location
       // Position position = await Geolocator.getCurrentPosition();
 
-      String userId = "testuser"; // قايز ترا هذا مؤقت لوقت التطوير فقط
+      //String userId = "testuser"; // قايز ترا هذا مؤقت لوقت التطوير فقط
       print("👤 userId: $userId");
       //data for the location
       //final homeLocation = {

@@ -34,7 +34,7 @@ class _ReviewPageState extends State<ReviewPage> {
 
   Future<void> _fetchDriverName() async {
     try {
-      final name = await FirestoreService().getDriverName(widget.driverId);
+      final name = await FirestoreService().getUserOrDriverName(widget.driverId , true);
       setState(() {
         driverName = name ??
             "السائق"; // إذا لم يتم العثور على الاسم، استخدم الاسم الافتراضي
@@ -251,18 +251,11 @@ class _ReviewPageState extends State<ReviewPage> {
                         }
 
                         try {
-                          // جلب uid من UserProvider
-                          final userId =
-                              Provider.of<UserProvider>(context, listen: false)
-                                  .uid;
-
-                          if (userId == null) {
-                            throw Exception('لم يتم العثور على معرف المستخدم');
-                          }
-
+                          final userProvider =
+                              Provider.of<UserProvider>(context, listen: false);
                           await RatingService().addRating(
-                            userId: userId,
-                            driverId: widget.driverId,
+                            userId: userProvider.uid!,
+                            driverId: userProvider.driverId!,
                             rating: _rating,
                             comment: '', // يمكن تعديل هذا لإضافة التعليقات
                           );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/request.dart';
 import 'package:rem_s_appliceation9/widgets/subscription_card.dart';
 
@@ -7,6 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
 import 'package:rem_s_appliceation9/Screens/ReviewPage.dart';
+
+import '../services/UserProvider.dart';
 
 class OngoingSubPage extends StatefulWidget {
   _OngoingSubPageState createState() => _OngoingSubPageState();
@@ -17,18 +20,17 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
   final double borderRadius = 12.0;
 
   List<Map<String, dynamic>> subscriptions = []; // قائمة الاشتراكات
-  TextEditingController searchController =
-      TextEditingController(); // Controller for search field
+  TextEditingController searchController = TextEditingController();
 
-  // تعديل دالة البحث عن الاشتراك
   Future<void> searchSubscription(String tripId) async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final userId = userProvider.uid; // الحصول على uid من البروفايدر
+      if (userId == null) {
         showToast(message: 'يرجى تسجيل الدخول أولاً');
         return;
       }
-      // استدعاء الدالة من ملف request.dart
+
       final subscriptionData = await getRequestByTripId(tripId);
       if (subscriptionData != null) {
         //تحقق من وجود المستخدم في قاعدة البيانات
@@ -36,24 +38,20 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
             .collection('rideRequests')
             .doc(tripId)
             .collection('users')
-            .doc(user.uid)
+            .doc(userId)
             .get();
 
         String? subStatus;
         if (userDoc.exists) {
           subStatus = userDoc.data()?['sub_status'];
         }
-        if (userDoc.exists) {
-          subStatus = userDoc.data()?['sub_status'];
-        }
-        //if (subscriptionData != null) {
+
         // تصفية البيانات العامة فقط
         setState(() {
           subscriptions = [
             {
               'tripId': tripId,
               //رقم الساقئ عند قبول الرحله
-
               'subscriptionData': {
                 'type': subscriptionData['type'], // نوع الاشتراك
                 'price': subscriptionData['price'], // السعر
@@ -68,7 +66,6 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
           ];
         });
       } else {
-        // إذا لم يتم العثور على الاشتراك
         setState(() {
           subscriptions = []; // لا توجد نتائج
         });
@@ -79,6 +76,7 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
     }
   }
 
+//هذي الاكواد لازم تنقل الى صفحة التأكيد 
   Future<void> _sendSubscriptionRequest(
       Map<String, dynamic> subscription) async {
     try {

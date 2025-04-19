@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rem_s_appliceation9/widgets/AvailableSubscriptionsCard.dart';
+import 'package:provider/provider.dart';
+import '../services/UserProvider.dart';
 
 class AvailableSubscriptionsPage extends StatefulWidget {
   const AvailableSubscriptionsPage({Key? key}) : super(key: key);
@@ -87,11 +89,19 @@ class _AvailableSubscriptionsPageState
   }
 
   void _handleAcceptSubscription(String subscriptionId) {
-    // Remove from list when accepted
+    // الحصول على UserProvider لتحديث بيانات السائق
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // تحديث driverId في UserProvider عند قبول الاشتراك
+    userProvider.setDriverId(subscriptionId); // حفظ ID السائق أو الرحلة
+
+    // إزالة الاشتراك من القائمة
     setState(() {
       _allSubscriptions.removeWhere((sub) => sub['id'] == subscriptionId);
       _filterSubscriptions();
     });
+
+    // عرض رسالة تأكيد
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('تم قبول الاشتراك #$subscriptionId')),
     );

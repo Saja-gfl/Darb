@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/services/FireStore.dart';
 import 'package:rem_s_appliceation9/widgets/app_bar/custom_dropdown.dart';
 
+import '../services/UserProvider.dart';
+//يحتاج تغيير لون الخط اللي باللست عشان تبان لليوزر 
 class DriverInfoPage extends StatefulWidget {
   const DriverInfoPage({super.key});
 
@@ -42,48 +44,51 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
 
   // لتحميل بيانات السائق من Firestore
   Future<void> _loadDriverData() async {
-    // Load the driver data from Firestore
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      try {
-        // Fetch driver data from Firestore
-        DocumentSnapshot driverData = await FirebaseFirestore.instance
-            .collection('driverdata') // تغيير المسار إلى driverdata
-            .doc(user.uid)
-            .get();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final firestoreService = FirestoreService();
 
-        if (driverData.exists) {
-          // Update the text controllers with the driver data
-          setState(() {
-            nameController.text = driverData['name'] ?? '';
-            emailController.text = driverData['email'] ?? '';
-            plateNumberController.text =
-                driverData['plateNumber'] ?? ''; // رقم اللوحة
-            carModelController.text =
-                driverData['carType'] ?? ''; // نوع السيارة
-            phoneController.text = driverData['phone'] ?? '';
-            priceController.text =
-                driverData['price']?.toString() ?? ''; // السعر
-            acceptedLocationsController =
-                driverData['acceptedLocations']??''; // الأماكن المقبولة
-            selectedGender = driverData['gender'] ?? ''; // تحديد الجنس
-            selectedLocation = driverData['location'] ?? '';
-            selectedSubscriptionType = driverData['subscriptionType'] ?? '';
-            passengerCountController.text =
-                driverData['passengerCount']?.toString() ?? '';
-          });
-        }
-      } catch (e) {
-        print("خطأ في تحميل بيانات السائق: $e");
+    try {
+      final userId = userProvider.uid;
+      if (userId == null) {
+        print("❌ المستخدم غير مسجل الدخول");
+        return;
       }
+
+      final driverData = await firestoreService.getUserData(userId);
+      if (driverData != null && driverData['isDriver'] == true) {
+        setState(() {
+          selectedLocation = locations.contains(driverData['location']) ? driverData['location'] : null;
+          acceptedLocationsController = locations.contains(driverData['acceptedLocations']) ? driverData['acceptedLocations'] : null;
+          nameController.text = driverData['name'] ?? '';
+          emailController.text = driverData['email'] ?? '';
+          plateNumberController.text = driverData['plateNumber'] ?? '';
+          carModelController.text = driverData['carType'] ?? '';
+          phoneController.text = driverData['phone'] ?? '';
+          priceController.text = driverData['price']?.toString() ?? '';
+          selectedGender = driverData['gender'] ?? '';
+          selectedSubscriptionType = driverData['subscriptionType'] ?? '';
+          passengerCountController.text =
+              driverData['passengerCount']?.toString() ?? '';
+        });
+
+        // تحديث UserProvider
+        userProvider.setDriverName(driverData['name'] ?? '');
+        userProvider.setLocation(driverData['location'] ?? '');
+      } else {
+        print("❌ لا توجد بيانات للسائق");
+      }
+    } catch (e) {
+      print("❌ خطأ في تحميل بيانات السائق: $e");
     }
   }
 
-// لحفظ بيانات السائق إلى Firestore
+  // لحفظ بيانات السائق إلى Firestore باستخدام FirestoreService
   Future<void> _saveDriverData() async {
-    // Save the driver data to Firestore
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final firestoreService = FirestoreService();
+
+    final userId = userProvider.uid;
+    if (userId == null) {
       showToast(message: "المستخدم غير مسجل الدخول");
       return;
     }
@@ -104,28 +109,48 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       return;
     }
 
+    if (!locations.contains(selectedLocation)) {
+      selectedLocation = null;
+    }
+
+    if (!locations.contains(acceptedLocationsController)) {
+      acceptedLocationsController = null;
+    }
+
     try {
       // تحديث البيانات في Firestore
-      await FirebaseFirestore.instance
-          .collection('driverdata')
-          .doc(user.uid)
-          .update({
-        'name': nameController.text,
-        'email': emailController.text,
-        'plateNumber': plateNumberController.text, // حفظ رقم اللوحة
-        'carType': carModelController.text, // حفظ نوع السيارة
-        'phone': phoneController.text,
-        'price': double.tryParse(priceController.text) ?? 0.0, // حفظ السعر
-        'acceptedLocations': acceptedLocationsController,
-        'gender': selectedGender,
-        'location': selectedLocation, // حفظ الموقع الجغرافي المحدد
-        'subscriptionType': selectedSubscriptionType, // حفظ نوع الاشتراك
-        'passengerCount':
-            int.tryParse(passengerCountController.text) ?? 0, // حفظ عدد الركاب
-      });
+      await firestoreService.updateUserData(
+        userId: userId,
+        nameController: nameController.text,
+        emailController: emailController.text,
+        addressController: selectedLocation!,
+
+        phoneController: phoneController.text,
+        selectedGender: selectedGender,
+        isDriver: true,
+        carType: carModelController.text,
+        plateNumber: plateNumberController.text,
+        price: double.parse(priceController.text),
+        acceptedLocations: acceptedLocationsController!,
+        passengerCount: passengerCountController.text,
+        subscriptionType: selectedSubscriptionType!,
+
+      );
+
+      // تحديث UserProvider
+      userProvider.setDriverName(nameController.text);
+      userProvider.setLocation(selectedLocation!);
+      userProvider.setEmail(emailController.text);
+      userProvider.setCarType(carModelController.text);
+      userProvider.setPlateNumber(plateNumberController.text);
+      userProvider.setPhoneNumber(phoneController.text);
+      userProvider.setSubscriptionType(selectedSubscriptionType!);
+
+
+
       showToast(message: "تم حفظ البيانات بنجاح");
     } catch (e) {
-      print("خطأ في حفظ بيانات السائق: $e");
+      print("❌ خطأ في حفظ بيانات السائق: $e");
       showToast(message: "حدث خطأ أثناء حفظ البيانات");
     }
   }
@@ -213,7 +238,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             CustomDropdown(
               label: "الموقع الجغرافي",
               hint: "اختر موقعك من القائمة",
-              value: selectedLocation,
+              value: locations.contains(selectedLocation) ? selectedLocation : null,
               items: locations,
               onChanged: (value) {
                 setState(() {
@@ -226,8 +251,8 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             // Accepted Locations Field
             CustomDropdown(
               label: "الأماكن التي تقبل الذهاب إليها",
-              hint: "أدخل الأماكن التي يمكن أن تذهب إليها )",
-              value: acceptedLocationsController,
+              hint: "أدخل الأماكن التي يمكن أن تذهب إليها",
+              value: locations.contains(acceptedLocationsController) ? acceptedLocationsController : null,
               items: locations,
               onChanged: (value) {
                 setState(() {
@@ -259,7 +284,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             CustomDropdown(
               label: "نوع الاشتراك",
               hint: "اختر نوع الاشتراك",
-              value: selectedSubscriptionType,
+              value: locations.contains(selectedSubscriptionType) ? selectedSubscriptionType : null,
               items: subscriptionTypes,
               onChanged: (value) {
                 setState(() {
@@ -486,12 +511,15 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             onPressed: () {
               _saveDriverData();
               // Save action
-              //print("Selected Gender: $selectedGender");
-              //print("Name: ${nameController.text}");
-              //print("Email: ${emailController.text}");
-              //print("Car Model: ${carModelController.text}");
-              //print("Plate Number: ${plateNumberController.text}");
-              //print("Phone: ${phoneController.text}");
+             /*print("Selected Gender: $selectedGender");
+              print("Name: ${nameController.text}");
+              print("Email: ${emailController.text}");
+              print("Car Model: ${carModelController.text}");
+              print("Plate Number: ${plateNumberController.text}");
+              print("Phone: ${phoneController.text}");
+              print("Location: $selectedLocation");
+              print("Accepted Locations: $acceptedLocationsController");
+              print("type: $selectedSubscriptionType");*/
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,

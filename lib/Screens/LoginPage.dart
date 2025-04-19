@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
@@ -5,6 +6,7 @@ import 'package:rem_s_appliceation9/routes/app_routes.dart';
 import 'package:rem_s_appliceation9/theme/app_decoration.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
+import '../services/FireStore.dart';
 import '../widgets/custom_checkbox_button.dart';
 import '../widgets/custom_text_form_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -166,21 +168,69 @@ class _K0ScreenState extends State<K0Screen> {
     String email = usernameInputController.text;
     String password = passwordInputController.text;
 
-    User? user = await _auth.login(email, password);
+    try {
+      User? user = await _auth.login(email, password);
 
-    setState(() {
-      _isSigning = false;
-    });
+      if (user != null) {
+        FirestoreService firestoreService = FirestoreService();
+        Map<String, dynamic>? userData = await firestoreService.getUserData(user.uid);;
 
-    if (user != null) {
-      // هنا يتم حفظ الـ UID في الـ Provider بعد التحقق من تسجيل الدخول
-      Provider.of<UserProvider>(context, listen: false).setUid(user.uid);
-      
-      showToast(message: "User is successfully signed in");
-      Navigator.pushNamed(context, "/home");
-    } else {
-      showToast(message: "some error occured");
+        //print("🔍 البحث عن بيانات المستخدم في المجموعة: ${false ? 'driverdata' : 'userdata'}");
+        //print("🔍 User ID: ${user.uid}");
+
+        if (userData != null ) {
+          _updateUserProvider(user, userData);
+
+          showToast(message: "تم تسجيل الدخول بنجاح");
+
+          final userProvider = Provider.of<UserProvider>(context, listen: false);
+          Navigator.pushReplacementNamed(
+            context,
+            userProvider.isDriver ? AppRoutes.driverHomePage : AppRoutes.userHomePage,
+          );
+        } else {
+          showToast(message: "تعذر جلب بيانات المستخدم. يرجى المحاولة لاحقًا.");
+        }
+      } else {
+        showToast(message: "البريد الإلكتروني أو كلمة المرور غير صحيحة");
+      }
+    } catch (e) {
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-not-found':
+            showToast(message: "المستخدم غير موجود");
+            break;
+          case 'wrong-password':
+            showToast(message: "كلمة المرور غير صحيحة");
+            break;
+          default:
+            showToast(message: "حدث خطأ: ${e.message}");
+        }
+      } else {
+        showToast(message: "حدث خطأ غير متوقع: ${e.toString()}");
+      }
+    } finally {
+      setState(() {
+        _isSigning = false;
+      });
     }
+  }
+
+  void _updateUserProvider(User user, Map<String, dynamic> userData) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    userProvider.setUid(user.uid);
+    userProvider.setEmail(user.email ?? '');
+    userProvider.setUserName(userData['name'] ?? '');
+    userProvider.setPhoneNumber(userData['phone'] ?? '');
+    userProvider.setLocation(userData['address'] ?? '');
+    userProvider.setIsDriver(userData['isDriver'] ?? false);
+    userProvider.setTripId(userData['gender'] ?? '');
+    userProvider.setCarType(userData['carType'] ?? '');
+    userProvider.setPlateNumber(userData['plateNumber'] ?? '');
+
+    
+
   }
 
   Future<void> _checkLoginStatus() async {

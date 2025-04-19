@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
+import 'package:rem_s_appliceation9/routes/app_routes.dart';
+
+import '../services/UserProvider.dart';
 import '../services/chatService.dart';
-import 'driverHomePage.dart';
+//import 'driverHomePage.dart';
+import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
-  final String tripId;
-  final String userId;
-  final String userName;
-  final bool isDriver; // تحديد إذا كان المستخدم سائقًا
-
-  const ChatPage({
-    Key? key,
-    required this.tripId,
-    required this.userId,
-    required this.userName,
-    this.isDriver = false, // القيمة الافتراضية: ليس سائقًا
-  }) : super(key: key);
+  const ChatPage({Key? key}) : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -36,7 +29,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _listenToMessages() {
-    _chatService.getMessages(widget.tripId).listen((snapshot) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final tripId = userProvider.tripId ?? '';
+
+    _chatService.getMessages(tripId).listen((snapshot) {
       final messages = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         return {
@@ -66,15 +62,21 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _sendMessage() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final tripId = userProvider.tripId ?? '';
+    final userId = userProvider.uid ?? '';
+    final userName = userProvider.userName ?? '';
+
     final messageText = _messageController.text.trim();
     if (messageText.isNotEmpty) {
+      // استخدام ChatService لإرسال الرسالة
       _chatService.sendMessage(
-        chatId: widget.tripId,
-        senderId: widget.userId,
-        senderName: widget.userName,
-        message: messageText,
+        chatId: tripId, // ID غرفة الدردشة
+        senderId: userId, // ID المرسل
+        senderName: userName, // اسم المرسل
+        message: messageText, // نص الرسالة
       );
-      _messageController.clear();
+      _messageController.clear(); // مسح حقل الإدخال بعد الإرسال
     }
   }
 //حق الوقت
@@ -86,9 +88,10 @@ class _ChatPageState extends State<ChatPage> {
   return '$hour:$minute $period';
 }*/
 
-
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF9F3),
       appBar: AppBar(
@@ -96,17 +99,12 @@ class _ChatPageState extends State<ChatPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            // التحقق من نوع المستخدم وإعادة التوجيه
-            if (widget.isDriver) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => DriverHomePage()),
-              );
+            if (userProvider.isDriver) {
+              Navigator.pushReplacementNamed(context, AppRoutes.driverHomePage);
+              
             } else {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => UserHomePage()),
-              );
+              Navigator.pushReplacementNamed(context, AppRoutes.userHomePage);
+              
             }
           },
         ),
@@ -129,15 +127,15 @@ class _ChatPageState extends State<ChatPage> {
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
-                final isCurrentUser = message['senderId'] == widget.userId;
+                final isCurrentUser = message['senderId'] == userProvider.uid;
 
                 return Align(
                   alignment: isCurrentUser
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   child: Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: isCurrentUser
@@ -219,7 +217,10 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   child: IconButton(
                     icon: const Icon(Icons.send, color: Colors.white),
-                    onPressed: _sendMessage,
+                    onPressed: () {
+                      // استدعاء دالة إرسال الرسالة
+                      _sendMessage();
+                    },
                   ),
                 ),
               ],

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
-import '../core/app_export.dart';
 
 String _appTheme = "lightCode";
 LightCodeColors get appTheme => ThemeHelper().themeColor();

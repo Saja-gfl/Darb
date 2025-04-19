@@ -6,12 +6,32 @@ class FirestoreService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // 🔹 تحميل بيانات المستخدم (راكب أو سائق)
-  Future<DocumentSnapshot?> getUserData(String userId, bool isDriver) async {
+  Future<Map<String, dynamic>?> getUserData(String userId) async {
     try {
-      return await _firestore
-          .collection(isDriver ? 'driverdata' : 'userdata')
-          .doc(userId)
-          .get();
+      // جلب البيانات من مجموعة السائقين
+      DocumentSnapshot driverDoc =
+          await _firestore.collection('driverdata').doc(userId).get();
+      if (driverDoc.exists) {
+        print("✅ تم العثور على المستخدم كسائق.");
+        return {
+          ...driverDoc.data() as Map<String, dynamic>,
+          'isDriver': true,
+        };
+      }
+
+      // جلب البيانات من مجموعة المستخدمين
+      DocumentSnapshot userDoc =
+          await _firestore.collection('userdata').doc(userId).get();
+      if (userDoc.exists) {
+        print("✅ تم العثور على المستخدم كراكب.");
+        return {
+          ...userDoc.data() as Map<String, dynamic>,
+          'isDriver': false,
+        };
+      }
+
+      print("❌ لم يتم العثور على بيانات المستخدم.");
+      return null;
     } catch (e) {
       print("❌ خطأ أثناء تحميل البيانات: $e");
       return null;
@@ -26,6 +46,14 @@ class FirestoreService {
     required String addressController,
     required String phoneController,
     required String selectedGender,
+    required bool isDriver,
+    String? carType,
+    String? plateNumber,
+    String? acceptedLocations,
+    String? passengerCount,
+    String? subscriptionType,
+    double? price,
+
   }) async {
     try {
       // بناء البيانات للتحديث
@@ -35,11 +63,20 @@ class FirestoreService {
         'address': addressController,
         'phone': phoneController,
         'gender': selectedGender,
+
       };
+      if (isDriver) {
+        updatedData['carType'] = carType;
+        updatedData['plateNumber'] = plateNumber;
+        updatedData['acceptedLocations'] = acceptedLocations;
+        updatedData['passengerCount'] = passengerCount;
+        updatedData['subscriptionType'] = subscriptionType;
+        updatedData['price'] = price;
+      }
 
       // تحديث البيانات في Firestore
       await _firestore
-          .collection('userdata')
+          .collection(isDriver ? 'driverdata' : 'userdata')
           .doc(userId)
           .update(updatedData); // تحديث البيانات حسب userId
       print("✅ تم تحديث بيانات المستخدم بنجاح");
@@ -68,14 +105,13 @@ class FirestoreService {
         'phone': phoneController,
         'gender': selectedGender,
         'createdAt': FieldValue.serverTimestamp(),
+        'isDriver': isDriver,
       };
 
       // إضافة بيانات السائق إذا كان المستخدم سائقًا
       if (isDriver) {
         data['carType'] = carType;
         data['plateNumber'] = plateNumber;
-      } else {
-        data['isDriver'] = false;
       }
 
       // حفظ البيانات في Firestore
@@ -90,18 +126,22 @@ class FirestoreService {
   }
 
 //جلب اسم السائق من قاعدة البيانات
-   Future<String?> getDriverName(String driverId) async {
+  Future<String?> getUserOrDriverName(String userId, bool isDriver) async {
     try {
-      DocumentSnapshot driverDoc =
-          await _firestore.collection('driverdata').doc(driverId).get();
-      if (driverDoc.exists) {
-        return driverDoc['name'] as String?;
+      // تحديد المجموعة المناسبة (userdata أو driverdata)
+      String collection = isDriver ? 'driverdata' : 'userdata';
+
+      DocumentSnapshot doc =
+          await _firestore.collection(collection).doc(userId).get();
+      if (doc.exists) {
+        return doc['name'] as String?;
       } else {
-        print("❌ السائق غير موجود في قاعدة البيانات");
+        print(
+            "❌ ${isDriver ? 'السائق' : 'المستخدم'} غير موجود في قاعدة البيانات");
         return null;
       }
     } catch (e) {
-      print("❌ خطأ أثناء جلب اسم السائق: $e");
+      print("❌ خطأ أثناء جلب الاسم: $e");
       return null;
     }
   }

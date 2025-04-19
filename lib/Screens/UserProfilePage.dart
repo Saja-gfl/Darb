@@ -23,33 +23,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
     @override
   void initState() {
     super.initState();
-    _loadUserData(); // Load the user data
+    _loadUserData(); // Load the user data from UserProvider
   }
-  Future<void> _loadUserData() async {
-    // Load the user data from Firestore
-       final user = FirebaseAuth.instance.currentUser;
-       if (user !=null){
-        try {
-        // Fetch user data from Firestore
-        DocumentSnapshot userData = await FirebaseFirestore.instance
-            .collection('userdata')
-            .doc(user.uid)
-            .get();
 
-        if (userData.exists) {
-          // Update the text controllers with the user data
-          setState(() {
-          nameController.text = userData['name'] ??'';
-          emailController.text = userData['email']??'';
-          addressController.text = userData['address']??'';
-          phoneController.text = userData['phone']??'';
-          selectedGender = userData['gender']??'';
-          });
-       }
-      } catch (e) {
-        print("خطأ في تحميل بيانات المستخدم: $e");
-      }
-    }
+  // Load user data from UserProvider
+  void _loadUserData() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    setState(() {
+      nameController.text = userProvider.userName ?? '';
+      emailController.text = userProvider.email ?? '';
+      addressController.text = userProvider.location ?? '';
+      phoneController.text = userProvider.phoneNumber ?? '';
+      selectedGender = userProvider.Gender ?? 'ذكر';
+      
+    });
   }
 
   //save user data
@@ -61,29 +48,41 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return;
   }
 
-  if (nameController.text.isEmpty ||
-      emailController.text.isEmpty ||
-      addressController.text.isEmpty ||
-      phoneController.text.isEmpty ||
-      selectedGender.isEmpty) {
-    showToast(message: "يرجى ملء جميع الحقول");
-    return;
-  }
-      try {
-        await FirebaseFirestore.instance.collection('userdata').doc(user.uid).update({
-          'name': nameController.text,
-          'email': emailController.text,
-          'address': addressController.text,
-          'phone': phoneController.text,
-          'gender': selectedGender,
-        });
-        showToast(message: "تم حفظ البيانات بنجاح");
-      } catch (e) {
-        print("خطأ في حفظ بيانات المستخدم: $e");
-        showToast(message: "حدث خطأ أثناء حفظ البيانات");
-      }
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        addressController.text.isEmpty ||
+        phoneController.text.isEmpty ||
+        selectedGender.isEmpty) {
+      showToast(message: "يرجى ملء جميع الحقول");
+      return;
     }
-  
+
+    try {
+      // Update Firestore
+      await FirebaseFirestore.instance.collection('userdata').doc(user.uid).update({
+        'name': nameController.text,
+        'email': emailController.text,
+        'address': addressController.text,
+        'phone': phoneController.text,
+        'gender': selectedGender,
+      });
+
+      // Update UserProvider
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.setUserName(nameController.text);
+      userProvider.setEmail(emailController.text);
+      userProvider.setLocation(addressController.text);
+      userProvider.setPhoneNumber(phoneController.text);
+
+      
+
+      showToast(message: "تم حفظ البيانات بنجاح");
+    } catch (e) {
+      print("خطأ في حفظ بيانات المستخدم: $e");
+      showToast(message: "حدث خطأ أثناء حفظ البيانات");
+    }
+  }
+
   void showToast({required String message}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -95,7 +94,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    String? uid = Provider.of<UserProvider>(context).uid;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
