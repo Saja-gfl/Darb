@@ -180,7 +180,7 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
         backgroundColor: backgroundColor,
         elevation: 0,
         title: Text(
-          'الاشتراكات الجارية',
+          ' الاشتراكات',
           style: GoogleFonts.tajawal(
             color: primaryColor,
             fontSize: 22,
