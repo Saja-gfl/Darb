@@ -6,12 +6,14 @@ class RatingService {
   // 🔹 إضافة تقييم جديد
   Future<void> addRating(
       {required String userId,
+      required String userName, // إضافة اسم المستخدم
       required String driverId,
       required int rating,
       String? comment}) async {
     try {
       await _firestore.collection('driverRatings').add({
         'userId': userId,
+        'userName': userName, // إضافة اسم المستخدم
         'driverId': driverId,
         'rating': rating,
         'comment': comment ?? '', // إذا لم يكن هناك تعليق، اجعل القيمة فارغة

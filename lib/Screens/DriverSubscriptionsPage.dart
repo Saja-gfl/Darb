@@ -20,7 +20,7 @@ class _DriverSubscriptionsPageState extends State<DriverSubscriptionsPage> {
       appBar: AppBar(title: const Text("طلبات الاشتراك")),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('subscriptionRequests')
+            .collection('rideRequests')//('subscriptionRequests')
             .where('driverId', isEqualTo: currentUserId)
             .snapshots(),
         builder: (context, snapshot) {
@@ -29,8 +29,8 @@ class _DriverSubscriptionsPageState extends State<DriverSubscriptionsPage> {
 
           final docs = snapshot.data!.docs;
 
-          final pending = docs.where((doc) => doc['status'] == 'معلق').toList();
-          final active = docs.where((doc) => doc['status'] == 'نشط').toList();
+          final pending = docs.where((doc) => doc['sub_status'] == 'معلق').toList();
+          final active = docs.where((doc) => doc['sub_status'] == 'نشط').toList();
 
           return ListView(
             children: [
@@ -61,11 +61,11 @@ class SubscriptionTile extends StatelessWidget {
   void acceptSubscription(BuildContext context) async {
     try {
       await FirebaseFirestore.instance
-          .collection('subscriptionRequests')
+          .collection('rideRequests')//('subscriptionRequests')
           .doc(doc.id)
           .update({
         'sub_status': 'نشط',
-        'driverId': FirebaseAuth.instance.currentUser?.uid ?? 'legJfO1wakMmTmUvGtQjNny7yGW2',
+        'driverId': FirebaseAuth.instance.currentUser?.uid ?? 'غير معروف',
       });
 
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("تم قبول الاشتراك.")));
@@ -77,7 +77,7 @@ class SubscriptionTile extends StatelessWidget {
   void rejectSubscription(BuildContext context) async {
     try {
       await FirebaseFirestore.instance
-          .collection('subscriptionRequests')
+          .collection('rideRequests')//('subscriptionRequests')
           .doc(doc.id)
           .update({'sub_status': 'مرفوض'});
 

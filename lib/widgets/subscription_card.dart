@@ -10,11 +10,11 @@ class SubscriptionCard extends StatelessWidget {
   final String dropoff;
   final String schedule;
   final String price;
-  final String driverId; // إضافة driverId
+  final String driverName; // إضافة driverId
+  final String driverId;
   final String sub_status;
   final VoidCallback onSharePressed;
   final VoidCallback onRatePressed;
-  final Widget actionButton;
 
   SubscriptionCard({
     required this.subscriptionNumber,
@@ -24,11 +24,11 @@ class SubscriptionCard extends StatelessWidget {
     required this.dropoff,
     required this.schedule,
     required this.price,
-    required this.driverId, // تمرير driverId
+    required this.driverName, // تمرير driverId
+    required this.driverId, // إضافة driverId
     required this.sub_status,
     required this.onSharePressed,
     required this.onRatePressed,
-    required this.actionButton,
   });
 
   @override
@@ -75,18 +75,18 @@ class SubscriptionCard extends StatelessWidget {
             Divider(height: 24, color: Colors.grey[300]),
 
             // Route Info
-            _buildInfoRow(Icons.place, route),
+            //_buildInfoRow(Icons.place, route),
             SizedBox(height: 12),
-            _buildInfoRow(Icons.location_on, 'انطلاق: $pickup'),
+            _buildInfoRow(Icons.location_on, 'من: $pickup'),
             SizedBox(height: 12),
-            _buildInfoRow(Icons.location_on, 'وصول: $dropoff'),
+            _buildInfoRow(Icons.location_on, 'الى: $route'),
             SizedBox(height: 12),
-            _buildInfoRow(Icons.access_time, schedule),
+           _buildInfoRow(Icons.access_time, schedule),
             SizedBox(height: 12),
             _buildInfoRow(Icons.attach_money, price),
             SizedBox(height: 12),
-            // _buildInfoRow(Icons.person, 'السائق: $driver'),
-            // SizedBox(height: 16),
+            _buildInfoRow(Icons.person, 'السائق: $driverName'),
+            SizedBox(height: 16),
 
             // Status and Actions
             Row(
@@ -119,7 +119,9 @@ class SubscriptionCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ReviewPage(driverId: driverId,), // تمرير اسم السائق
+                        builder: (context) => ReviewPage(
+                          driverId: driverId,
+                        ), // تمرير اسم السائق
                       ),
                     );
                   },

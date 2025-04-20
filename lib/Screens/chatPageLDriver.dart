@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:rem_s_appliceation9/Screens/chatPage.dart';
+import 'package:provider/provider.dart';
 
 import '../routes/app_routes.dart';
+import '../services/UserProvider.dart';
+import 'ChatPage.dart';
 
 class ChatHomePage extends StatefulWidget {
   final bool isDriver;
@@ -18,18 +21,9 @@ class _ChatHomePageState extends State<ChatHomePage> {
   final TextEditingController _searchController = TextEditingController();
 
   // Mock chat data
-  final List<Map<String, dynamic>> _allChats = [
-    {
-      'id': '1',
-      'userName': 'أحمد السائق',
-      'lastMessage': 'سأكون هناك خلال 10 دقائق',
-      'time': '10:30 ص',
-      'unread': 2,
-      'isOnline': true,
-      'tripId': 'trip123',
-      'userId': 'driver1',
-    },
-    {
+   List<Map<String, dynamic>> _activeChats = [
+
+    /*{
       'id': '2',
       'userName': 'محمد الراكب',
       'lastMessage': 'شكراً على التوصيل!',
@@ -38,20 +32,43 @@ class _ChatHomePageState extends State<ChatHomePage> {
       'isOnline': false,
       'tripId': 'trip456',
       'userId': 'user1',
-    },
-    {
-      'id': '3',
-      'userName': 'سارة',
-      'lastMessage': 'أين نقطة اللقاء؟',
-      'time': 'الثلاثاء',
-      'unread': 1,
-      'isOnline': true,
-      'tripId': 'trip789',
-      'userId': 'user2',
-    },
+    },*/
   ];
-
   @override
+   void initState() {
+    super.initState();
+    _fetchActiveChats();
+  }
+  void _fetchActiveChats() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.uid;
+    
+    if (userId != null) {
+      // Fetch active chats from the server or database
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('rideRequests')
+          .where('driverId', isEqualTo: userId)
+          //.where('status_ride', isEqualTo: 'active')
+          .get();
+
+          setState(() {
+            _activeChats = querySnapshot.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return {
+                'tripId': doc.id,
+                'userName': doc.id,
+                'lastMessage': data['lastMessage'] ?? 'لا توجد رسائل',
+                'time': data['time'] ?? 'غير متوفر',
+                'unread': data['unread'] ?? 0,
+                'isOnline': data['isOnline'] ?? false,
+              };
+            }).toList();
+          });
+    }
+  }
+      
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -103,9 +120,9 @@ class _ChatHomePageState extends State<ChatHomePage> {
           // Chat List
           Expanded(
             child: ListView.builder(
-              itemCount: _allChats.length,
+              itemCount: _activeChats.length,
               itemBuilder: (context, index) {
-                final chat = _allChats[index];
+                final chat = _activeChats[index];
                 return _buildChatItem(chat);
               },
             ),
@@ -119,18 +136,15 @@ class _ChatHomePageState extends State<ChatHomePage> {
     return InkWell(
       onTap: () {
 
-        Navigator.pushNamed(context, AppRoutes.chatPage);
-       /* Navigator.push(
+        // Navigate to chat page with the selected chat details
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChatPage(
-                // tripId: chat['tripId'],
-                //userId: widget.isDriver ? 'driver1' : chat['userId'],
-                //userName: widget.isDriver ? 'السائق' : chat['userName'],
-                //isDriver: widget.isDriver,
-                ),
+              tripId: chat['tripId'],
+            ),
           ),
-        );*/
+        );
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

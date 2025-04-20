@@ -715,7 +715,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
         "homeLocation": homeLocation,
         "workLocation": workLocation,
         "schedule": scheduleDays.toString(),
-        "price": price,
+        "price": price.toString(),
         "notes": driverNotes,
         "sub_status": "معلق",
         "createdAt": DateTime.now(),
@@ -723,9 +723,10 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
       print("📦 subscriptionData: $subscriptionData");
 
       //استدعاء submitSubscription من ملف request.dart
-      String tripId = await submitRequest("", userId, subscriptionData);
-
-      print("🚀 تم إرسال الطلب، tripId: $tripId");
+      String tripId =
+          await submitRequest(context,"", userId, subscriptionData);
+      userProvider.setTripId(tripId); // Set the trip ID in the provider
+    print("🚀 تم إرسال الطلب، tripId: $tripId");
 
       // Move to DriverSelectionPage
       Navigator.push(

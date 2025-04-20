@@ -49,12 +49,8 @@ class AppRoutes {
     userProfilePage: (context) => UserProfilePage(),
     // subPage: (context) => CreateSubscriptionPage(),
     //numberSub: (context) => NumberSubPage(),
-    chatPage: (context) => ChatPage(
-          tripId: 'mock_trip_123', // Fake trip ID
-          userId: 'mock_user_456', // Fake user ID
-          userName: 'مستخدم تجريبي', // Fake user name
-          isDriver: false, // Fake driver status
-        ), //findDriverPage: (context) => FindDriverPage(),
+    //chatPage: (context) => ChatPage(),
+    //findDriverPage: (context) => FindDriverPage(),
     //reviewPage: (context) => ReviewPage(),
     // otpPage: (context) => OTPVerificationScreen(),
     ongoingSubPage: (context) => OngoingSubPage(),

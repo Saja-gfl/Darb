@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rem_s_appliceation9/services/FireStore.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
@@ -25,6 +26,7 @@ class _ReviewPageState extends State<ReviewPage> {
   final Set<String> _selectedTags = {};
   String driverName = "السائق"; // اسم افتراضي
   bool isLoading = true;
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void initState() {
@@ -205,6 +207,7 @@ class _ReviewPageState extends State<ReviewPage> {
                       ),
                       SizedBox(height: 8),
                       TextField(
+                        controller: _commentController, // ربط TextEditingController
                         maxLines: 4,
                         decoration: InputDecoration(
                           hintText: 'شارك رأيك بتجربتك (اختياري)',
@@ -251,18 +254,28 @@ class _ReviewPageState extends State<ReviewPage> {
                         }
 
                         try {
-                          final userProvider =
-                              Provider.of<UserProvider>(context, listen: false);
+                          final userProvider = Provider.of<UserProvider>(context, listen: false);
+                          final userName = userProvider.userName ?? 'مجهول';
+                      
+                          // جمع النص من TextField والعلامات المختارة
+                          final additionalComment = _commentController.text.trim();
+                          final combinedComment = [
+                            ..._selectedTags,
+                            if (additionalComment.isNotEmpty) additionalComment,
+                          ].join(', ');
+                      
                           await RatingService().addRating(
                             userId: userProvider.uid!,
-                            driverId: userProvider.driverId!,
+                            userName: userName,
+                            driverId: widget.driverId,
                             rating: _rating,
-                            comment: '', // يمكن تعديل هذا لإضافة التعليقات
+                            comment: combinedComment, // إرسال النص والعلامات معًا
                           );
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('تم إرسال التقييم بنجاح')),
                           );
+                          _commentController.clear();
                           Navigator.pop(context);
                         } catch (e) {
                           print("خطأ أثناء إضافة التقييم: $e");

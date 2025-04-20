@@ -6,6 +6,7 @@ import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
 import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
+import 'AccountPage.dart';
 import 'DriverInfoPage.dart';
 import 'CustomBottomNavBar.dart';
 import 'DriverOngoingSubsPage.dart';
@@ -13,9 +14,9 @@ import 'DriverSubscriptionsPage.dart';
 // كومنت مهم تحت !! 
 import 'package:provider/provider.dart';
 import '../services/UserProvider.dart';
+import 'chatPageLDriver.dart';
 
 // كومنت مهم تحت !!
-import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
 import 'package:rem_s_appliceation9/Screens/CustomBottomNavBar.dart';
 
 class DriverHomePage extends StatefulWidget {
@@ -64,21 +65,15 @@ class _DriverHomePageState extends State<DriverHomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChatPage(
+                builder: (context) => ChatHomePage(
                 ),
               ),
             );
           } else if (index == 2) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DriverInfoPage()),
+              MaterialPageRoute(builder: (context) => AccountPage()),
             );
-          if (index == 1) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MessagesHomePage()));
-          } else if (index == 2) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => DriverInfoPage()));
           }
         },
       ),
