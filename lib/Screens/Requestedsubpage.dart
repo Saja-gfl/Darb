@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
 
 class Requestedsubpage extends StatelessWidget {
+  const Requestedsubpage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFFFFB300)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserHomePage()),
+              );
+            }),
         title: Text(
           'الاشتراكات المرفوعة',
           style: GoogleFonts.getFont(
@@ -18,90 +28,17 @@ class Requestedsubpage extends StatelessWidget {
         ),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Search Bar
-            _buildSearchBar(),
-            const SizedBox(height: 16),
-
-            // Filter Chips
-            _buildFilterChips(),
-            const SizedBox(height: 24),
-
             // Subscription Card
             _buildSubscriptionCard(),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFD4D4D4)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'ابحث عن اشتراك...',
-          hintStyle: GoogleFonts.inter(
-            color: const Color(0xFFADAEBC),
-            fontWeight: FontWeight.w400,
-          ),
-          prefixIcon: const Icon(Icons.search, color: Colors.grey),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChips() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          _buildChip("الأيام المفضلة"),
-          const SizedBox(width: 8),
-          _buildChip("أسبوعي"),
-          const SizedBox(width: 8),
-          _buildChip("شهري"),
-          const SizedBox(width: 8),
-          _buildChip("تصفية", icon: Icons.filter_list),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChip(String text, {IconData? icon}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFD4D4D4)),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 16, color: Colors.black),
-            const SizedBox(width: 8),
-          ],
-          Text(
-            text,
-            style: GoogleFonts.inter(
-              color: Colors.black,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -141,6 +78,7 @@ class Requestedsubpage extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
+                    color: const Color(0xFFFFB300),
                   ),
                 ),
               ],
@@ -152,14 +90,14 @@ class Requestedsubpage extends StatelessWidget {
             _buildInfoRow('نقطة الانطلاق', Icons.location_on),
             _buildInfoRow('نقطة التوصيل', Icons.location_on),
 
-            const Divider(height: 32),
+            const Divider(height: 24),
 
             // Schedule and Price
             _buildDetailRow(
                 '7:00 صباحاً - الأحد إلى الخميس', Icons.access_time),
             _buildDetailRow('500 ريال/شهرياً', Icons.attach_money),
 
-            const Divider(height: 32),
+            const Divider(height: 24),
 
             // Action Buttons
             _buildActionButton('تعديل الاشتراك', Icons.edit),
@@ -194,7 +132,7 @@ class Requestedsubpage extends StatelessWidget {
 
   Widget _buildDetailRow(String text, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
