@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
@@ -8,6 +9,12 @@ import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
 import 'package:rem_s_appliceation9/Screens/AccountPageUser.dart';
 import 'package:rem_s_appliceation9/Screens/subpage.dart'; // Import for SubPage
 import 'package:rem_s_appliceation9/Screens/Requestedsubpage.dart';
+
+import '../services/UserProvider.dart';
+import 'ChatPage.dart';
+import 'MessagesHomePage.dart';
+import 'UserProfilePage.dart';
+import 'chatPageLDriver.dart';
 
 // ignore_for_file: must_be_immutable
 class UserHomePage extends StatefulWidget {
@@ -182,17 +189,49 @@ class _UserHomePageState extends State<UserHomePage> {
 
   Widget _buildBottomNavBar() {
     return BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "الرئيسية"),
-          BottomNavigationBarItem(icon: Icon(Icons.message), label: "الرسائل"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "الحساب"),
-        ],
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
+      items: [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: "الرئيسية"),
+        BottomNavigationBarItem(icon: Icon(Icons.message), label: "الرسائل"),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: "الحساب"),
+      ],
+      selectedItemColor: Colors.orange,
+      unselectedItemColor: Colors.grey,
+      onTap: (index) {
+        if (index == 1) {
+         final tripId = Provider.of<UserProvider>(context, listen: false).tripId;
+         //print("trip is" + tripId!);
+          //if (tripId != null && tripId.isNotEmpty) {  
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AccountPage()));
-        });
+              context,
+              MaterialPageRoute(
+                builder: (context) =>MessagesHomePage(), // Pass the tripId to ChatPage
+              ));
+          /* Navigator.push(
+             context, MaterialPageRoute(builder: (context) => ChatPage( )));*/
+          /*} else {
+            // Handle the case when tripId is null
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("لا توجد محادثات حالية"),
+              ),
+            );
+          }*/
+        } else if (index == 2) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => AccountPage()));
+        }
+      },
+    );
+  }
+}
+
+class ActiveSubscriptionsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("الاشتراكات الجارية")),
+      body: Center(child: Text("محتوى صفحة الاشتراكات الجارية")),
+    );
   }
 }
 

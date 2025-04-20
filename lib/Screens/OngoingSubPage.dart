@@ -12,16 +12,49 @@ import 'package:rem_s_appliceation9/Screens/ReviewPage.dart';
 import '../services/UserProvider.dart';
 
 class OngoingSubPage extends StatefulWidget {
+  const OngoingSubPage({Key? key}) : super(key: key);
+
+  @override
   _OngoingSubPageState createState() => _OngoingSubPageState();
 }
 
 class _OngoingSubPageState extends State<OngoingSubPage> {
+
   final Color primaryColor = Color(0xFFFFB300);
   final double borderRadius = 12.0;
 
-  List<Map<String, dynamic>> subscriptions = []; // قائمة الاشتراكات
   TextEditingController searchController = TextEditingController();
+  late String currentUserId;
+    List<Map<String, dynamic>> subscriptions = []; // قائمة الاشتراكات
+  bool isLoading = true;
 
+
+  @override
+  void initState() {
+    super.initState();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    currentUserId = userProvider.uid!;
+    fetchSubscriptions(); // جلب الاشتراكات النشطة عند تحميل الصفحة
+  }
+
+
+Future<void> fetchSubscriptions() async {
+  try {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    currentUserId = userProvider.uid!;
+  final subs = await getActiveTripsForUser(currentUserId);
+  setState(() {
+    subscriptions = subs;
+    isLoading = false;
+  });
+  } catch (e) {
+    print("خطأ أثناء جلب الاشتراكات: $e");
+    setState(() {
+      isLoading = false; // إيقاف التحميل في حالة حدوث خطأ
+    });
+  }
+} 
+ 
   Future<void> searchSubscription(String tripId) async {
     try {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -35,7 +68,7 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
       if (subscriptionData != null) {
         //تحقق من وجود المستخدم في قاعدة البيانات
         final userDoc = await FirebaseFirestore.instance
-            .collection('rideRequests')
+            .collection('rideRequests')//('subscriptionRequests')
             .doc(tripId)
             .collection('users')
             .doc(userId)
@@ -55,7 +88,7 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
               'subscriptionData': {
                 'type': subscriptionData['type'], // نوع الاشتراك
                 'price': subscriptionData['price'], // السعر
-                'schedule': subscriptionData['schedule'], // الجدول
+                //'schedule': subscriptionData['schedule'], // الجدول
                 'from': subscriptionData['fromLocation'], // موقع المغادرة
                 'to': subscriptionData['toLocation'], // موقع الوصول
                 'startDate': subscriptionData['startDate'], // تاريخ البدء
@@ -280,8 +313,10 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
             subscriptions.isNotEmpty
                 ? Column(
                     children: subscriptions.map((subscription) {
-                      final subscriptionData = subscription['subscriptionData'];
-                      final schedule = subscriptionData['schedule'] ?? '';
+                     final driverName = subscription['driverData']?['name'] ?? 'غير معروف';
+
+                      
+                      final schedule = subscription['schedule'] ?? '';
                       final scheduleText = schedule is List
                           ? schedule
                               .map((day) => "${day['day']} - ${day['time']}")
@@ -291,21 +326,22 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
                       // عرض بطاقة الاشتراك
                       return SubscriptionCard(
                         subscriptionNumber: subscription['tripId'] ?? '',
-                        type: subscriptionData['type'] ?? '',
-                        route: subscriptionData['workLocation'] ?? '',
-                        pickup: subscriptionData['from'] ?? '',
-                        dropoff: subscriptionData['to'] ?? '',
+                        driverName: driverName,
+                        type: subscription['type'] ?? '',
+                        route: subscription['workLocation'] ?? '',
+                        pickup: subscription['fromLocation'] ?? '',
+                        dropoff: subscription['toLocation'] ?? '',
                         schedule: scheduleText,
-                        price: subscriptionData['price'] ?? '',
+                        price: subscription['price'] ?? '',
                         sub_status:
-                            subscriptionData['sub_status'] ?? 'غير معروف',
-                        driverId: subscriptionData['driverId'] ??
+                            subscription['sub_status'] ?? 'غير معروف',
+                        driverId: subscription['driverId'] ??
                             '', // تمرير driverId
                         onSharePressed: () {
                           // Handle share functionality
                         },
                         onRatePressed: () {
-                          final driverId = subscriptionData['driverId'];
+                          final driverId = subscription['driverId'];
                           if (driverId != null) {
                             Navigator.push(
                               context,
@@ -319,12 +355,8 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
                                 message: 'لا يوجد سائق مرتبط بهذه الرحلة');
                           }
                         },
-                        actionButton: ElevatedButton(
-                          onPressed: () {
-                            // Handle action button
-                          },
-                          child: Text('Button'),
-                        ),
+                        
+                          
                       );
                     }).toList(),
                   )

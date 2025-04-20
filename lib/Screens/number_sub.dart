@@ -195,12 +195,12 @@ class NumberSubPage extends StatelessWidget {
             // Chat Button
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
+                /*Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatPage(),
                   ),
-                );
+                );*/
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,

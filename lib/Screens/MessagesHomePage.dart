@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
@@ -6,6 +7,10 @@ import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'package:rem_s_appliceation9/Screens/ChatPage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
+
+import '../services/ChatService.dart';
+import '../services/UserProvider.dart';
+import '../services/request.dart';
 
 class MessagesHomePage extends StatefulWidget {
   const MessagesHomePage({Key? key}) : super(key: key);
@@ -15,7 +20,40 @@ class MessagesHomePage extends StatefulWidget {
 }
 
 class _MessagesHomePageState extends State<MessagesHomePage> {
+  final ChatService _chatService = ChatService();
+  List<Map<String, dynamic>> _userChats = [];
   int _currentIndex = 1; // Highlight messages tab
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserChats();
+  }
+
+  void _fetchUserChats() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.uid;
+
+    if (userId != null) {
+      final chats = await _chatService.getUserChatRooms(userId);
+      setState(() {
+        _userChats = chats.map((chat) {
+          check_Sub_tatus(chat['tripId'], userId);
+          return {
+            'name': ((chat['name'] ?? 'غير معروف') +
+                ": رحلة رقم"), // قيمة افتراضية للاسم
+            'lastMessage':
+                chat['lastMessage'] ?? 'لا توجد رسائل', // قيمة افتراضية للرسالة
+            'time': chat['time'] ?? 'غير متوفر', // قيمة افتراضية للوقت
+            'unread': chat['unread'] ?? false, // قيمة افتراضية لحالة القراءة
+            'tripId': chat['tripId'] ?? '', // تأكد من وجود tripId
+          };
+        }).toList();
+      });
+    }
+  }
+
+  @override
 
   // Mock chat data
   final List<Map<String, dynamic>> _chats = [
@@ -167,10 +205,10 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
         ListView.separated(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: _chats.length,
+          itemCount: _userChats.length,
           separatorBuilder: (context, index) => SizedBox(height: 16.h),
           itemBuilder: (context, index) {
-            final chat = _chats[index];
+            final chat = _userChats[index];
             return _buildChatItem(
               chat['name'],
               chat['lastMessage'],
@@ -182,9 +220,6 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                   MaterialPageRoute(
                     builder: (context) => ChatPage(
                       tripId: chat['tripId'],
-                      userId: chat['id'],
-                      userName: chat['name'],
-                      isDriver: chat['isDriver'],
                     ),
                   ),
                 );

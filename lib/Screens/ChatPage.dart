@@ -9,7 +9,8 @@ import '../services/chatService.dart';
 import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  final String tripId; // ID الرحلة
+  const ChatPage({Key? key, required this.tripId}) : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -21,18 +22,32 @@ class _ChatPageState extends State<ChatPage> {
   final ScrollController _scrollController = ScrollController();
 
   List<Map<String, dynamic>> _messages = [];
+  bool _isSubscriptionEnded = false;
 
   @override
   void initState() {
     super.initState();
+    _checkSubscriptionStatus();
     _listenToMessages();
   }
 
-  void _listenToMessages() {
+  Future<void> _checkSubscriptionStatus() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final tripId = userProvider.tripId ?? '';
+    final userId = userProvider.uid;
 
-    _chatService.getMessages(tripId).listen((snapshot) {
+    if (userId != null) {
+      final canSend = await _chatService.canSendMessage(widget.tripId, userId);
+      setState(() {
+        _isSubscriptionEnded = !canSend;
+      });
+    }
+  }
+
+  void _listenToMessages() {
+    //final userProvider = Provider.of<UserProvider>(context, listen: false);
+    //final tripId = userProvider.tripId ?? '';
+
+    _chatService.getMessages(widget.tripId).listen((snapshot) {
       final messages = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         return {
@@ -62,8 +77,18 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _sendMessage() {
+    if (_isSubscriptionEnded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("لا يمكنك الإرسال: الاشتراك منتهي"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final tripId = userProvider.tripId ?? '';
+    //final tripId = userProvider.tripId ?? '';
     final userId = userProvider.uid ?? '';
     final userName = userProvider.userName ?? '';
 
@@ -71,7 +96,7 @@ class _ChatPageState extends State<ChatPage> {
     if (messageText.isNotEmpty) {
       // استخدام ChatService لإرسال الرسالة
       _chatService.sendMessage(
-        chatId: tripId, // ID غرفة الدردشة
+        chatId: widget.tripId, // ID غرفة الدردشة
         senderId: userId, // ID المرسل
         senderName: userName, // اسم المرسل
         message: messageText, // نص الرسالة
@@ -101,10 +126,8 @@ class _ChatPageState extends State<ChatPage> {
           onPressed: () {
             if (userProvider.isDriver) {
               Navigator.pushReplacementNamed(context, AppRoutes.driverHomePage);
-              
             } else {
               Navigator.pushReplacementNamed(context, AppRoutes.userHomePage);
-              
             }
           },
         ),
@@ -183,47 +206,60 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
           ),
+          if (_isSubscriptionEnded)
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.red[100],
+              child: const Text(
+                'الاشتراك منتهي. لا يمكنك إرسال رسائل جديدة.',
+                style: TextStyle(color: Colors.red, fontFamily: 'Tajawal'),
+              ),
+            )
+          else
+            _buildMessageInput(), // تأكد من أن هذا السطر مكتمل وصحيح
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageInput() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      color: Colors.white,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _messageController,
+              textDirection: TextDirection.rtl,
+              decoration: InputDecoration(
+                hintText: 'اكتب رسالتك...',
+                hintStyle: TextStyle(
+                  fontFamily: 'Tajawal',
+                  color: Colors.grey[600],
+                ),
+                filled: true,
+                fillColor: const Color(0xFFFFF3E0),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            color: Colors.white,
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    textDirection: TextDirection.rtl,
-                    decoration: InputDecoration(
-                      hintText: 'اكتب رسالتك...',
-                      hintStyle: TextStyle(
-                        fontFamily: 'Tajawal',
-                        color: Colors.grey[600],
-                      ),
-                      filled: true,
-                      fillColor: const Color(0xFFFFF3E0),
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 14),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFFB85C),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.send, color: Colors.white),
-                    onPressed: () {
-                      // استدعاء دالة إرسال الرسالة
-                      _sendMessage();
-                    },
-                  ),
-                ),
-              ],
+            decoration: const BoxDecoration(
+              color: Color(0xFFFFB85C),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.send, color: Colors.white),
+              onPressed: () {
+                // استدعاء دالة إرسال الرسالة
+                _sendMessage();
+              },
             ),
           ),
         ],

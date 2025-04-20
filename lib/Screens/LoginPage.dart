@@ -225,7 +225,8 @@ class _K0ScreenState extends State<K0Screen> {
     userProvider.setPhoneNumber(userData['phone'] ?? '');
     userProvider.setLocation(userData['address'] ?? '');
     userProvider.setIsDriver(userData['isDriver'] ?? false);
-    userProvider.setTripId(userData['gender'] ?? '');
+    userProvider.setTripId(userData['tripId'] ?? '');
+    userProvider.setGender(userData['Gender'] ?? '');
     userProvider.setCarType(userData['carType'] ?? '');
     userProvider.setPlateNumber(userData['plateNumber'] ?? '');
 

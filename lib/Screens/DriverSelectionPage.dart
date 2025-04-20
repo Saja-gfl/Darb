@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
 import '../services/chatService.dart';
 import '../services/request.dart';
@@ -8,9 +9,9 @@ import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
 import 'package:rem_s_appliceation9/screens/subpage.dart';
 import 'package:rem_s_appliceation9/services/request.dart';
 import 'dart:async';
-import 'dart:math'; // لإضافة مكتبة Random
+import 'dart:math';
 
-
+import 'ChatPage.dart'; // لإضافة مكتبة Random
 
 class Driver {
   final String id;
@@ -104,7 +105,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   @override
   void initState() {
     super.initState();
-    
+
     Future.delayed(Duration.zero, () async {
       List<Driver> results = await filterDrivers(
         fromLocation: widget.fromLocation,
@@ -130,7 +131,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
       // استعلام لتصفية السائقين في Firestore بناءً على المعايير المدخلة
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('driverdata')
-          .where('location', isEqualTo: fromLocation) // تصفية حسب الموقع
+          .where('address', isEqualTo: fromLocation) // تصفية حسب الموقع
           .where('subscriptionType', isEqualTo: subscriptionType)
           .where('acceptedLocations', isEqualTo: toLocation) // تصفية حسب الموقع
           .where('price', isLessThanOrEqualTo: price) // تصفية حسب السعر
@@ -138,14 +139,14 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
       print(
           'Query Results: ${snapshot.docs.length}'); // طباعة عدد الوثائق المسترجعة
 
+      // تحويل المستندات إلى قائمة من السائقين مع تقييماتهم
+      List<Driver> filteredDrivers =
+          await Future.wait(snapshot.docs.map((doc) async {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-    // تحويل المستندات إلى قائمة من السائقين مع تقييماتهم
-    List<Driver> filteredDrivers = await Future.wait(snapshot.docs.map((doc) async {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-              // جلب آخر 10 تقييمات للسائق
-      List<Map<String, dynamic>> ratings =
-          await RatingService().getDriverRatings(doc.id);
+        // جلب آخر 10 تقييمات للسائق
+        List<Map<String, dynamic>> ratings =
+            await RatingService().getDriverRatings(doc.id);
 
         return Driver(
           id: doc.id,
@@ -159,7 +160,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
           ratings: ratings.take(10).toList(), // أخذ آخر 10 تقييمات فقط
         );
       }).toList());
-    
+
       return filteredDrivers;
     } catch (e) {
       print("خطأ في تصفية السائقين: $e");
@@ -167,13 +168,40 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
     }
   }
 
+  Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
+    try {
+      final userId = FirebaseAuth.instance.currentUser?.uid ??
+          "usertest"; // UID المستخدم الحالي (الراكب)
+      final tripId = widget.tripId; //
 
-Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
-  try {
-    final userId = FirebaseAuth.instance.currentUser?.uid ?? "usertest"; // UID المستخدم الحالي (الراكب)
-    final requestId = generateRequestId(); // توليد ID عشوائي للطلب
+      await FirebaseFirestore.instance
+          .collection('rideRequests')
+          .doc(tripId)
+          .update({
+        'driverId': driverData['id'], // UID الخاص بالسائق
+        'sub_status': 'معلق', // حالة الطلب (معلق)
+        'driverData': {
+          'id': driverData['id'],
+          'name': driverData['name'],
+          'phone': driverData['phone'],
+          'carModel': driverData['carType'],
+        }, // إضافة بيانات السائق كـ Map
+        'updatedAt': Timestamp.now(), // وقت التحديث
+      });
 
-    await FirebaseFirestore.instance
+      // إظهار رسالة تأكيد للمستخدم
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("تم ارسال الطلب  للسائق")),
+      );
+    } catch (e) {
+      print("خطأ في إرسال طلب الاشتراك: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("حدث خطأ أثناء إرسال الطلب")),
+      );
+    }
+    //final requestId = generateRequestId(); // توليد ID عشوائي للطلب
+
+    /*await FirebaseFirestore.instance
         .collection('subscriptionRequests')
         .doc(requestId)
         .set({
@@ -194,11 +222,8 @@ Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
     );
   } catch (e) {
     print("❌ خطأ أثناء إرسال طلب الاشتراك: $e");
+  }*/
   }
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -231,12 +256,13 @@ Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
                   child: ListView.builder(
                     itemCount: filteredDrivers.length, //drivers.length,
                     itemBuilder: (context, index) {
-                return DriverCard(
-                  driver: filteredDrivers[index],
-                  onSubscribe: () =>
-                      sendSubscriptionRequest(filteredDrivers[index].toMap()),
-                );
-                      
+                      return DriverCard(
+                        driver: filteredDrivers[index],
+                        onSubscribe: () => sendSubscriptionRequest(
+                            filteredDrivers[index].toMap()),
+                        tripId: widget.tripId, // معرف الاشتراك
+                      );
+
                       //return DriverCard(driver: drivers[index]);
                     },
                   ),
@@ -251,10 +277,14 @@ class DriverCard extends StatelessWidget {
   final Driver driver;
   //final Function(String) onSubscribe; // وظيفة يتم استدعاؤها عند الاشتراك
   final VoidCallback onSubscribe;
+  final String tripId; // معرف الاشتراك
 
- const DriverCard({Key? key, required this.driver, required this.onSubscribe})
+  const DriverCard(
+      {Key? key,
+      required this.driver,
+      required this.onSubscribe,
+      required this.tripId})
       : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
@@ -331,9 +361,29 @@ class DriverCard extends StatelessWidget {
             ),
           if (driver.ratings.isNotEmpty)
             ...driver.ratings.map((rating) {
+              String userName = (rating['userName'] ?? 'غير معروف');
+
+              // تنسيق الاسم لإظهار أول ثلاث أحرف فقط والباقي **
+              String formattedUserName = userName.length > 3
+                  ? '${userName.substring(0, 3)}**'
+                  : userName;
+
+              String truncatedComment = (rating['comment'] ?? 'لا يوجد تعليق')
+                  .split(' ')
+                  .take(4)
+                  .join(' ');
               return ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.amber,
+                  child: Text(
+                    formattedUserName,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
                 title: Text(
-                  rating['comment'] ?? 'لا يوجد تعليق',
+                  truncatedComment,
+                  // rating['comment'] ?? 'لا يوجد تعليق',
                   textDirection: TextDirection.rtl,
                   style: const TextStyle(fontSize: 14),
                 ),
@@ -358,7 +408,8 @@ class DriverCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-        onPressed: onSubscribe,  // نقوم هنا فقط باستدعاء onSubscribe بدون معلمات.
+                    onPressed:
+                        onSubscribe, // نقوم هنا فقط باستدعاء onSubscribe بدون معلمات.
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 221, 145, 21),
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -378,7 +429,21 @@ class DriverCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final userId = FirebaseAuth.instance.currentUser?.uid ??
+                          "unknown_user";
+                      final driverId = driver.id; // معرف السائق
+
+                      await ChatService()
+                          .createChatRoom(tripId, driverId, [userId]);
+                      // الانتقال إلى صفحة الدردشة
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(tripId: tripId),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(vertical: 12),
