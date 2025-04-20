@@ -19,15 +19,13 @@ class OngoingSubPage extends StatefulWidget {
 }
 
 class _OngoingSubPageState extends State<OngoingSubPage> {
-
   final Color primaryColor = Color(0xFFFFB300);
   final double borderRadius = 12.0;
 
   TextEditingController searchController = TextEditingController();
   late String currentUserId;
-    List<Map<String, dynamic>> subscriptions = []; // قائمة الاشتراكات
+  List<Map<String, dynamic>> subscriptions = []; // قائمة الاشتراكات
   bool isLoading = true;
-
 
   @override
   void initState() {
@@ -37,24 +35,23 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
     fetchSubscriptions(); // جلب الاشتراكات النشطة عند تحميل الصفحة
   }
 
-
-Future<void> fetchSubscriptions() async {
-  try {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    currentUserId = userProvider.uid!;
-  final subs = await getActiveTripsForUser(currentUserId);
-  setState(() {
-    subscriptions = subs;
-    isLoading = false;
-  });
-  } catch (e) {
-    print("خطأ أثناء جلب الاشتراكات: $e");
-    setState(() {
-      isLoading = false; // إيقاف التحميل في حالة حدوث خطأ
-    });
+  Future<void> fetchSubscriptions() async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      currentUserId = userProvider.uid!;
+      final subs = await getActiveTripsForUser(currentUserId);
+      setState(() {
+        subscriptions = subs;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("خطأ أثناء جلب الاشتراكات: $e");
+      setState(() {
+        isLoading = false; // إيقاف التحميل في حالة حدوث خطأ
+      });
+    }
   }
-} 
- 
+
   Future<void> searchSubscription(String tripId) async {
     try {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -68,7 +65,7 @@ Future<void> fetchSubscriptions() async {
       if (subscriptionData != null) {
         //تحقق من وجود المستخدم في قاعدة البيانات
         final userDoc = await FirebaseFirestore.instance
-            .collection('rideRequests')//('subscriptionRequests')
+            .collection('rideRequests') //('subscriptionRequests')
             .doc(tripId)
             .collection('users')
             .doc(userId)
@@ -109,7 +106,7 @@ Future<void> fetchSubscriptions() async {
     }
   }
 
-//هذي الاكواد لازم تنقل الى صفحة التأكيد 
+//هذي الاكواد لازم تنقل الى صفحة التأكيد
   Future<void> _sendSubscriptionRequest(
       Map<String, dynamic> subscription) async {
     try {
@@ -196,126 +193,13 @@ Future<void> fetchSubscriptions() async {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            // Search and Filter Row
-            Row(
-              children: [
-                // Filter Button
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: primaryColor),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(borderRadius),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.filter_list, size: 20, color: primaryColor),
-                        SizedBox(width: 8),
-                        Text(
-                          'تصفية',
-                          style: GoogleFonts.tajawal(
-                            color: primaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-
-                // Search Field
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    controller: searchController, // Attach controller
-                    onSubmitted: (value) {
-                      if (value.isNotEmpty) {
-                        searchSubscription(value); // Trigger search on submit
-                      }
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'ابحث عن اشتراك...',
-                      hintStyle: GoogleFonts.tajawal(color: Colors.grey),
-                      prefixIcon: Icon(Icons.search, color: primaryColor),
-                      filled: true,
-                      fillColor: Colors.grey[50],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(borderRadius),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(borderRadius),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-
-            // Subscription Type Tabs
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(borderRadius),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        backgroundColor: primaryColor.withOpacity(0.1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(borderRadius),
-                        ),
-                      ),
-                      child: Text(
-                        'الأيام المفضلة',
-                        style: GoogleFonts.tajawal(
-                          color: primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'أسبوعي',
-                        style: GoogleFonts.tajawal(),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'شهري',
-                        style: GoogleFonts.tajawal(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 24),
-
             // Subscription Cards
             subscriptions.isNotEmpty
                 ? Column(
                     children: subscriptions.map((subscription) {
-                     final driverName = subscription['driverData']?['name'] ?? 'غير معروف';
+                      final driverName =
+                          subscription['driverData']?['name'] ?? 'غير معروف';
 
-                      
                       final schedule = subscription['schedule'] ?? '';
                       final scheduleText = schedule is List
                           ? schedule
@@ -333,10 +217,9 @@ Future<void> fetchSubscriptions() async {
                         dropoff: subscription['toLocation'] ?? '',
                         schedule: scheduleText,
                         price: subscription['price'] ?? '',
-                        sub_status:
-                            subscription['sub_status'] ?? 'غير معروف',
-                        driverId: subscription['driverId'] ??
-                            '', // تمرير driverId
+                        sub_status: subscription['sub_status'] ?? 'غير معروف',
+                        driverId:
+                            subscription['driverId'] ?? '', // تمرير driverId
                         onSharePressed: () {
                           // Handle share functionality
                         },
@@ -355,8 +238,6 @@ Future<void> fetchSubscriptions() async {
                                 message: 'لا يوجد سائق مرتبط بهذه الرحلة');
                           }
                         },
-                        
-                          
                       );
                     }).toList(),
                   )
