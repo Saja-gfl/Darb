@@ -100,8 +100,6 @@ class Requestedsubpage extends StatelessWidget {
             const Divider(height: 24),
 
             // Action Buttons
-            _buildActionButton('تعديل الاشتراك', Icons.edit),
-            _buildActionButton('قائمة السائقين', Icons.people),
             _buildActionButton('إلغاء الاشتراك', Icons.cancel,
                 color: Colors.red),
           ],
