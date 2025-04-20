@@ -132,7 +132,8 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NumberSubPage()),
+                  MaterialPageRoute(
+                      builder: (context) => SubscriptionNumberPage()),
                 );
               },
               style: TextButton.styleFrom(
