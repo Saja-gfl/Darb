@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:rem_s_appliceation9/Screens/DriverSelectionPage.dart';
+import 'package:rem_s_appliceation9/Screens/ReviewPage.dart';
 import 'package:rem_s_appliceation9/Screens/Welcomepage.dart';
+import 'package:rem_s_appliceation9/Screens/number_sub.dart';
+import 'package:rem_s_appliceation9/Screens/otp.dart';
 import '../Screens/LoginPage.dart';
 import '../Screens/RegistrationPage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
@@ -47,11 +51,11 @@ class AppRoutes {
     // driverSelectionPage: (context) => DriverSelectionPage(),
     userHomePage: (context) => UserHomePage(),
     userProfilePage: (context) => UserProfilePage(),
-    // subPage: (context) => CreateSubscriptionPage(),
-    //numberSub: (context) => NumberSubPage(),
-    //chatPage: (context) => ChatPage(),
-    //findDriverPage: (context) => FindDriverPage(),
-    //reviewPage: (context) => ReviewPage(),
+    subPage: (context) => CreateSubscriptionPage(),
+    // numberSub: (context) => NumberSubPage(),
+    chatPage: (context) => ChatPage(),
+    // findDriverPage: (context) => FindDriverPage(),
+    // reviewPage: (context) => ReviewPage(),
     // otpPage: (context) => OTPVerificationScreen(),
     ongoingSubPage: (context) => OngoingSubPage(),
   };
