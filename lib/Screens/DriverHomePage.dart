@@ -3,19 +3,13 @@ import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
-import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
-import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
-import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
 import 'AccountPage.dart';
 import 'CustomBottomNavBar.dart';
 import 'DriverSubscriptionsPage.dart';
 // كومنت مهم تحت !! 
-import 'package:provider/provider.dart';
-import '../services/UserProvider.dart';
 import 'chatPageLDriver.dart';
 
 // كومنت مهم تحت !!
-import 'package:rem_s_appliceation9/Screens/CustomBottomNavBar.dart';
 
 class DriverHomePage extends StatefulWidget {
   const DriverHomePage({Key? key}) : super(key: key);

@@ -4,9 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
 import '../services/UserProvider.dart';
 import '../services/chatService.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
-import 'dart:math'; // لإضافة مكتبة Random
+// لإضافة مكتبة Random
 
 import 'ChatPage.dart'; // لإضافة مكتبة Random
 
