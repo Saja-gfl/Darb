@@ -1,7 +1,6 @@
 //welcome Screan
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rem_s_appliceation9/Screens/LoginPage.dart';
 
 import '../routes/app_routes.dart';
 

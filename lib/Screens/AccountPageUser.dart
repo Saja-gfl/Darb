@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
+import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/UserProfilePage.dart';
 import 'package:rem_s_appliceation9/Screens/SettingsPage.dart';
-import 'package:rem_s_appliceation9/services/UserProvider.dart';
 
-class AccountPage extends StatefulWidget {
-  const AccountPage({Key? key}) : super(key: key);
+import '../services/UserProvider.dart';
+import 'userhome_pageM.dart';
+
+class AccountPageUser extends StatefulWidget {
+  const AccountPageUser({Key? key}) : super(key: key);
 
   @override
   _AccountPageState createState() => _AccountPageState();
 }
 
-class _AccountPageState extends State<AccountPage> {
+class _AccountPageState extends State<AccountPageUser> {
   int _currentIndex = 2; // Highlight account tab
   String name = "أحمد محمد";
   String email = "ahmed@example.com";
@@ -83,9 +84,9 @@ class _AccountPageState extends State<AccountPage> {
             _buildInfoCard(
               title: "معلوماتي",
               items: [
-                _buildInfoItem("الاسم", name),
-                _buildInfoItem("البريد الإلكتروني", email),
-                _buildInfoItem("الجنس", gender),
+                {'label': "الاسم", 'value': name},
+                {'label': "البريد الإلكتروني", 'value': email},
+                {'label': "الجنس", 'value': gender},
               ],
             ),
             const SizedBox(height: 16),
@@ -94,8 +95,8 @@ class _AccountPageState extends State<AccountPage> {
             _buildInfoCard(
               title: "معلومات الاتصال",
               items: [
-                _buildInfoItem("رقم الجوال", phone),
-                _buildInfoItem("العنوان", address),
+                {'label': "رقم الجوال", 'value': phone},
+                {'label': "العنوان", 'value': address},
               ],
             ),
             const SizedBox(height: 16),
@@ -127,7 +128,7 @@ class _AccountPageState extends State<AccountPage> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const DriverHomePage()),
+              MaterialPageRoute(builder: (context) =>  UserHomePage()),
             );
           } else if (index == 1) {
             Navigator.pushReplacement(
@@ -179,7 +180,12 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-  Widget _buildInfoCard({required String title, required List<Widget> items}) {
+  Widget _buildInfoCard({required String title, required List<Map<String, String>> items}) {
+  final filteredItems = items.where((item) => item['value'] != null && item['value']!.isNotEmpty).toList();
+
+    if (filteredItems.isEmpty) {
+      return const SizedBox.shrink(); // Return an empty widget if no items to display
+    }
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -199,7 +205,8 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ),
             const SizedBox(height: 12),
-            ...items,
+            ...filteredItems.map((item) => _buildInfoItem(item['label']!, item['value']!)).toList(),
+
           ],
         ),
       ),
@@ -207,6 +214,7 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget _buildInfoItem(String label, String value) {
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -272,7 +280,22 @@ class _AccountPageState extends State<AccountPage> {
             textAlign: TextAlign.right,
             style: TextStyle(color: Colors.red),
           ),
-          onTap: () {
+          onTap: () async {
+           await FirebaseAuth.instance.signOut();
+
+            final userProvider = Provider.of<UserProvider>(context, listen: false);
+            userProvider.clearUserData();
+
+            //اخبار المستخدم تم تسجيل الخروج بنجاح 
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("تم تسجيل الخروج بنجاح"),
+                duration: Duration(seconds: 2),
+              ),
+            );
+            Navigator.pushReplacementNamed(context, '/login_page');
+
+
             // Handle logout
           },
         ),

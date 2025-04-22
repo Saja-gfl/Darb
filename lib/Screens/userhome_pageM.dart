@@ -11,10 +11,7 @@ import 'package:rem_s_appliceation9/Screens/subpage.dart'; // Import for SubPage
 import 'package:rem_s_appliceation9/Screens/Requestedsubpage.dart';
 
 import '../services/UserProvider.dart';
-import 'ChatPage.dart';
 import 'MessagesHomePage.dart';
-import 'UserProfilePage.dart';
-import 'chatPageLDriver.dart';
 
 // ignore_for_file: must_be_immutable
 class UserHomePage extends StatefulWidget {
@@ -218,7 +215,7 @@ class _UserHomePageState extends State<UserHomePage> {
           }*/
         } else if (index == 2) {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AccountPage()));
+              MaterialPageRoute(builder: (context) => AccountPageUser()));
         }
       },
     );

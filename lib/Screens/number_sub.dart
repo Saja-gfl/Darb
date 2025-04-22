@@ -1,6 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/services/UserProvider.dart';
+
+import '../core/utils/show_toast.dart';
+import '../services/request.dart';
 
 class SubscriptionNumberPage extends StatefulWidget {
   const SubscriptionNumberPage({Key? key}) : super(key: key);
@@ -12,12 +18,12 @@ class SubscriptionNumberPage extends StatefulWidget {
 class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
   final TextEditingController _searchController = TextEditingController();
   List<SubscriptionInfo> _filteredSubscriptions = [];
-  final List<SubscriptionInfo> _allSubscriptions = [
+  List<SubscriptionInfo> _allSubscriptions = [
     SubscriptionInfo(
       id: '12345',
       type: 'شهري',
       route: 'عنيزة -> بريدة',
-      pickup: 'ميدان الملك فهد',
+      //  pickup: 'ميدان الملك فهد',
       dropoff: 'جامعة القصيم',
       schedule: '7:00 صباحاً - الأحد إلى الخميس',
       price: '500 ريال/شهرياً',
@@ -29,7 +35,7 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
       id: '67890',
       type: 'أسبوعي',
       route: 'الرياض -> الدمام',
-      pickup: 'حي النخيل',
+      // pickup: 'حي النخيل',
       dropoff: 'جامعة الملك فهد',
       schedule: '6:30 صباحاً - السبت إلى الأربعاء',
       price: '300 ريال/أسبوعياً',
@@ -43,7 +49,6 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
   void initState() {
     super.initState();
     _filteredSubscriptions = _allSubscriptions;
-    _searchController.addListener(_filterSubscriptions);
   }
 
   @override
@@ -52,16 +57,75 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
     super.dispose();
   }
 
-  void _filterSubscriptions() {
-    final query = _searchController.text.toLowerCase();
+  Future<void> searchSubscription(String tripId) async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final userId = userProvider.uid; // الحصول على uid من البروفايدر
+      if (userId == null) {
+        showToast(message: 'يرجى تسجيل الدخول أولاً');
+        return;
+      }
+
+      final subscriptionData = await getRequestByTripId(tripId);
+      if (subscriptionData != null) {
+        // تحقق من وجود المستخدم في قاعدة البيانات
+        final userDoc = await FirebaseFirestore.instance
+            .collection('rideRequests')
+            .doc(tripId)
+            .collection('users')
+            .doc(userId)
+            .get();
+
+        String? subStatus;
+        if (userDoc.exists) {
+          subStatus = userDoc.data()?['sub_status'];
+        }
+
+        // تصفية البيانات العامة فقط
+        setState(() {
+          _filteredSubscriptions = [
+            SubscriptionInfo(
+              id: tripId,
+              type: subscriptionData['type'] ?? 'غير محدد', // نوع الاشتراك
+              route: (subscriptionData['fromLocation'] ?? 'غير معروف') +
+                  " الى " +
+                  (subscriptionData['toLocation'] ?? 'غير معروف'), // المسار
+              //pickup:
+              // subscriptionData['pickup'] ?? 'غير معروف', // نقطة الالتقاط
+              dropoff: subscriptionData['workLocation'] ??
+                  'غير معروف', // نقطة التسليم
+              schedule:
+                  subscriptionData['schedule'] ?? 'غير معروف', // الجدول الزمني
+              price: subscriptionData['price'] ?? 'غير معروف', // السعر
+              driver: subscriptionData['driverData']?['name'] ??
+                  'غير معروف', // اسم السائق
+              status: subStatus ?? 'غير معروف', // حالة الاشتراك
+              phone:
+                  subscriptionData['phone'] ?? 'غير معروف', // رقم هاتف السائق
+            ),
+          ];
+        });
+      } else {
+        setState(() {
+          _filteredSubscriptions = [];
+        });
+        showToast(message: 'لا توجد بيانات للاشتراك بهذا الرقم');
+      }
+    } catch (e) {
+      print("خطأ أثناء جلب بيانات الاشتراك: $e");
+    }
+  }
+
+  /* void _filterSubscriptions() {
+    final query = _searchController.text;
     setState(() {
       _filteredSubscriptions = _allSubscriptions.where((sub) {
-        return sub.id.toLowerCase().contains(query) ||
-            sub.route.toLowerCase().contains(query) ||
-            sub.driver.toLowerCase().contains(query);
+        return sub.id.toLowerCase().contains(query); //||
+        //sub.route.toLowerCase().contains(query) ||
+        //sub.driver.toLowerCase().contains(query);
       }).toList();
     });
-  }
+  }*/
 
   Future<void> _messageDriver(String phone) async {
     final Uri smsUri = Uri(
@@ -118,7 +182,7 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'ابحث برقم الاشتراك أو المسار أو السائق...',
+                  hintText: 'ابحث برقم الاشتراك ...',
                   hintStyle: GoogleFonts.inter(
                     color: const Color(0xFFADAEBC),
                     fontSize: 14,
@@ -129,6 +193,17 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                 ),
                 textAlign: TextAlign.right,
+                onSubmitted: (query) {
+                  if (query.isEmpty) {
+                    showToast(message: 'يرجى إدخال رقم اشتراك');
+                  } else if (query.length < 7 ||
+                      !RegExp(r'^R\d{6}$').hasMatch(query)) {
+                    showToast(
+                        message: 'يرجى إدخال رقم اشتراك صحيح مثل R123456');
+                  } else {
+                    searchSubscription(query);
+                  }
+                },
               ),
             ),
           ),
@@ -143,6 +218,9 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
                 return SubscriptionCard(
                   info: sub,
                   onMessage: () => _messageDriver(sub.phone),
+                  onRequestSubscription: () {
+                    // وظيفة طلب الاشتراك
+                  },
                 );
               },
             ),
@@ -157,7 +235,7 @@ class SubscriptionInfo {
   final String id;
   final String type;
   final String route;
-  final String pickup;
+  //final String pickup;
   final String dropoff;
   final String schedule;
   final String price;
@@ -169,7 +247,7 @@ class SubscriptionInfo {
     required this.id,
     required this.type,
     required this.route,
-    required this.pickup,
+    //  required this.pickup,
     required this.dropoff,
     required this.schedule,
     required this.price,
@@ -182,11 +260,13 @@ class SubscriptionInfo {
 class SubscriptionCard extends StatelessWidget {
   final SubscriptionInfo info;
   final VoidCallback onMessage;
+  final VoidCallback onRequestSubscription; // وظيفة جديدة للزر
 
   const SubscriptionCard({
     Key? key,
     required this.info,
     required this.onMessage,
+    required this.onRequestSubscription, // تمرير الوظيفة
   }) : super(key: key);
 
   @override
@@ -234,7 +314,6 @@ class SubscriptionCard extends StatelessWidget {
 
             // Route Information
             _buildInfoRow(info.route, Icons.arrow_forward),
-            _buildInfoRow(info.pickup, Icons.location_on),
             _buildInfoRow(info.dropoff, Icons.location_on),
 
             const Divider(height: 24),
@@ -246,22 +325,48 @@ class SubscriptionCard extends StatelessWidget {
 
             const Divider(height: 24),
 
-            // Action Button
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFB300),
-                minimumSize: const Size(double.infinity, 40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            // Action Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, // لون الزر الأخضر
+                      minimumSize: const Size(double.infinity, 40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: onRequestSubscription,
+                    child: Text(
+                      'طلب اشتراك',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              onPressed: onMessage,
-              child: Text(
-                'مراسلة السائق',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          const Color(0xFFFFB300), // لون الزر الأصفر
+                      minimumSize: const Size(double.infinity, 40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: onMessage,
+                    child: Text(
+                      'مراسلة السائق',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

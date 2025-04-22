@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
 import 'package:rem_s_appliceation9/routes/app_routes.dart';
 
 import '../services/UserProvider.dart';
@@ -91,7 +90,6 @@ class _ChatPageState extends State<ChatPage> {
     //final tripId = userProvider.tripId ?? '';
     final userId = userProvider.uid ?? '';
     final userName = userProvider.userName ?? '';
-
     final messageText = _messageController.text.trim();
     if (messageText.isNotEmpty) {
       // استخدام ChatService لإرسال الرسالة
@@ -104,14 +102,6 @@ class _ChatPageState extends State<ChatPage> {
       _messageController.clear(); // مسح حقل الإدخال بعد الإرسال
     }
   }
-//حق الوقت
-  /*String _formatTimestamp(Timestamp timestamp) {
-  final time = timestamp.toDate();
-  final hour = time.hour > 12 ? time.hour - 12 : time.hour;
-  final period = time.hour >= 12 ? 'م' : 'ص';
-  final minute = time.minute.toString().padLeft(2, '0');
-  return '$hour:$minute $period';
-}*/
 
   @override
   Widget build(BuildContext context) {

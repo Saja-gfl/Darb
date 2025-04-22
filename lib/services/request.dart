@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
@@ -95,6 +94,7 @@ Future<String> submitRequest(
   }
   /*} else {
     showToast(message: "المستخدم غير مسجل الدخول");
+  }
   }*/
   throw Exception("حدث خطأ غير متوقع أثناء إنشاء الطلب");
 }

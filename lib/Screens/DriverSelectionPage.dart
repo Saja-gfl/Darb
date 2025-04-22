@@ -3,13 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
 import '../services/chatService.dart';
-import '../services/request.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
-import 'package:rem_s_appliceation9/screens/subpage.dart';
-import 'package:rem_s_appliceation9/services/request.dart';
 import 'dart:async';
-import 'dart:math';
+import 'dart:math'; // لإضافة مكتبة Random
 
 import 'ChatPage.dart'; // لإضافة مكتبة Random
 

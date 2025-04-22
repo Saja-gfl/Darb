@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'FireStore.dart';
 
 class UserProvider with ChangeNotifier {
   String? _uid;
@@ -11,9 +12,12 @@ class UserProvider with ChangeNotifier {
   bool _isDriver = false;
   String? _tripId;
   String? _subscriptionType;
+  String? _price;
   String? _driverId;
   String? _driverName;
   String? _location;
+  String? _passengerCount;
+  String? _acceptedLocations;
 
   // Getters
   String? get uid => _uid;
@@ -26,9 +30,12 @@ class UserProvider with ChangeNotifier {
   bool get isDriver => _isDriver;
   String? get tripId => _tripId;
   String? get subscriptionType => _subscriptionType;
+  String? get price => _price;
   String? get driverId => _driverId;
   String? get driverName => _driverName;
   String? get location => _location;
+  String? get passengerCount => _passengerCount;
+  String? get acceptedLocations => _acceptedLocations;
 
   // Setters
   void setUid(String uid) {
@@ -41,7 +48,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
- void setEmail(String email) {
+  void setEmail(String email) {
     _email = email;
     notifyListeners();
   }
@@ -50,6 +57,7 @@ class UserProvider with ChangeNotifier {
     _phoneNumber = phoneNumber;
     notifyListeners();
   }
+
   void setGender(String Gender) {
     _Gender = Gender;
     notifyListeners();
@@ -80,6 +88,11 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setPrice(String price) {
+    _price = price;
+    notifyListeners();
+  }
+
   void setDriverId(String driverId) {
     _driverId = driverId;
     notifyListeners();
@@ -93,6 +106,40 @@ class UserProvider with ChangeNotifier {
   void setLocation(String location) {
     _location = location;
     notifyListeners();
+  }
+
+  void setPassengerCount(String passengerCount) {
+    _passengerCount = passengerCount;
+    notifyListeners();
+  }
+
+  void setAcceptedLocations(String acceptedLocations) {
+    _acceptedLocations = acceptedLocations;
+    notifyListeners();
+  }
+
+
+  // load user data
+  Future<void> loadUserData(String userId) async {
+    final FirestoreService _firestoreService = FirestoreService(); // إنشاء كائن
+    final userData = await _firestoreService.getUserData(userId);
+    if (userData != null) {
+      _uid = userId;
+      _userName = userData['name'];
+      _email = userData['email'];
+      _phoneNumber = userData['phone'];
+      _Gender = userData['gender'];
+      _location = userData['address'];
+      _isDriver = userData['isDriver'] ?? false;
+      _plateNumber = userData['plateNumber'] ?? '';
+      _subscriptionType = userData['subscriptionType'] ?? '';
+      _carType = userData['carType'] ?? '';
+      _passengerCount = userData['passengerCount'] ?? '0';
+      _price = userData['price']?.toString() ?? '0';
+      _acceptedLocations = userData['acceptedLocations'] ?? '';
+
+      notifyListeners();
+    }
   }
 
   // Clear all user data
@@ -109,6 +156,10 @@ class UserProvider with ChangeNotifier {
     _driverId = null;
     _driverName = null;
     _location = null;
+    _passengerCount = null;
+    _price = null;
+    _acceptedLocations = null;
+
     notifyListeners();
   }
 }
