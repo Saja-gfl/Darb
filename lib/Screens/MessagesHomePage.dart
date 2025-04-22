@@ -44,8 +44,8 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                 ": رحلة رقم"), // قيمة افتراضية للاسم
             'lastMessage':
                 chat['lastMessage'] ?? 'لا توجد رسائل', // قيمة افتراضية للرسالة
-            'time': chat['time'] ?? 'غير متوفر', // قيمة افتراضية للوقت
-            'unread': chat['unread'] ?? false, // قيمة افتراضية لحالة القراءة
+            'time':ChatService.formatTimestamp(chat['timestamp']), // قيمة افتراضية للوقت
+            'unread': chat['unread'] ?? 0, // قيمة افتراضية لحالة القراءة
             'tripId': chat['tripId'] ?? '', // تأكد من وجود tripId
           };
         }).toList();
@@ -62,7 +62,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
       'name': 'المستخدم أحمد',
       'lastMessage': 'هل يمكن تغيير موعد الاشتراك؟',
       'time': '10:30 ص',
-      'unread': true,
+      'unread': 1,
       'isDriver': false,
       'tripId': 'trip_123'
     },
@@ -71,7 +71,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
       'name': 'المستخدم خالد',
       'lastMessage': 'شكرًا على الخدمة الممتازة',
       'time': 'أمس',
-      'unread': false,
+      'unread': 1,
       'isDriver': false,
       'tripId': 'trip_456'
     },
@@ -80,7 +80,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
       'name': 'السائق محمد',
       'lastMessage': 'سأكون متأخرًا 10 دقائق اليوم',
       'time': 'الثلاثاء',
-      'unread': false,
+      'unread': 1,
       'isDriver': true,
       'tripId': 'trip_789'
     },
@@ -183,7 +183,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                   )),
               SizedBox(height: 4.h),
               Text(
-                "${_chats.where((chat) => chat['unread']).length} رسائل جديدة",
+                "${_chats.where((chat) => chat['unread']>0).length} رسائل جديدة",
                 style: theme.textTheme.bodyMedium,
               ),
             ],
@@ -232,7 +232,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
   }
 
   Widget _buildChatItem(String name, String lastMessage, String time,
-      bool unread, VoidCallback onTap) {
+      int unread, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -277,7 +277,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (unread)
+                      if (unread>0)
                         Container(
                           width: 8.h,
                           height: 8.h,
@@ -293,7 +293,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                           textAlign: TextAlign.end,
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontWeight:
-                                unread ? FontWeight.bold : FontWeight.normal,
+                                unread >0 ? FontWeight.bold : FontWeight.normal,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),

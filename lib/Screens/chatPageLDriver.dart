@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../routes/app_routes.dart';
+import '../services/ChatService.dart';
 import '../services/UserProvider.dart';
 import 'ChatPage.dart';
 
@@ -39,6 +40,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
     super.initState();
     _fetchActiveChats();
   }
+  
   void _fetchActiveChats() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.uid;
@@ -46,21 +48,20 @@ class _ChatHomePageState extends State<ChatHomePage> {
     if (userId != null) {
       // Fetch active chats from the server or database
       final querySnapshot = await FirebaseFirestore.instance
-          .collection('rideRequests')
+          .collection('chatRooms')
           .where('driverId', isEqualTo: userId)
           //.where('status_ride', isEqualTo: 'active')
           .get();
 
           setState(() {
             _activeChats = querySnapshot.docs.map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
+              final data = doc.data();
               return {
                 'tripId': doc.id,
                 'userName': doc.id,
                 'lastMessage': data['lastMessage'] ?? 'لا توجد رسائل',
-                'time': data['time'] ?? 'غير متوفر',
+                  'time': ChatService.formatTimestamp(data['timestamp']),
                 'unread': data['unread'] ?? 0,
-                'isOnline': data['isOnline'] ?? false,
               };
             }).toList();
           });
@@ -134,8 +135,8 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
   Widget _buildChatItem(Map<String, dynamic> chat) {
     return InkWell(
-      onTap: () {
-
+      onTap: () async {
+        await ChatService().markMessagesAsRead(chat['tripId']);
         // Navigate to chat page with the selected chat details
         Navigator.push(
           context,
@@ -167,7 +168,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
                     size: 28,
                   ),
                 ),
-                if (chat['isOnline'])
+                /*if (chat['isOnline']==true)
                   Positioned(
                     right: 0,
                     bottom: 0,
@@ -183,7 +184,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
                         ),
                       ),
                     ),
-                  ),
+                  ),*/
               ],
             ),
 

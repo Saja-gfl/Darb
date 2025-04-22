@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
+import '../services/UserProvider.dart';
 import '../services/chatService.dart';
-import '../services/request.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
-import 'package:rem_s_appliceation9/screens/subpage.dart';
-import 'package:rem_s_appliceation9/services/request.dart';
 import 'dart:async';
-import 'dart:math';
+import 'dart:math'; // لإضافة مكتبة Random
 
 import 'ChatPage.dart'; // لإضافة مكتبة Random
 
@@ -170,8 +167,8 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
 
   Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
     try {
-      final userId = FirebaseAuth.instance.currentUser?.uid ??
-          "usertest"; // UID المستخدم الحالي (الراكب)
+      final userId = Provider.of<UserProvider>(context, listen: false).uid;
+ // UID المستخدم الحالي (الراكب)
       final tripId = widget.tripId; //
 
       await FirebaseFirestore.instance
@@ -179,7 +176,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
           .doc(tripId)
           .update({
         'driverId': driverData['id'], // UID الخاص بالسائق
-        'sub_status': 'معلق', // حالة الطلب (معلق)
+        //'sub_status':(معلق) مكرر ماله داعي 
         'driverData': {
           'id': driverData['id'],
           'name': driverData['name'],
@@ -188,7 +185,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
         }, // إضافة بيانات السائق كـ Map
         'updatedAt': Timestamp.now(), // وقت التحديث
       });
-
+ 
       // إظهار رسالة تأكيد للمستخدم
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("تم ارسال الطلب  للسائق")),
@@ -430,8 +427,8 @@ class DriverCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
-                      final userId = FirebaseAuth.instance.currentUser?.uid ??
-                          "unknown_user";
+                        final userId = Provider.of<UserProvider>(context, listen: false).uid ?? 'unknown_user'; 
+
                       final driverId = driver.id; // معرف السائق
 
                       await ChatService()

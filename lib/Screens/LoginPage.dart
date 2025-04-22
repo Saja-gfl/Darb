@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
@@ -179,18 +178,20 @@ class _K0ScreenState extends State<K0Screen> {
       User? user = await _auth.login(email, password);
 
       if (user != null) {
-        FirestoreService firestoreService = FirestoreService();
-        Map<String, dynamic>? userData = await firestoreService.getUserData(user.uid);;
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        await userProvider.loadUserData(user.uid);
+
+        //FirestoreService firestoreService = FirestoreService();
+      //  Map<String, dynamic>? userData = await firestoreService.getUserData(user.uid);;
 
         //print("🔍 البحث عن بيانات المستخدم في المجموعة: ${false ? 'driverdata' : 'userdata'}");
         //print("🔍 User ID: ${user.uid}");
 
-        if (userData != null ) {
-          _updateUserProvider(user, userData);
+       // if (userData != null ) {
+        //  _updateUserProvider(user, userData);
 
           showToast(message: "تم تسجيل الدخول بنجاح");
 
-          final userProvider = Provider.of<UserProvider>(context, listen: false);
           Navigator.pushReplacementNamed(
             context,
             userProvider.isDriver ? AppRoutes.driverHomePage : AppRoutes.userHomePage,
@@ -198,9 +199,9 @@ class _K0ScreenState extends State<K0Screen> {
         } else {
           showToast(message: "تعذر جلب بيانات المستخدم. يرجى المحاولة لاحقًا.");
         }
-      } else {
-        showToast(message: "البريد الإلكتروني أو كلمة المرور غير صحيحة");
-      }
+      //} else {
+      //  showToast(message: "البريد الإلكتروني أو كلمة المرور غير صحيحة");
+      //}
     } catch (e) {
       if (e is FirebaseAuthException) {
         switch (e.code) {
@@ -215,6 +216,7 @@ class _K0ScreenState extends State<K0Screen> {
         }
       } else {
         showToast(message: "حدث خطأ غير متوقع: ${e.toString()}");
+        print(e.toString());
       }
     } finally {
       setState(() {

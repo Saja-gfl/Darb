@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -58,6 +59,7 @@ class ChatService {
       await _firestore.collection('chatRooms').doc(chatId).update({
         'lastMessage': message,
         'timestamp': FieldValue.serverTimestamp(),
+        'unread': FieldValue.increment(1), // زيادة عدد الرسائل غير المقروءة
       });
     } catch (e) {
       print("❌ Error sending message: $e");
@@ -114,14 +116,14 @@ class ChatService {
           .get();
 
       return querySnapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         return {
           'tripId': data['tripId'] ?? '',
         'driverId': data['driverId'] ?? '',
         'name': data['tripId'] ?? 'غير معروف', // اسم افتراضي
         'lastMessage': data['lastMessage'] ?? 'لا توجد رسائل', // رسالة افتراضية
-        'time': (data['timestamp'] as Timestamp?)?.toDate().toString() ?? 'غير متوفر', // وقت افتراضي
-        'unread': data['unread'] ?? true, // عدد الرسائل غير المقروءة
+        'time':ChatService.formatTimestamp(data['timestamp']), // وقت افتراضي
+        'unread': data['unread'] ?? 0, // عدد الرسائل غير المقروءة
         };
       }).toList();
     } catch (e) {
@@ -148,4 +150,20 @@ class ChatService {
       return false;
     }
   }
+
+  // إعادة تعيين عدد الرسائل غير المقروءة
+  Future<void> markMessagesAsRead(String chatId) async {
+    try {
+      await _firestore.collection('chatRooms').doc(chatId).update({
+        'unread': 0,
+      });
+    } catch (e) {
+      print('Error marking messages as read: $e');
+    }
+  }
+  static String formatTimestamp(Timestamp? timestamp) {
+  if (timestamp == null) return 'غير متوفر';
+  final date = timestamp.toDate();
+  return DateFormat('hh:mm a').format(date); // تنسيق الوقت
+}
 }
