@@ -4,6 +4,7 @@ import 'package:rem_s_appliceation9/Screens/ReviewPage.dart';
 import 'package:rem_s_appliceation9/Screens/Welcomepage.dart';
 import 'package:rem_s_appliceation9/Screens/number_sub.dart';
 import 'package:rem_s_appliceation9/Screens/otp.dart';
+import '../Screens/ChatPage.dart';
 import '../Screens/LoginPage.dart';
 import '../Screens/RegistrationPage.dart';
 import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
@@ -52,7 +53,10 @@ class AppRoutes {
     userProfilePage: (context) => UserProfilePage(),
     subPage: (context) => CreateSubscriptionPage(),
     // numberSub: (context) => NumberSubPage(),
-    chatPage: (context) => ChatPage(),
+    chatPage: (context) {
+      final tripId = ModalRoute.of(context)?.settings.arguments as String?;
+      return ChatPage(tripId: tripId ?? '');
+    },
     // findDriverPage: (context) => FindDriverPage(),
     // reviewPage: (context) => ReviewPage(),
     // otpPage: (context) => OTPVerificationScreen(),

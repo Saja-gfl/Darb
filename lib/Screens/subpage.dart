@@ -715,6 +715,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
         "price": price.toString(),
         "notes": driverNotes,
         "sub_status": "معلق",
+        'status': "معلق",
         "createdAt": DateTime.now(),
       };
       print("📦 subscriptionData: $subscriptionData");

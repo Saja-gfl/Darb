@@ -19,7 +19,7 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
   final TextEditingController _searchController = TextEditingController();
   List<SubscriptionInfo> _filteredSubscriptions = [];
   List<SubscriptionInfo> _allSubscriptions = [
-    SubscriptionInfo(
+    /*SubscriptionInfo(
       id: '12345',
       type: 'شهري',
       route: 'عنيزة -> بريدة',
@@ -42,7 +42,7 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
       driver: 'علي خالد',
       status: 'متاح',
       phone: '0559876543',
-    ),
+    ),*/
   ];
 
   @override
@@ -218,8 +218,60 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
                 return SubscriptionCard(
                   info: sub,
                   onMessage: () => _messageDriver(sub.phone),
-                  onRequestSubscription: () {
-                    // وظيفة طلب الاشتراك
+                  onRequestSubscription: () async {
+                    final userProvider =
+                        Provider.of<UserProvider>(context, listen: false);
+                    final userId = userProvider.uid; // معرف المستخدم
+                    if (userId == null) {
+                      showToast(message: 'يرجى تسجيل الدخول أولاً');
+                      return;
+                    }
+                    // تحقق من أن driverId ليس فارغًا أو null
+                    if (sub.driver.isEmpty ||
+                        sub.driver == 'غير معروف' ||
+                        sub.status == 'منتهي') {
+                      showToast(
+                          message:
+                              'لايوجد سائق او الاشتراك منتهي، لا يمكن إرسال الطلب');
+                      return;
+                    }
+                    String homeLocation = '';
+                    await showDialog(
+                      context: context,
+                      builder: (context) {
+                        final TextEditingController _homeLocationController =
+                            TextEditingController();
+                        return AlertDialog(
+                          title: Text("ارفاق موقع المنزل"),
+                          content: TextField(
+                            controller: _homeLocationController,
+                            decoration: InputDecoration(
+                              hintText: 'ادخل موقع المنزل',
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text("إلغاء"),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                homeLocation = _homeLocationController.text;
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("تأكيد"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                    if (homeLocation.isNotEmpty) {
+                      await SendByNum_Sub(context, sub.id, userId,
+                          homeLocation); // تم إصلاح الخطأ هنا
+                      showToast(message: 'تم إرسال طلب الاشتراك بنجاح');
+                    } else {
+                      showToast(message: 'يرجى إدخال موقع المنزل');
+                    }
                   },
                 );
               },

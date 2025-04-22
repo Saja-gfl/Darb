@@ -55,16 +55,14 @@ Future<String> submitRequest(
         .set({
       'tripId': tripId, // رقم الرحلة الفريد
       'driverId': driverId,
+      'status': 'معلق', // public status 
       'type': subscriptionData['type'],
       'homeLocation': subscriptionData['homeLocation'], // إضافة homeLocation
-      'workLocation':
-          subscriptionData['workLocation'], // الموقع الذي يعمل فيه المستخدم
+      'workLocation':subscriptionData['workLocation'], // الموقع الذي يعمل فيه المستخدم
       'price': subscriptionData['price'], // السعر المتفق علي
       "schedule": subscriptionData['schedule'], // جدول الرحلة (تاريخ ووقت)
-      'fromLocation':
-          subscriptionData['from'], // الموقع الذي انطلق منه المستخدم
-      'toLocation':
-          subscriptionData['to'], // الموقع الذي يريد المستخدم الذهاب إليه
+      'fromLocation':subscriptionData['from'], // الموقع الذي انطلق منه المستخدم
+      'toLocation': subscriptionData['to'], // الموقع الذي يريد المستخدم الذهاب إليه
       'startDate': subscriptionData['startDate'], // وقت بدء الرحلة
 
       // 'createdAt': Timestamp.now(),  // تاريخ ووقت الطلب
@@ -77,11 +75,11 @@ Future<String> submitRequest(
         .collection('users')
         .doc(userId) // استخدام userId بدلاً من tripId
         .set({
+       'userId': userId, // معرف المستخدم
       'userName': userName, // معرف المستخدم
       'userphone': userPhone, // رقم هاتف المستخدم
       //'homeLocation': homeLocation, // إضافة homeLocation
       'sub_status': 'معلق',
-      // 'userphone': userId.phoneNumber, // رقم هاتف المستخدم
       'createdAt': Timestamp.now(), // تاريخ ووقت الطلب
     });
     // إظهار رسالة تأكيد للمستخدم
@@ -204,5 +202,35 @@ Future<void> check_Sub_tatus(
     }
   } catch (e) {
     print("❌ خطأ أثناء التحقق من حالة الاشتراك: $e");
+  }}
+
+    Future<void> SendByNum_Sub(
+      BuildContext context, String tripId, String userId, String homeLocation) async {
+    try {
+       final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final userName = userProvider.userName ?? "unknown_user"; // اسم المستخدم
+      final userPhone =userProvider.phoneNumber ?? "unknown_phone"; // رقم هاتف المستخدم
+
+      // تحديث بيانات المستخدم في الرحلة
+      await FirebaseFirestore.instance
+          .collection('rideRequests')
+          .doc(tripId)
+          .collection('users')
+          .doc(userId)
+          .set({
+            'userId': userId, // معرف المستخدم
+            'userName': userName, // معرف المستخدم
+            'userphone': userPhone, // رقم هاتف المستخدم
+            'sub_status': 'معلق',
+            'homeLocation': homeLocation, // إضافة موقع المنزل
+            'createdAt': Timestamp.now(), // تاريخ ووقت الطلب
+
+      });
+  
+      showToast(message: "تم إرسال طلب الاشتراك بنجاح");
+    } catch (e) {
+      print("خطأ أثناء إرسال طلب الاشتراك: $e");
+      showToast(message: "حدث خطأ أثناء إرسال الطلب");
+    }
   }
-}
+
