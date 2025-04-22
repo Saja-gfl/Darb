@@ -78,38 +78,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ]),
             SizedBox(height: 24.h),
 
-            // Support Section
-            _buildSectionHeader("الدعم"),
-            _buildSettingsCard([
-              _buildSettingsItem(
-                icon: Icons.help_outline,
-                title: "المساعدة",
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HelpPage()),
-                ),
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.privacy_tip_outlined,
-                title: "سياسة الخصوصية",
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
-                ),
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.description_outlined,
-                title: "شروط الخدمة",
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TermsPage()),
-                ),
-              ),
-            ]),
-            SizedBox(height: 24.h),
-
             // Logout Button
             Center(
               child: ElevatedButton(
