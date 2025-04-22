@@ -102,21 +102,6 @@ class _ChatHomePageState extends State<ChatHomePage> {
                   ),
                 ],
               ),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'ابحث عن محادثة...',
-                  hintStyle: const TextStyle(fontFamily: 'Tajawal'),
-                  prefixIcon: Icon(Icons.search, color: primaryColor),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                onChanged: (value) {
-                  setState(() {});
-                },
-              ),
-            ),
-          ),
 
           // Chat List
           Expanded(
