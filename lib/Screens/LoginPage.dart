@@ -31,6 +31,7 @@ class _K0ScreenState extends State<K0Screen> {
 
   bool tf = false;
   bool _isSigning = false;
+  bool hidePassword = true; 
 
   @override
   void initState() {
@@ -102,15 +103,16 @@ class _K0ScreenState extends State<K0Screen> {
           Align(
             alignment: Alignment.centerRight,
             child: Text(
-              "اسم المستخدم:",
+              "البريد الالكتروني:",
               style: theme.textTheme.bodyLarge,
             ),
           ),
           SizedBox(height: 8.h),
           CustomTextFormField(
             controller: usernameInputController,
-            hintText: "ادخل اسم المستخدم",
+            hintText: "ادخل البريد الالكتروني",
             contentPadding: EdgeInsets.fromLTRB(12.h, 10.h, 12.h, 6.h),
+            textStyle: TextStyle(color: Colors.black), 
           ),
           SizedBox(height: 24.h),
           Align(
@@ -126,14 +128,16 @@ class _K0ScreenState extends State<K0Screen> {
             hintText: "أدخل كلمة السر هنا",
             textInputAction: TextInputAction.done,
             contentPadding: EdgeInsets.fromLTRB(12.h, 10.h, 12.h, 6.h),
+            textStyle: TextStyle(color: Colors.black), 
+            obscureText: hidePassword,  
           ),
           SizedBox(height: 26.h),
           CustomCheckboxButton(
             text: "عرض كلمة المرور",
-            value: tf,
+            value: !hidePassword, 
             onChange: (value) {
               setState(() {
-                tf = value;
+                hidePassword = !value; 
               });
             },
           ),
