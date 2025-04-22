@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/FireStore.dart';
 import 'package:rem_s_appliceation9/widgets/app_bar/custom_dropdown.dart';
 
 import '../services/UserProvider.dart';
-//يحتاج تغيير لون الخط اللي باللست عشان تبان لليوزر 
+
+//يحتاج تغيير لون الخط اللي باللست عشان تبان لليوزر
 class DriverInfoPage extends StatefulWidget {
   const DriverInfoPage({super.key});
 
@@ -57,8 +59,13 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       final driverData = await firestoreService.getUserData(userId);
       if (driverData != null && driverData['isDriver'] == true) {
         setState(() {
-          selectedLocation = locations.contains(driverData['location']) ? driverData['location'] : null;
-          acceptedLocationsController = locations.contains(driverData['acceptedLocations']) ? driverData['acceptedLocations'] : null;
+          selectedLocation = locations.contains(driverData['location'])
+              ? driverData['location']
+              : null;
+          acceptedLocationsController =
+              locations.contains(driverData['acceptedLocations'])
+                  ? driverData['acceptedLocations']
+                  : null;
           nameController.text = driverData['name'] ?? '';
           emailController.text = driverData['email'] ?? '';
           plateNumberController.text = driverData['plateNumber'] ?? '';
@@ -124,7 +131,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
         nameController: nameController.text,
         emailController: emailController.text,
         addressController: selectedLocation!,
-
         phoneController: phoneController.text,
         selectedGender: selectedGender,
         isDriver: true,
@@ -134,7 +140,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
         acceptedLocations: acceptedLocationsController!,
         passengerCount: passengerCountController.text,
         subscriptionType: selectedSubscriptionType!,
-
       );
 
       // تحديث UserProvider
@@ -145,8 +150,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       userProvider.setPlateNumber(plateNumberController.text);
       userProvider.setPhoneNumber(phoneController.text);
       userProvider.setSubscriptionType(selectedSubscriptionType!);
-
-
 
       showToast(message: "تم حفظ البيانات بنجاح");
     } catch (e) {
@@ -238,7 +241,9 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             CustomDropdown(
               label: "الموقع الجغرافي",
               hint: "اختر موقعك من القائمة",
-              value: locations.contains(selectedLocation) ? selectedLocation : null,
+              value: locations.contains(selectedLocation)
+                  ? selectedLocation
+                  : null,
               items: locations,
               onChanged: (value) {
                 setState(() {
@@ -252,7 +257,9 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             CustomDropdown(
               label: "الأماكن التي تقبل الذهاب إليها",
               hint: "أدخل الأماكن التي يمكن أن تذهب إليها",
-              value: locations.contains(acceptedLocationsController) ? acceptedLocationsController : null,
+              value: locations.contains(acceptedLocationsController)
+                  ? acceptedLocationsController
+                  : null,
               items: locations,
               onChanged: (value) {
                 setState(() {
@@ -284,7 +291,9 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             CustomDropdown(
               label: "نوع الاشتراك",
               hint: "اختر نوع الاشتراك",
-              value: locations.contains(selectedSubscriptionType) ? selectedSubscriptionType : null,
+              value: locations.contains(selectedSubscriptionType)
+                  ? selectedSubscriptionType
+                  : null,
               items: subscriptionTypes,
               onChanged: (value) {
                 setState(() {
@@ -297,9 +306,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             // Action Buttons
             _buildActionButtons(),
             const SizedBox(height: 24),
-
-            // Account Details
-            _buildAccountDetails(),
           ],
         ),
       ),
@@ -335,18 +341,11 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
           children: [
             CircleAvatar(
               radius: 48,
-              backgroundColor: Colors.grey[300],
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                Icons.camera_alt,
-                color: Colors.white,
-                size: 20,
+              backgroundColor: Colors.grey[200],
+              child: Icon(
+                Icons.person,
+                size: 48,
+                color: const Color.fromARGB(255, 255, 178, 25),
               ),
             ),
           ],
@@ -387,7 +386,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: Colors.grey.shade400,
+                color: Color(0xFFFFB300),
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -417,7 +416,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
-          "النوع",
+          "الجنس",
           style: TextStyle(
             color: Colors.black,
             fontSize: 14,
@@ -436,10 +435,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
               child: _buildGenderButton("أنثى", selectedGender == "أنثى"),
             ),
             const SizedBox(width: 8),
-            Expanded(
-              child: _buildGenderButton(
-                  "أفضل عدم الاجابة", selectedGender == "أفضل عدم الاجابة"),
-            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -474,7 +469,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
           child: Text(
             text,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black,
+              color: isSelected ? Colors.amber : Colors.black,
               fontSize: 14,
               fontFamily: 'Roboto',
             ),
@@ -511,7 +506,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
             onPressed: () {
               _saveDriverData();
               // Save action
-             /*print("Selected Gender: $selectedGender");
+              /*print("Selected Gender: $selectedGender");
               print("Name: ${nameController.text}");
               print("Email: ${emailController.text}");
               print("Car Model: ${carModelController.text}");
@@ -530,69 +525,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
               ),
             ),
             child: const Text("حفظ"),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Account Details
-  Widget _buildAccountDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          "تفاصيل الحساب",
-          style: TextStyle(
-            color: Colors.orange,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildDetailRow("555-123-4567", "رقم الجوال", Icons.phone),
-        const SizedBox(height: 16),
-        _buildDetailRow(
-            "example@example.com", "البريد الإلكتروني", Icons.email),
-      ],
-    );
-  }
-
-  // Detail Row
-  Widget _buildDetailRow(String value, String label, IconData icon) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            color: Colors.orange,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.orange,
-            fontSize: 14,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(
-            icon,
-            color: Colors.orange,
-            size: 20,
           ),
         ),
       ],

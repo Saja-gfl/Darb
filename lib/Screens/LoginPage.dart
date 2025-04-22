@@ -49,10 +49,13 @@ class _K0ScreenState extends State<K0Screen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: theme.colorScheme.onPrimaryContainer,
-      resizeToAvoidBottomInset: false,
-      body: Container(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+       backgroundColor: theme.colorScheme.onPrimaryContainer,
+       resizeToAvoidBottomInset: false,
+       body: Container(
+
         width: double.maxFinite,
         padding: EdgeInsets.only(
           left: 36.h,
@@ -67,14 +70,14 @@ class _K0ScreenState extends State<K0Screen> {
               imagePath: ImageConstant.img5935976241859510486,
               height: 122.h,
               width: 182.h,
-              margin: EdgeInsets.only(right: 56.h),
+              margin: EdgeInsets.only(left: 70.h),
             ),
             SizedBox(height: 38.h),
             _buildUserLoginForm(context)
           ],
         ),
       ),
-    );
+    ));
   }
 
   /// Section Widget
