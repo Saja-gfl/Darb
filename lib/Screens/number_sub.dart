@@ -341,7 +341,8 @@ class SubscriptionCard extends StatelessWidget {
                 children: [
                   // Subscription Type
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                       color: primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -355,7 +356,7 @@ class SubscriptionCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Subscription Number
                   Text(
                     '#${info.id}',
@@ -366,21 +367,21 @@ class SubscriptionCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Route Information
               _buildInfoRow('المسار', info.route, Icons.alt_route),
               _buildInfoRow('نقطة الوصول', info.dropoff, Icons.location_on),
-              
+
               const Divider(height: 24, thickness: 1),
-              
+
               // Schedule Information
               _buildSectionTitle('الجدول الزمني'),
               _buildScheduleDetails(info.schedule),
-              
+
               const Divider(height: 24, thickness: 1),
-              
+
               // Price and Driver
               Row(
                 children: [
@@ -389,14 +390,14 @@ class SubscriptionCard extends StatelessWidget {
                   _buildInfoBox('السائق', info.driver, Icons.person),
                 ],
               ),
-              
+
               if (info.status.isNotEmpty && info.status != 'غير معروف') ...[
                 const SizedBox(height: 12),
                 _buildInfoBox('حالة الاشتراك', info.status, Icons.info),
               ],
-              
+
               const SizedBox(height: 16),
-              
+
               // Action Button
               SizedBox(
                 width: double.infinity,
@@ -478,27 +479,29 @@ class SubscriptionCard extends StatelessWidget {
   Widget _buildScheduleDetails(String schedule) {
     // تحسين عرض الجدول الزمني مع دعم التنسيقات المختلفة
     final parts = schedule.split('-').map((e) => e.trim()).toList();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (parts.length > 1)
-          ...parts.map((part) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.circle, size: 8, color: primaryColor),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    part,
-                    style: GoogleFonts.tajawal(fontSize: 14),
-                  ),
-                ),
-              ],
-            ),
-          )).toList()
+          ...parts
+              .map((part) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.circle, size: 8, color: primaryColor),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            part,
+                            style: GoogleFonts.tajawal(fontSize: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ))
+              .toList()
         else
           Text(
             schedule,
@@ -548,23 +551,22 @@ class SubscriptionCard extends StatelessWidget {
   }
 }
 
-  Widget _buildDetailRow(String text, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
-            text,
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
+Widget _buildDetailRow(String text, IconData icon) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Text(
+          text,
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
           ),
-          const SizedBox(width: 8),
-          Icon(icon, size: 16, color: Colors.grey),
-        ],
-      ),
-    );
-  }
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 16, color: Colors.grey),
+      ],
+    ),
+  );
 }
