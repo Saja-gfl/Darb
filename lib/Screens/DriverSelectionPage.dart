@@ -168,7 +168,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
     try {
       final userId = Provider.of<UserProvider>(context, listen: false).uid;
- // UID المستخدم الحالي (الراكب)
+      // UID المستخدم الحالي (الراكب)
       final tripId = widget.tripId; //
 
       await FirebaseFirestore.instance
@@ -176,7 +176,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
           .doc(tripId)
           .update({
         'driverId': driverData['id'], // UID الخاص بالسائق
-        //'sub_status':(معلق) مكرر ماله داعي 
+        //'sub_status':(معلق) مكرر ماله داعي
         'driverData': {
           'id': driverData['id'],
           'name': driverData['name'],
@@ -185,7 +185,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
         }, // إضافة بيانات السائق كـ Map
         'updatedAt': Timestamp.now(), // وقت التحديث
       });
- 
+
       // إظهار رسالة تأكيد للمستخدم
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("تم ارسال الطلب  للسائق")),
@@ -416,40 +416,6 @@ class DriverCard extends StatelessWidget {
                     ),
                     child: const Text(
                       'اشتراك',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                        final userId = Provider.of<UserProvider>(context, listen: false).uid ?? 'unknown_user'; 
-
-                      final driverId = driver.id; // معرف السائق
-
-                      await ChatService()
-                          .createChatRoom(tripId, driverId, [userId]);
-                      // الانتقال إلى صفحة الدردشة
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatPage(tripId: tripId),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'مراسلة',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
