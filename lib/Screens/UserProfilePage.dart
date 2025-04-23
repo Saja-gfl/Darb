@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rem_s_appliceation9/services/UserProvider.dart';
 
-
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
 
@@ -20,7 +19,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   TextEditingController phoneController = TextEditingController();
   String selectedGender = ""; // Track the selected gender
 
-    @override
+  @override
   void initState() {
     super.initState();
     _loadUserData(); // Load the user data from UserProvider
@@ -35,7 +34,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       addressController.text = userProvider.location ?? '';
       phoneController.text = userProvider.phoneNumber ?? '';
       selectedGender = userProvider.Gender ?? 'ذكر';
-      
     });
   }
 
@@ -44,9 +42,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
     // Save the user data to Firestore
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-    showToast(message: "المستخدم غير مسجل الدخول");
-    return;
-  }
+      showToast(message: "المستخدم غير مسجل الدخول");
+      return;
+    }
 
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
@@ -59,7 +57,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     try {
       // Update Firestore
-      await FirebaseFirestore.instance.collection('userdata').doc(user.uid).update({
+      await FirebaseFirestore.instance
+          .collection('userdata')
+          .doc(user.uid)
+          .update({
         'name': nameController.text,
         'email': emailController.text,
         'address': addressController.text,
@@ -74,8 +75,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       userProvider.setLocation(addressController.text);
       userProvider.setPhoneNumber(phoneController.text);
 
-      
-
       showToast(message: "تم حفظ البيانات بنجاح");
     } catch (e) {
       print("خطأ في حفظ بيانات المستخدم: $e");
@@ -88,9 +87,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       SnackBar(content: Text(message)),
     );
   }
-
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +264,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
-          "النوع",
+          "الجنس",
           style: TextStyle(
             color: Colors.black,
             fontSize: 14,
@@ -287,10 +283,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: _buildGenderButton("أنثى", selectedGender == "أنثى"),
             ),
             const SizedBox(width: 8),
-            Expanded(
-              child: _buildGenderButton(
-                  "أفضل عدم الاجابة", selectedGender == "أفضل عدم الاجابة"),
-            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -359,11 +351,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
         const SizedBox(width: 16),
         Expanded(
           child: ElevatedButton(
-            onPressed: _saveUserData, 
-              // Save action
-              //print("Selected Gender: $selectedGender");
-              //_saveUserData,
-            
+            onPressed: _saveUserData,
+            // Save action
+            //print("Selected Gender: $selectedGender");
+            //_saveUserData,
+
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
