@@ -121,12 +121,25 @@ class _ChatPageState extends State<ChatPage> {
             }
           },
         ),
-        title: const Text(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+       const Text(
           'الدردشة الجماعية',
           style: TextStyle(
             fontFamily: 'Tajawal',
             color: Colors.white,
           ),
+        ),
+        Text(
+        'رقم الرحلة: ${widget.tripId}', // عرض رقم الرحلة
+        style: const TextStyle(
+          fontFamily: 'Tajawal',
+          color: Colors.grey, // لون رمادي
+          fontSize: 12, // حجم خط صغير
+        ),
+      ),
+    ],
         ),
         centerTitle: true,
         elevation: 2,

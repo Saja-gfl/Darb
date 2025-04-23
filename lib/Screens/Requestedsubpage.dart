@@ -1,9 +1,78 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
 
-class Requestedsubpage extends StatelessWidget {
+import '../core/utils/show_toast.dart';
+import '../services/UserProvider.dart';
+import '../services/request.dart';
+
+class Requestedsubpage extends StatefulWidget {
   const Requestedsubpage({Key? key}) : super(key: key);
+
+  @override
+  _RequestedsubpageState createState() => _RequestedsubpageState();
+}
+
+class _RequestedsubpageState extends State<Requestedsubpage> {
+  List<Map<String, dynamic>> subscriptions = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSubscriptions();
+  }
+
+  Future<void> _fetchSubscriptions() async {
+    try {
+      // استبدل userId بمعرف المستخدم الحالي
+      final userId = Provider.of<UserProvider>(context, listen: false).uid;
+      final data = await getPendingOrRejectedTripsForUser(userId!);
+
+      // تصفية الاشتراكات بناءً على حالة الاشتراك
+      final filteredData = data.where((sub) {
+        return sub['sub_status'] == 'معلق' || sub['sub_status'] == 'مرفوض';
+      }).toList();
+
+      setState(() {
+        subscriptions = filteredData;
+        isLoading = false;
+      });
+    } catch (e) {
+      showToast(message: "حدث خطأ أثناء جلب البيانات: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _cancelSubscription(String tripId, String userId) async {
+    try {
+      // تحديث حالة الاشتراك إلى "منتهية"
+      await FirebaseFirestore.instance
+          .collection('rideRequests')
+          .doc(tripId)
+          .update({'sub_status': 'منتهية'});
+
+      // حذف بيانات المستخدم من مجموعة "users" داخل الرحلة
+      await FirebaseFirestore.instance
+          .collection('rideRequests')
+          .doc(tripId)
+          .collection('users')
+          .doc(userId)
+          .delete();
+
+      // حذف بيانات الرحلة من البروفايدر
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.setTripId('');
+
+      showToast(message: "تم إلغاء الاشتراك بنجاح");
+    } catch (e) {
+      showToast(message: "حدث خطأ أثناء إلغاء الاشتراك: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,20 +99,23 @@ class Requestedsubpage extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            // Subscription Card
-            _buildSubscriptionCard(),
-          ],
-        ),
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : subscriptions.isEmpty
+              ? const Center(child: Text("لا توجد اشتراكات لعرضها"))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: subscriptions.length,
+                  itemBuilder: (context, index) {
+                    final subscription = subscriptions[index];
+                    return _buildSubscriptionCard(subscription);
+                  },
+                ),
     );
   }
 
-  Widget _buildSubscriptionCard() {
+  Widget _buildSubscriptionCard(Map<String, dynamic> subscription) {
+    print(subscription['sub_status']);
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -66,7 +138,7 @@ class Requestedsubpage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    'شهري',
+                    subscription['type'] ?? 'غير محدد',
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
@@ -74,7 +146,7 @@ class Requestedsubpage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'اشتراك # 12345',
+                  'اشتراك # ${subscription['tripId']}',
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -86,22 +158,60 @@ class Requestedsubpage extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Route Information
-            _buildInfoRow('عنيزة -> بريدة', Icons.arrow_forward),
-            _buildInfoRow('نقطة الانطلاق', Icons.location_on),
-            _buildInfoRow('نقطة التوصيل', Icons.location_on),
+            _buildInfoRow(
+                '${subscription['fromLocation']} -> ${subscription['toLocation']}',
+                Icons.directions),
+            _buildInfoRow(' ${subscription['homeLocation']}:نقطة الانطلاق',
+                Icons.location_on),
+            _buildInfoRow('${subscription['workLocation']} : نقطة التوصيل',
+                Icons.location_on),
+            _buildInfoRow(' ${subscription['driverData']['name']} :اسم السائق',
+                Icons.person),
 
             const Divider(height: 24),
 
             // Schedule and Price
             _buildDetailRow(
-                '7:00 صباحاً - الأحد إلى الخميس', Icons.access_time),
-            _buildDetailRow('500 ريال/شهرياً', Icons.attach_money),
+                subscription['schedule'] ?? 'غير محدد', Icons.access_time),
+            _buildDetailRow(
+                '${subscription['price']} ريال/شهرياً', Icons.attach_money),
 
             const Divider(height: 24),
 
+            // Subscription Status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color:
+                        const Color(0xFFF5F5F5), // لون الخلفية الرمادي الفاتح
+                    borderRadius: BorderRadius.circular(20), // الحواف الدائرية
+                  ),
+                  child: Text(
+                    subscription['sub_status'] ?? 'غير محدد',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey, // لون النص الرمادي
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
             // Action Buttons
-            _buildActionButton('إلغاء الاشتراك', Icons.cancel,
-                color: Colors.red),
+            _buildActionButton(
+            'إلغاء الاشتراك',
+            Icons.cancel,
+            color: Colors.red,
+            onPressed: () {
+            final userId = Provider.of<UserProvider>(context, listen: false).uid;
+              _cancelSubscription ( subscription['tripId'], userId!);
+            },
+            ),
           ],
         ),
       ),
@@ -149,7 +259,7 @@ class Requestedsubpage extends StatelessWidget {
   }
 
   Widget _buildActionButton(String text, IconData icon,
-      {Color color = Colors.black}) {
+      {Color color = Colors.black ,required VoidCallback onPressed}) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 8),
@@ -163,7 +273,7 @@ class Requestedsubpage extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(vertical: 12),
         ),
-        onPressed: () {},
+        onPressed: onPressed,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

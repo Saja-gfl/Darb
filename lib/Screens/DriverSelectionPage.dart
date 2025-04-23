@@ -4,9 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
 import '../services/UserProvider.dart';
 import '../services/chatService.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
-import 'dart:math'; // لإضافة مكتبة Random
+// لإضافة مكتبة Random
 
 import 'ChatPage.dart'; // لإضافة مكتبة Random
 
@@ -427,12 +426,12 @@ class DriverCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
-                        final userId = Provider.of<UserProvider>(context, listen: false).uid ?? 'unknown_user'; 
+                        final String userId = Provider.of<UserProvider>(context, listen: false).uid ?? 'unknown_user'; 
 
                       final driverId = driver.id; // معرف السائق
 
-                      await ChatService()
-                          .createChatRoom(tripId, driverId, [userId]);
+                     // await ChatService()
+                        //  .createChatRoom(tripId, driverId, userId);
                       // الانتقال إلى صفحة الدردشة
                       Navigator.push(
                         context,

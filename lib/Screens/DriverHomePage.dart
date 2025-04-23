@@ -3,19 +3,15 @@ import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
-import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
-import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
-import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
 import 'AccountPage.dart';
 import 'CustomBottomNavBar.dart';
 import 'DriverSubscriptionsPage.dart';
+import 'AvailableSubscriptionsPage.dart';
 // كومنت مهم تحت !! 
-import 'package:provider/provider.dart';
-import '../services/UserProvider.dart';
+import 'MessagesHomePage.dart';
 import 'chatPageLDriver.dart';
 
 // كومنت مهم تحت !!
-import 'package:rem_s_appliceation9/Screens/CustomBottomNavBar.dart';
 
 class DriverHomePage extends StatefulWidget {
   const DriverHomePage({Key? key}) : super(key: key);
@@ -63,7 +59,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChatHomePage(
+                builder: (context) => MessagesHomePage(
                 ),
               ),
             );
@@ -120,26 +116,26 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   Widget _buildServicesSection() {
     //final userProvider = Provider.of<UserProvider>(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text("الخدمات", style: theme.textTheme.titleLarge),
-        SizedBox(height: 16.h),
-        _buildServiceItem(
-          "عرض الاشتراكات الحالية",
-          "متابعة جدول اشتراكاتك الحالية",
-          Icons.list,
-          () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  // builder: (context) => AvailableSubscriptionsPage()));
-                  //اللي فاضيه تنقل الدوال من الصفحة المؤقته الي تحت الكومنت الى الصفحة اللي سوته مرام فوق الكومنت هذا
-                  builder: (context) => DriverSubscriptionsPage()));
-        }),
-      ],
-    );
+return Column(
+  crossAxisAlignment: CrossAxisAlignment.end,
+  children: [
+    Text("الخدمات", style: theme.textTheme.titleLarge),
+    SizedBox(height: 16.h),
+    _buildServiceItem(
+      "عرض الاشتراكات الحالية",
+      "متابعة جدول اشتراكاتك الحالية",
+      Icons.list,
+      () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AvailableSubscriptionsPage(),
+          ),
+        );
+      },
+    ),
+  ],
+);
   }
 
   Widget _buildServiceItem(

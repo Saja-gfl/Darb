@@ -81,7 +81,7 @@ class SubscriptionCard extends StatelessWidget {
             SizedBox(height: 12),
             _buildInfoRow(Icons.location_on, 'الى: $route'),
             SizedBox(height: 12),
-           _buildInfoRow(Icons.access_time, schedule),
+            _buildInfoRow(Icons.access_time, schedule),
             SizedBox(height: 12),
             _buildInfoRow(Icons.attach_money, price),
             SizedBox(height: 12),
@@ -95,14 +95,19 @@ class SubscriptionCard extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: secondaryColor.withOpacity(0.2),
+                      color: sub_status == 'منتهي'
+                          ? Colors.red.withOpacity(0.2)
+                          : secondaryColor.withOpacity(
+                              0.2), // تغيير لون الخلفية بناءً على الحالة
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       sub_status,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.tajawal(
-                        color: secondaryColor,
+                        color: sub_status == 'منتهي'
+                            ? Colors.red
+                            : secondaryColor, // تغيير لون النص بناءً على الحالة
                         fontWeight: FontWeight.bold,
                       ),
                     ),

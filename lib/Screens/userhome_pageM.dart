@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/Screens/ChatPage.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
+import 'package:rem_s_appliceation9/widgets/CustomBottomNavBar.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
-
 import 'package:rem_s_appliceation9/Screens/AccountPageUser.dart';
-import 'package:rem_s_appliceation9/Screens/subpage.dart'; // Import for SubPage
+import 'package:rem_s_appliceation9/Screens/subpage.dart';
 import 'package:rem_s_appliceation9/Screens/Requestedsubpage.dart';
-
 import '../services/UserProvider.dart';
 import 'MessagesHomePage.dart';
 
-// ignore_for_file: must_be_immutable
 class UserHomePage extends StatefulWidget {
   UserHomePage({Key? key}) : super(key: key);
 
@@ -68,31 +67,13 @@ class _UserHomePageState extends State<UserHomePage> {
   }
 
   Widget _buildNotificationsSection() {
-    return Container(
-      padding: EdgeInsets.all(16.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.h),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4.h,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text("الإشعارات", style: theme.textTheme.titleLarge),
-          SizedBox(height: 8.h),
-          Text("تم قبول طلب اشتراكك من قبل السائق أحمد",
-              style: theme.textTheme.bodyMedium),
-          SizedBox(height: 4.h),
-          Text("منذ ساعتين",
-              style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text("الإشعارات", style: theme.textTheme.titleLarge),
+        SizedBox(height: 16.h),
+        Text("لا توجد إشعارات جديدة", style: theme.textTheme.bodyMedium),
+      ],
     );
   }
 
@@ -102,10 +83,9 @@ class _UserHomePageState extends State<UserHomePage> {
       children: [
         Text("الخدمات", style: theme.textTheme.titleLarge),
         SizedBox(height: 16.h),
-        // New subscription creation service
         _buildServiceItem(
           "إنشاء اشتراك جديد",
-          " مع السائق المفضل",
+          " انشاء اشتراك ",
           Icons.add_circle_outline,
           () => _navigateToSubPage(),
         ),
@@ -129,21 +109,17 @@ class _UserHomePageState extends State<UserHomePage> {
             MaterialPageRoute(builder: (context) => Requestedsubpage()),
           ),
         ),
+        SizedBox(height: 16.h),
+        _buildServiceItem(
+          "الانضمام إلى اشتراك",
+          "عرض قائمة الاشتراكات النشطة والانضمام إليها",
+          Icons.group_add,
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ActiveSubscriptionsPage()),
+          ),
+        ),
       ],
-    );
-  }
-
-  void _navigateToSubPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CreateSubscriptionPage(
-            // Add any required parameters here
-            // For example:
-            // userId: '123',
-            // isNewSubscription: true,
-            ),
-      ),
     );
   }
 
@@ -178,17 +154,6 @@ class _UserHomePageState extends State<UserHomePage> {
                 ],
               ),
             ),
-          SizedBox(height: 16.h),
-_buildServiceItem(
-  "الانضمام إلى اشتراك",
-  "عرض قائمة الاشتراكات النشطة والانضمام إليها",
-  Icons.group_add,
-  () => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => ActiveSubscriptionsPage()),
-  ),
-),
-
           ],
         ),
       ),
@@ -206,30 +171,34 @@ _buildServiceItem(
       unselectedItemColor: Colors.grey,
       onTap: (index) {
         if (index == 1) {
-         final tripId = Provider.of<UserProvider>(context, listen: false).tripId;
-         //print("trip is" + tripId!);
-          //if (tripId != null && tripId.isNotEmpty) {  
-          Navigator.push(
+          final tripId =
+              Provider.of<UserProvider>(context, listen: false).tripId;
+
+          if (tripId != null && tripId != '') {
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>MessagesHomePage(), // Pass the tripId to ChatPage
-              ));
-          /* Navigator.push(
-             context, MaterialPageRoute(builder: (context) => ChatPage( )));*/
-          /*} else {
-            // Handle the case when tripId is null
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("لا توجد محادثات حالية"),
+                builder: (context) => ChatPage(tripId: tripId),
               ),
             );
-          }*/
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("لا توجد محادثات حالية")),
+            );
+          }
         } else if (index == 2) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AccountPageUser()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AccountPageUser()),
+          );
         }
       },
     );
+  }
+
+  void _navigateToSubPage() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => CreateSubscriptionPage()));
   }
 }
 
