@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
 import 'package:rem_s_appliceation9/services/FireStore.dart';
 import 'package:rem_s_appliceation9/widgets/app_bar/custom_dropdown.dart';
 
@@ -170,7 +171,10 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => DriverHomePage()),
+  )
         ),
         iconTheme: IconThemeData(
           color: Color(0xFFFFB300),
