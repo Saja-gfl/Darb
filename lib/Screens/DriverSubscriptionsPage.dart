@@ -1,10 +1,9 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import '../services/UserProvider.dart';
 
 class DriverSubscriptionsPage extends StatefulWidget {
@@ -14,88 +13,89 @@ class DriverSubscriptionsPage extends StatefulWidget {
   State<DriverSubscriptionsPage> createState() =>
       _DriverSubscriptionsPageState();
 }
-// انتباه هذي الصفحة مخصصة فقط للاختبار
-//!! احذفو الصفحة فقط بعد تنفيد الكومنت اللي في درايفر هوم !!
+
 
 class _DriverSubscriptionsPageState extends State<DriverSubscriptionsPage> {
-  final currentUserId = FirebaseAuth.instance.currentUser?.uid ??
-      "legJfO1wakMmTmUvGtQjNny7yGW2"; // 🔄 بدل testuser بـ uid الحقيقي
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("طلبات الاشتراك")),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('rideRequests') //('subscriptionRequests')
-            .where('driverId', isEqualTo: currentUserId)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
-            return const Center(child: CircularProgressIndicator());
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
-            return const Center(child: Text('لا يوجد اشتراكات حالياً.'));
+@override
+Widget build(BuildContext context) {
+  final currentUserId =
+      Provider.of<UserProvider>(context, listen: false).uid;
 
-          final docs = snapshot.data!.docs;
+  return Scaffold(
+    appBar: AppBar(title: const Text("طلبات الاشتراك")),
+    body: StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('rideRequests')
+          .where('driverId', isEqualTo: currentUserId)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting)
+          return const Center(child: CircularProgressIndicator());
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
+          return const Center(child: Text('لا يوجد اشتراكات حالياً.'));
 
-          return ListView(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Text('طلبات معلقة:',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-              ...docs.map((doc) {
-                return FutureBuilder<QuerySnapshot>(
-                  future: doc.reference
-                      .collection('users')
-                      .where('sub_status', isEqualTo: 'معلق')
-                      .get(),
-                  builder: (context, userSnapshot) {
-                    if (userSnapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const SizedBox(); // عرض عنصر فارغ أثناء التحميل
-                    }
-                    if (!userSnapshot.hasData ||
-                        userSnapshot.data!.docs.isEmpty) {
-                      return const SizedBox(); // لا يوجد طلبات معلقة
-                    }
-                    return SubscriptionTile(doc: doc, isPending: true);
-                  },
-                );
-              }).toList(),
-              const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Text('اشتراكات جارية:',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-              ...docs.map((doc) {
-                return FutureBuilder<QuerySnapshot>(
-                  future: doc.reference
-                      .collection('users')
-                      .where('sub_status', isEqualTo: 'نشط')
-                      .get(),
-                  builder: (context, userSnapshot) {
-                    if (userSnapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const SizedBox(); // عرض عنصر فارغ أثناء التحميل
-                    }
-                    if (!userSnapshot.hasData ||
-                        userSnapshot.data!.docs.isEmpty) {
-                      return const SizedBox(); // لا يوجد اشتراكات جارية
-                    }
-                    return SubscriptionTile(doc: doc, isPending: false);
-                  },
-                );
-              }).toList(),
-            ],
-          );
-        },
-      ),
-    );
-  }
+        final docs = snapshot.data!.docs;
+
+        return ListView(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(12.0),
+              child: Text('طلبات معلقة:',
+                  style:
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            ...docs.map((doc) {
+              return FutureBuilder<QuerySnapshot>(
+                future: doc.reference
+                    .collection('users')
+                    .where('sub_status', isEqualTo: 'معلق')
+                    .get(),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const SizedBox();
+                  }
+                  if (!userSnapshot.hasData ||
+                      userSnapshot.data!.docs.isEmpty) {
+                    return const SizedBox();
+                  }
+                  return SubscriptionTile(doc: doc, isPending: true);
+                },
+              );
+            }).toList(),
+            const Padding(
+              padding: EdgeInsets.all(12.0),
+              child: Text('اشتراكات جارية:',
+                  style:
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            ...docs.map((doc) {
+              return FutureBuilder<QuerySnapshot>(
+                future: doc.reference
+                    .collection('users')
+                    .where('sub_status', isEqualTo: 'نشط')
+                    .get(),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const SizedBox();
+                  }
+                  if (!userSnapshot.hasData ||
+                      userSnapshot.data!.docs.isEmpty) {
+                    return const SizedBox();
+                  }
+                  return SubscriptionTile(doc: doc, isPending: false);
+                },
+              );
+            }).toList(),
+          ],
+        );
+      },
+    ),
+  );
+}
+
 }
 
 class SubscriptionTile extends StatelessWidget {
@@ -204,37 +204,65 @@ class SubscriptionTile extends StatelessWidget {
     final data = doc.data() as Map<String, dynamic>;
     final subscription = data['subscriptionData'] ?? {};
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        title: Text("الراكب: ${data['userId']}"),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+ return Card(
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  elevation: 3,
+  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-                "نوع الاشتراك: ${subscription['subscriptionType'] ?? 'غير محدد'}"),
-            Text(
-                "من: ${subscription['fromLocation'] ?? '؟'} إلى: ${subscription['toLocation'] ?? '؟'}"),
-            Text("السعر: ${subscription['price'] ?? '؟'}"),
-            Text("عدد الأيام: ${subscription['days']?.length ?? 0} يوم"),
+              "الراكب: ${data['userId']}",
+              style: GoogleFonts.tajawal(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            isPending
+                ? Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.check_circle, color: Colors.green),
+                        onPressed: () => acceptSubscription(context),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.cancel, color: Colors.red),
+                        onPressed: () => rejectSubscription(context),
+                      ),
+                    ],
+                  )
+                : const Icon(Icons.check, color: Colors.green),
           ],
         ),
-        trailing: isPending
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.check_circle, color: Colors.green),
-                    onPressed: () => acceptSubscription(context),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.cancel, color: Colors.red),
-                    onPressed: () => rejectSubscription(context),
-                  ),
-                ],
-              )
-            : const Icon(Icons.check, color: Colors.green),
-      ),
-    );
+        const SizedBox(height: 8),
+        Text(
+          "نوع الاشتراك: ${subscription['subscriptionType'] ?? 'غير محدد'}",
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "من: ${subscription['fromLocation'] ?? '؟'} إلى: ${subscription['toLocation'] ?? '؟'}",
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "السعر: ${subscription['price'] ?? '؟'}",
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "عدد الأيام: ${subscription['days']?.length ?? 0} يوم",
+          style: const TextStyle(fontSize: 16),
+        ),
+      ],
+    ),
+  ),
+);
+
   }
 }

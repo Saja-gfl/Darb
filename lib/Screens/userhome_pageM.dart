@@ -178,6 +178,17 @@ class _UserHomePageState extends State<UserHomePage> {
                 ],
               ),
             ),
+          SizedBox(height: 16.h),
+_buildServiceItem(
+  "الانضمام إلى اشتراك",
+  "عرض قائمة الاشتراكات النشطة والانضمام إليها",
+  Icons.group_add,
+  () => Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => ActiveSubscriptionsPage()),
+  ),
+),
+
           ],
         ),
       ),
