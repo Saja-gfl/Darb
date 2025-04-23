@@ -3,11 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
 import '../services/UserProvider.dart';
-import '../services/chatService.dart';
 import 'dart:async';
 // لإضافة مكتبة Random
-
-import 'ChatPage.dart'; // لإضافة مكتبة Random
 
 class Driver {
   final String id;
@@ -226,6 +223,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   }*/
   }
 
+//مرام: هنا التعديل على الباك بوتن
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,9 +238,17 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.chat_bubble_outline, color: Colors.amber),
-          onPressed: () {},
+          icon: const Icon(Icons.arrow_back, color: Colors.amber),
+          onPressed: () {
+            Navigator.pop(context); // This will navigate back
+          },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline, color: Colors.amber),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: filteredDrivers.isEmpty
           ? const Center(
@@ -255,16 +261,14 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: filteredDrivers.length, //drivers.length,
+                    itemCount: filteredDrivers.length,
                     itemBuilder: (context, index) {
                       return DriverCard(
                         driver: filteredDrivers[index],
                         onSubscribe: () => sendSubscriptionRequest(
                             filteredDrivers[index].toMap()),
-                        tripId: widget.tripId, // معرف الاشتراك
+                        tripId: widget.tripId,
                       );
-
-                      //return DriverCard(driver: drivers[index]);
                     },
                   ),
                 ),
@@ -274,6 +278,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   }
 }
 
+// الى هنا
 class DriverCard extends StatelessWidget {
   final Driver driver;
   //final Function(String) onSubscribe; // وظيفة يتم استدعاؤها عند الاشتراك
