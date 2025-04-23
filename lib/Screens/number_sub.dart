@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/UserProvider.dart';
@@ -154,7 +155,10 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFFFFB300)),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => UserHomePage()),
+  ),
         ),
         title: Text(
           "الاشتراكات المتاحة",
