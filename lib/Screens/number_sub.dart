@@ -221,7 +221,6 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
                 final sub = _filteredSubscriptions[index];
                 return SubscriptionCard(
                   info: sub,
-                  onMessage: () => _messageDriver(sub.phone),
                   onRequestSubscription: () async {
                     final userProvider =
                         Provider.of<UserProvider>(context, listen: false);
@@ -315,138 +314,263 @@ class SubscriptionInfo {
 
 class SubscriptionCard extends StatelessWidget {
   final SubscriptionInfo info;
-  final VoidCallback onMessage;
-  final VoidCallback onRequestSubscription; // وظيفة جديدة للزر
+  final VoidCallback onRequestSubscription;
+  final Color primaryColor = const Color(0xFFFFB300);
+  final Color secondaryColor = const Color(0xFF76CB54);
 
   const SubscriptionCard({
     Key? key,
     required this.info,
-    required this.onMessage,
-    required this.onRequestSubscription, // تمرير الوظيفة
+    required this.onRequestSubscription,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            // Subscription Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.circular(4),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 16),
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with subscription info
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Subscription Type
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      info.type,
+                      style: GoogleFonts.tajawal(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+
+                  // Subscription Number
+                  Text(
+                    '#${info.id}',
+                    style: GoogleFonts.tajawal(
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              // Route Information
+              _buildInfoRow('المسار', info.route, Icons.alt_route),
+              _buildInfoRow('نقطة الوصول', info.dropoff, Icons.location_on),
+
+              const Divider(height: 24, thickness: 1),
+
+              // Schedule Information
+              _buildSectionTitle('الجدول الزمني'),
+              _buildScheduleDetails(info.schedule),
+
+              const Divider(height: 24, thickness: 1),
+
+              // Price and Driver
+              Row(
+                children: [
+                  _buildInfoBox('السعر', info.price, Icons.attach_money),
+                  const SizedBox(width: 12),
+                  _buildInfoBox('السائق', info.driver, Icons.person),
+                ],
+              ),
+
+              if (info.status.isNotEmpty && info.status != 'غير معروف') ...[
+                const SizedBox(height: 12),
+                _buildInfoBox('حالة الاشتراك', info.status, Icons.info),
+              ],
+
+              const SizedBox(height: 16),
+
+              // Action Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: onRequestSubscription,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   child: Text(
-                    info.type,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
+                    'طلب اشتراك',
+                    style: GoogleFonts.tajawal(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: GoogleFonts.tajawal(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: Colors.grey[800],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: primaryColor),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  'اشتراك #${info.id}',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                  label,
+                  style: GoogleFonts.tajawal(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: GoogleFonts.tajawal(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+          ),
+        ],
+      ),
+    );
+  }
 
-            // Route Information
-            _buildInfoRow(info.route, Icons.arrow_forward),
-            _buildInfoRow(info.dropoff, Icons.location_on),
+  Widget _buildScheduleDetails(String schedule) {
+    // تحسين عرض الجدول الزمني مع دعم التنسيقات المختلفة
+    final parts = schedule.split('-').map((e) => e.trim()).toList();
 
-            const Divider(height: 24),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (parts.length > 1)
+          ...parts
+              .map((part) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.circle, size: 8, color: primaryColor),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            part,
+                            style: GoogleFonts.tajawal(fontSize: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ))
+              .toList()
+        else
+          Text(
+            schedule,
+            style: GoogleFonts.tajawal(fontSize: 14),
+          ),
+      ],
+    );
+  }
 
-            // Schedule and Price
-            _buildDetailRow(info.schedule, Icons.access_time),
-            _buildDetailRow(info.price, Icons.attach_money),
-            _buildDetailRow('السائق: ${info.driver}', Icons.person),
-
-            const Divider(height: 24),
-
-            // Action Buttons
+  Widget _buildInfoBox(String label, String value, IconData icon) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey[200]!),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Row(
               children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green, // لون الزر الأخضر
-                      minimumSize: const Size(double.infinity, 40),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: onRequestSubscription,
-                    child: Text(
-                      'طلب اشتراك',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                      ),
-                    ),
+                Icon(icon, size: 16, color: primaryColor),
+                const SizedBox(width: 4),
+                Text(
+                  label,
+                  style: GoogleFonts.tajawal(
+                    fontSize: 12,
+                    color: Colors.grey[600],
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: GoogleFonts.tajawal(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildInfoRow(String text, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
-            text,
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
+Widget _buildDetailRow(String text, IconData icon) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Text(
+          text,
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
           ),
-          const SizedBox(width: 8),
-          Icon(icon, size: 16, color: const Color(0xFFFFB300)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String text, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
-            text,
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Icon(icon, size: 16, color: Colors.grey),
-        ],
-      ),
-    );
-  }
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 16, color: Colors.grey),
+      ],
+    ),
+  );
 }
