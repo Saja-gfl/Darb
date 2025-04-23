@@ -167,13 +167,8 @@ class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
         child: Column(
           children: [
             // Search and Filter Row
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: _buildSearchFilterRow(),
-            ),
 
             // Subscription Type Tabs
-            _buildSubscriptionTabs(),
 
             // Subscription Cards List
             Expanded(
@@ -181,7 +176,9 @@ class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
                   ? Center(
                       child: Text(
                         'لا توجد اشتراكات',
-                        style: TextStyle(color: Colors.grey, fontSize: 18),
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 18),
                       ),
                     )
                   : ListView.builder(
@@ -194,106 +191,6 @@ class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
                     ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchFilterRow() {
-    return Row(
-      children: [
-        // Filter Button
-        Expanded(
-          child: OutlinedButton(
-            onPressed: _showAdvancedFilter,
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              side: BorderSide(color: primaryColor),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.filter_list, size: 20, color: primaryColor),
-                const SizedBox(width: 8),
-                Text(
-                  'تصفية',
-                  style: GoogleFonts.tajawal(
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-
-        // Search Field
-        Expanded(
-          flex: 2,
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'ابحث عن اشتراك...',
-              hintStyle: GoogleFonts.tajawal(color: Colors.grey),
-              prefixIcon: Icon(Icons.search, color: primaryColor),
-              filled: true,
-              fillColor: Colors.grey[50],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSubscriptionTabs() {
-    final tabs = ['الكل', 'شهري', 'أسبوعي', 'يومي', 'غير منتهي'];
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: tabs.map((tab) {
-            final isSelected = _selectedTab == tab;
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: GestureDetector(
-                onTap: () => setState(() => _selectedTab = tab),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: isSelected ? primaryColor : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    tab,
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.grey[700],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
         ),
       ),
     );
