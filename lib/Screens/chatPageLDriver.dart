@@ -21,8 +21,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   final TextEditingController _searchController = TextEditingController();
 
   // Mock chat data
-   List<Map<String, dynamic>> _activeChats = [
-
+  List<Map<String, dynamic>> _activeChats = [
     /*{
       'id': '2',
       'userName': 'محمد الراكب',
@@ -35,15 +34,15 @@ class _ChatHomePageState extends State<ChatHomePage> {
     },*/
   ];
   @override
-   void initState() {
+  void initState() {
     super.initState();
     _fetchActiveChats();
   }
-  
+
   void _fetchActiveChats() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.uid;
-    
+
     if (userId != null) {
       // Fetch active chats from the server or database
       final querySnapshot = await FirebaseFirestore.instance
@@ -52,22 +51,20 @@ class _ChatHomePageState extends State<ChatHomePage> {
           //.where('status_ride', isEqualTo: 'active')
           .get();
 
-          setState(() {
-            _activeChats = querySnapshot.docs.map((doc) {
-              final data = doc.data();
-              return {
-                'tripId': doc.id,
-                'userName': doc.id,
-                'lastMessage': data['lastMessage'] ?? 'لا توجد رسائل',
-                  'time': ChatService.formatTimestamp(data['timestamp']),
-                'unread': data['unread'] ?? 0,
-              };
-            }).toList();
-          });
+      setState(() {
+        _activeChats = querySnapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'tripId': doc.id,
+            'userName': doc.id,
+            'lastMessage': data['lastMessage'] ?? 'لا توجد رسائل',
+            'time': ChatService.formatTimestamp(data['timestamp']),
+            'unread': data['unread'] ?? 0,
+          };
+        }).toList();
+      });
     }
   }
-      
-
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,38 +83,9 @@ class _ChatHomePageState extends State<ChatHomePage> {
       ),
       body: Column(
         children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'ابحث عن محادثة...',
-                  hintStyle: const TextStyle(fontFamily: 'Tajawal'),
-                  prefixIcon: Icon(Icons.search, color: primaryColor),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                onChanged: (value) {
-                  setState(() {});
-                },
-              ),
-            ),
-          ),
+          // تم حذف جزء البادding والبحث هنا
 
-          // Chat List
+          // قائمة المحادثات فقط
           Expanded(
             child: ListView.builder(
               itemCount: _activeChats.length,

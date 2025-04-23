@@ -118,47 +118,6 @@ class _AvailableSubscriptionsPageState
     );
   }
 
-  void _showFilterOptions() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              const Text(
-                'خيارات التصفية',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              _buildFilterOption('شهري', Icons.calendar_today),
-              _buildFilterOption('أسبوعي', Icons.calendar_view_week),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('تطبيق التصفية'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildFilterOption(String title, IconData icon) {
-    return ListTile(
-      leading: Icon(icon, color: primaryColor),
-      title: Text(title),
-      trailing: Checkbox(
-        value: false, // You would manage this state properly
-        onChanged: (value) {},
-      ),
-      onTap: () {},
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -182,12 +141,6 @@ class _AvailableSubscriptionsPageState
       ),
       body: Column(
         children: [
-          // Search and Filter Row
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: _buildSearchFilterRow(),
-          ),
-
           // Subscription Cards List
           Expanded(
             child: _filteredSubscriptions.isEmpty
@@ -229,65 +182,6 @@ class _AvailableSubscriptionsPageState
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSearchFilterRow() {
-    return Row(
-      children: [
-        // Filter Button
-        Expanded(
-          child: OutlinedButton(
-            onPressed: _showFilterOptions,
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              side: BorderSide(color: primaryColor),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.filter_list, size: 20, color: primaryColor),
-                const SizedBox(width: 8),
-                Text(
-                  'تصفية',
-                  style: GoogleFonts.tajawal(
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-
-        // Search Field
-        Expanded(
-          flex: 2,
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'ابحث عن اشتراك...',
-              hintStyle: GoogleFonts.tajawal(color: Colors.grey),
-              prefixIcon: Icon(Icons.search, color: primaryColor),
-              filled: true,
-              fillColor: Colors.grey[50],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
