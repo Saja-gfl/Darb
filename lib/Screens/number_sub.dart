@@ -19,18 +19,18 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
   final TextEditingController _searchController = TextEditingController();
   List<SubscriptionInfo> _filteredSubscriptions = [];
   List<SubscriptionInfo> _allSubscriptions = [
-    /*SubscriptionInfo(
-      id: '12345',
-      type: 'شهري',
-      route: 'عنيزة -> بريدة',
-      //  pickup: 'ميدان الملك فهد',
-      dropoff: 'جامعة القصيم',
-      schedule: '7:00 صباحاً - الأحد إلى الخميس',
-      price: '500 ريال/شهرياً',
-      driver: 'محمد أحمد',
-      status: 'متاح',
-      phone: '0551234567',
-    ),
+    // /*SubscriptionInfo(
+    //   id: '12345',
+    //   type: 'شهري',
+    //   route: 'عنيزة -> بريدة',
+    //   //  pickup: 'ميدان الملك فهد',
+    //   dropoff: 'جامعة القصيم',
+    //   schedule: '7:00 صباحاً - الأحد إلى الخميس',
+    //   price: '500 ريال/شهرياً',
+    //   driver: 'محمد أحمد',
+    //   status: 'متاح',
+    //   phone: '0551234567',
+    // ),
     SubscriptionInfo(
       id: '67890',
       type: 'أسبوعي',
@@ -42,7 +42,7 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
       driver: 'علي خالد',
       status: 'متاح',
       phone: '0559876543',
-    ),*/
+    ),
   ];
 
   @override
@@ -392,26 +392,6 @@ class SubscriptionCard extends StatelessWidget {
                     onPressed: onRequestSubscription,
                     child: Text(
                       'طلب اشتراك',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(0xFFFFB300), // لون الزر الأصفر
-                      minimumSize: const Size(double.infinity, 40),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: onMessage,
-                    child: Text(
-                      'مراسلة السائق',
                       style: GoogleFonts.inter(
                         color: Colors.white,
                       ),
