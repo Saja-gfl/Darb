@@ -4,10 +4,7 @@ import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
-import 'package:rem_s_appliceation9/Screens/sttingsPages/HelpPage.dart';
-import 'package:rem_s_appliceation9/Screens/sttingsPages/PrivacyPolicyPage.dart';
-import 'package:rem_s_appliceation9/Screens/sttingsPages/TermsPage.dart';
-import 'package:rem_s_appliceation9/Screens/sttingsPages/ChangePasswordPage.dart';
+import 'package:rem_s_appliceation9/Screens/ChangePasswordPage.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -19,7 +16,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   int _currentIndex = 2;
   bool _notificationsEnabled = true;
-  bool _darkModeEnabled = false;
 
   @override
   Widget build(BuildContext context) {
