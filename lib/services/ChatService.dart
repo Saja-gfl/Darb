@@ -6,16 +6,27 @@ class ChatService {
 
   // إنشاء غرفة دردشة جديدة
   Future<void> createChatRoom(
-      String tripId, String driverId, List<String> passengerIds) async {
+      String tripId, String driverId, String passengerId) async {
     try {
-      await _firestore.collection('chatRooms').doc(tripId).set({
-        'tripId': tripId,
-        'driverId': driverId,
-        'passengerIds': passengerIds,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      final chatRoomDoc =
+          await _firestore.collection('chatRooms').doc(tripId).get();
+
+      if (chatRoomDoc.exists) {
+        // إذا كانت غرفة الدردشة موجودة، أضف الراكب الجديد فقط
+        await _firestore.collection('chatRooms').doc(tripId).update({
+          'passengerIds': FieldValue.arrayUnion([passengerId]),
+        });
+      } else {
+        // إذا لم تكن غرفة الدردشة موجودة، أنشئ غرفة جديدة
+        await _firestore.collection('chatRooms').doc(tripId).set({
+          'tripId': tripId,
+          'driverId': driverId,
+          'passengerIds': [passengerId],
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
     } catch (e) {
-      print('Error creating chat room: $e');
+      print('Error creating or updating chat room: $e');
     }
   }
 
@@ -29,19 +40,19 @@ class ChatService {
     try {
       //حالة الاشتراك
       final userDoc = await FirebaseFirestore.instance
-        .collection('rideRequests')
-        .doc(chatId)
-        .get();
+          .collection('rideRequests')
+          .doc(chatId)
+          .get();
 
       if (userDoc.exists) {
         final status = userDoc.data()?['sub_status'];
         // منع الإرسال إذا كانت الحالة "منتهية"
-      if (status == 'منتهية') {
-        // إظهار رسالة خطأ
-        print("❌ لا يمكن إرسال الرسائل: الاشتراك منتهي");
-        return;
+        if (status == 'منتهي') {
+          // إظهار رسالة خطأ
+          print("❌ لا يمكن إرسال الرسائل: الاشتراك منتهي");
+          return;
+        }
       }
-    }  
       final timestamp = FieldValue.serverTimestamp();
 
       await _firestore
@@ -77,7 +88,7 @@ class ChatService {
   }
 
   // إضافة راكب إلى غرفة الدردشة
-  Future<void> addPassengerToChatRoom(String tripId, String passengerId) async {
+  /*Future<void> addPassengerToChatRoom(String tripId, String passengerId) async {
     try {
       await _firestore.collection('chatRooms').doc(tripId).update({
         'passengerIds': FieldValue.arrayUnion([passengerId]),
@@ -85,7 +96,7 @@ class ChatService {
     } catch (e) {
       print('Error adding passenger to chat room: $e');
     }
-  }
+  }*/
 
   // إزالة راكب من غرفة الدردشة
   Future<void> removePassengerFromChatRoom(
@@ -108,22 +119,23 @@ class ChatService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getUserChatRooms(String userId) async {
+  Future<List<Map<String, dynamic>>> getDriverChatRooms(String userId) async {
     try {
       final querySnapshot = await _firestore
           .collection('chatRooms')
-          .where('passengerIds', arrayContains: userId)
+          .where('driverId', arrayContains: userId)
           .get();
 
       return querySnapshot.docs.map((doc) {
         final data = doc.data();
         return {
           'tripId': data['tripId'] ?? '',
-        'driverId': data['driverId'] ?? '',
-        'name': data['tripId'] ?? 'غير معروف', // اسم افتراضي
-        'lastMessage': data['lastMessage'] ?? 'لا توجد رسائل', // رسالة افتراضية
-        'time':ChatService.formatTimestamp(data['timestamp']), // وقت افتراضي
-        'unread': data['unread'] ?? 0, // عدد الرسائل غير المقروءة
+          'driverId': data['driverId'] ?? '',
+          'name': data['tripId'] ?? 'غير معروف', // اسم افتراضي
+          'lastMessage':
+              data['lastMessage'] ?? 'لا توجد رسائل', // رسالة افتراضية
+          'time': ChatService.formatTimestamp(data['timestamp']), // وقت افتراضي
+          'unread': data['unread'] ?? 0, // عدد الرسائل غير المقروءة
         };
       }).toList();
     } catch (e) {
@@ -131,16 +143,17 @@ class ChatService {
       return [];
     }
   }
-    Future<bool> canSendMessage(String chatId, String userId) async {
+
+  Future<bool> canSendMessage(String chatId, String userId) async {
     try {
       final userDoc = await FirebaseFirestore.instance
           .collection('rideRequests')
           .doc(chatId)
           .get();
-  
+
       if (userDoc.exists) {
         final subStatus = userDoc.data()?['sub_status'];
-        if (subStatus == 'منتهية') {
+        if (subStatus == 'منتهي') {
           return false; // الاشتراك منتهي
         }
       }
@@ -161,9 +174,10 @@ class ChatService {
       print('Error marking messages as read: $e');
     }
   }
+
   static String formatTimestamp(Timestamp? timestamp) {
-  if (timestamp == null) return 'غير متوفر';
-  final date = timestamp.toDate();
-  return DateFormat('hh:mm a').format(date); // تنسيق الوقت
-}
+    if (timestamp == null) return 'غير متوفر';
+    final date = timestamp.toDate();
+    return DateFormat('hh:mm a').format(date); // تنسيق الوقت
+  }
 }

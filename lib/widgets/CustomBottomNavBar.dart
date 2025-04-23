@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 
@@ -384,7 +384,7 @@ class _HomeContent extends StatelessWidget {
 }
 
 class ChatPage extends StatelessWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  const ChatPage({Key? key, String? tripId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -424,3 +424,4 @@ class DriverInfoPage extends StatelessWidget {
     );
   }
 }
+*/

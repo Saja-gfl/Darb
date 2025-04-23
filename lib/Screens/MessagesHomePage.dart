@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
@@ -21,15 +23,52 @@ class MessagesHomePage extends StatefulWidget {
 
 class _MessagesHomePageState extends State<MessagesHomePage> {
   final ChatService _chatService = ChatService();
-  List<Map<String, dynamic>> _userChats = [];
+  List<Map<String, dynamic>> _activeChats = [];
   int _currentIndex = 1; // Highlight messages tab
 
   @override
   void initState() {
     super.initState();
-    _fetchUserChats();
+    _fetchActiveChats();
   }
 
+  void _fetchActiveChats() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.uid;
+
+    if (userId != null) {
+      try {
+        // Fetch active chats from the server or database
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('chatRooms')
+            .where('driverId', isEqualTo: userId)
+            //.where('status_ride', isEqualTo: 'active')
+            .get();
+
+        setState(() {
+          _activeChats = querySnapshot.docs.map((doc) {
+            final data = doc.data();
+            print("Data fetched: $data");
+            
+            return {
+              'tripId': doc.id ?? 'no tripId',
+              'userName': doc.id + ': رحلة رقم',
+              'lastMessage': data['lastMessage']  ?? 'لا توجد رسائل',
+              'time': data['timestamp'] is Timestamp
+                  ? ChatService.formatTimestamp(data['timestamp'])
+                  : 'مافيه وقت', // تحقق من النوع
+              'unread': data['unread'] ?? 0,
+            };
+          }).toList();
+        });
+      } catch (e) {
+        print("❌ خطأ أثناء جلب المحادثات: $e");
+        // Handle error if needed
+      }
+    }
+  }
+  //قائم دردشات اليوزر بس خلاص غيرناه
+  /*
   void _fetchUserChats() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.uid;
@@ -51,40 +90,32 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
         }).toList();
       });
     }
-  }
+  }*/
 
   @override
 
-  // Mock chat data
-  final List<Map<String, dynamic>> _chats = [
-    {
+  // Mock chat data احذفوه
+  final List<Map<String, dynamic>> _chats = [];
+  /*{
       'id': 'user_1',
-      'name': 'المستخدم أحمد',
-      'lastMessage': 'هل يمكن تغيير موعد الاشتراك؟',
+      'name': 'RR249153' + ':رحلة رقم',
+      'lastMessage': 'When will you arrive today?',
       'time': '10:30 ص',
       'unread': 1,
       'isDriver': false,
-      'tripId': 'trip_123'
+      'tripId': 'R209658'
     },
     {
       'id': 'user_2',
-      'name': 'المستخدم خالد',
-      'lastMessage': 'شكرًا على الخدمة الممتازة',
+      'name': 'R393497' + ':رحلة رقم',
+      'lastMessage': 'thank you for the ride!',
       'time': 'أمس',
       'unread': 1,
       'isDriver': false,
-      'tripId': 'trip_456'
+      'tripId': 'R209658'
     },
-    {
-      'id': 'driver_1',
-      'name': 'السائق محمد',
-      'lastMessage': 'سأكون متأخرًا 10 دقائق اليوم',
-      'time': 'الثلاثاء',
-      'unread': 1,
-      'isDriver': true,
-      'tripId': 'trip_789'
-    },
-  ];
+  
+  ];*/
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +214,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                   )),
               SizedBox(height: 4.h),
               Text(
-                "${_chats.where((chat) => chat['unread']>0).length} رسائل جديدة",
+                "${_activeChats.where((chat) => chat['unread'] > 0).length} رسائل جديدة",
                 style: theme.textTheme.bodyMedium,
               ),
             ],
@@ -205,36 +236,31 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
         ListView.separated(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: _userChats.length,
+          itemCount: _activeChats.length, // استخدام البيانات الوهمية
           separatorBuilder: (context, index) => SizedBox(height: 16.h),
           itemBuilder: (context, index) {
-            final chat = _userChats[index];
-            return _buildChatItem(
-              chat['name'],
-              chat['lastMessage'],
-              chat['time'],
-              chat['unread'],
-              () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatPage(
-                      tripId: chat['tripId'],
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      ],
-    );
-  }
+            final chat = _activeChats[index];
+            return _buildChatItem
+              (chat);      },
+      ),
+    ],
+  );
+}
+      
+  Widget _buildChatItem(Map<String, dynamic> chat) {
+    return InkWell(
+      onTap: () async {
+        await _chatService.markMessagesAsRead(chat['tripId']);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+              tripId: chat['tripId'],
 
-  Widget _buildChatItem(String name, String lastMessage, String time,
-      int unread, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
+            ),
+          ),
+        );
+      },
       child: Container(
         padding: EdgeInsets.all(16.h),
         decoration: BoxDecoration(
@@ -257,7 +283,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(time,
+                      Text(chat['time'] ?? 'لايوجد وقت',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: Colors.grey,
                             fontSize: 12.fSize,
@@ -266,7 +292,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                     ],
                   ),
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    Text(name,
+                    Text(chat['userName'] ?? 'غير معروف',
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: const Color.fromARGB(
                               255, 255, 189, 91), // Orange color
@@ -277,23 +303,29 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (unread>0)
+                      if (chat['unread']> 0)
                         Container(
-                          width: 8.h,
-                          height: 8.h,
-                          margin: EdgeInsets.only(left: 8.h),
+                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             color: Colors.orange,
                             shape: BoxShape.circle,
                           ),
+                          child: Text(
+                            chat['unread'].toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
                       Expanded(
                         child: Text(
-                          lastMessage,
+                          chat['lastMessage'] ?? 'لا توجد رسائل',
                           textAlign: TextAlign.end,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            fontWeight:
-                                unread >0 ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: chat['unread'] > 0
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),

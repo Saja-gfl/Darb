@@ -7,6 +7,7 @@ import 'package:rem_s_appliceation9/Screens/SettingsPage.dart';
 
 import '../services/UserProvider.dart';
 import 'DriverInfoPage.dart';
+import 'MessagesHomePage.dart';
 import 'chatPageLDriver.dart';
 
 class AccountPage extends StatefulWidget {
@@ -132,7 +133,7 @@ class _AccountPageState extends State<AccountPage> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const ChatHomePage()),
+                    builder: (context) => const MessagesHomePage()),
               );
             } else {
               setState(() {

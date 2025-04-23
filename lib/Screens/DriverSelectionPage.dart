@@ -426,12 +426,12 @@ class DriverCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
-                        final userId = Provider.of<UserProvider>(context, listen: false).uid ?? 'unknown_user'; 
+                        final String userId = Provider.of<UserProvider>(context, listen: false).uid ?? 'unknown_user'; 
 
                       final driverId = driver.id; // معرف السائق
 
-                      await ChatService()
-                          .createChatRoom(tripId, driverId, [userId]);
+                     // await ChatService()
+                        //  .createChatRoom(tripId, driverId, userId);
                       // الانتقال إلى صفحة الدردشة
                       Navigator.push(
                         context,

@@ -145,4 +145,30 @@ class FirestoreService {
       return null;
     }
   }
+  //اضافة رقم الرحله ال بيانات اليوزر
+static Future<void> addTripIdToUser(String userId, String tripId) async {
+  try {
+    final userDocRef =
+        FirebaseFirestore.instance.collection('userdata').doc(userId);
+    final userDoc = await userDocRef.get();
+    if (userDoc.exists) {
+      // إذا كانت بيانات المستخدم موجودة، قم بتحديث tripId
+      await userDocRef.update({
+        'tripId': tripId, // تحديث رقم الرحلة
+      });
+      print("✅ تم تحديث tripId للمستخدم $userId إلى $tripId");
+    } else {
+      // إذا لم تكن بيانات المستخدم موجودة، قم بإنشائها مع tripId
+      await userDocRef.set({
+        'userId': userId,
+        'tripId': tripId, // إضافة رقم الرحلة
+        'createdAt': Timestamp.now(), // تاريخ الإنشاء
+      });
+      print("✅ تم إنشاء بيانات جديدة للمستخدم $userId مع tripId $tripId");
+    }
+  } catch (e) {
+    print("❌ خطأ أثناء إضافة أو تحديث tripId للمستخدم $userId: $e");
+  }
+}
+
 }
