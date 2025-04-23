@@ -6,13 +6,6 @@ import 'dart:math';
 
 import 'UserProvider.dart'; // لإضافة مكتبة Random
 
-//ينشئ رقم للرحله
-String generateShortTripId() {
-  final random = Random();
-  return (100000 + random.nextInt(900000))
-      .toString(); // رقم عشوائي بين 100000 و999999
-}
-
 String generateRequestId() {
   final random = Random();
   String randomNumber = (100000 + random.nextInt(900000)).toString();
@@ -32,7 +25,6 @@ Future<String> submitRequest(
   //String homeLocation, // إضافة homeLocation
 ) async {
   final userProvider = Provider.of<UserProvider>(context, listen: false);
-  final userId = userProvider.uid; // معرف المستخدم
   final userName = userProvider.userName ?? "unknown_user"; // اسم المستخدم
   final userPhone =
       userProvider.phoneNumber ?? "unknown_phone"; // رقم هاتف المستخدم
@@ -55,14 +47,17 @@ Future<String> submitRequest(
         .set({
       'tripId': tripId, // رقم الرحلة الفريد
       'driverId': driverId,
-      'status': 'معلق', // public status 
+      'status': 'معلق', // public status
       'type': subscriptionData['type'],
       'homeLocation': subscriptionData['homeLocation'], // إضافة homeLocation
-      'workLocation':subscriptionData['workLocation'], // الموقع الذي يعمل فيه المستخدم
+      'workLocation':
+          subscriptionData['workLocation'], // الموقع الذي يعمل فيه المستخدم
       'price': subscriptionData['price'], // السعر المتفق علي
       "schedule": subscriptionData['schedule'], // جدول الرحلة (تاريخ ووقت)
-      'fromLocation':subscriptionData['from'], // الموقع الذي انطلق منه المستخدم
-      'toLocation': subscriptionData['to'], // الموقع الذي يريد المستخدم الذهاب إليه
+      'fromLocation':
+          subscriptionData['from'], // الموقع الذي انطلق منه المستخدم
+      'toLocation':
+          subscriptionData['to'], // الموقع الذي يريد المستخدم الذهاب إليه
       'startDate': subscriptionData['startDate'], // وقت بدء الرحلة
 
       // 'createdAt': Timestamp.now(),  // تاريخ ووقت الطلب
@@ -75,7 +70,7 @@ Future<String> submitRequest(
         .collection('users')
         .doc(userId) // استخدام userId بدلاً من tripId
         .set({
-       'userId': userId, // معرف المستخدم
+      'userId': userId, // معرف المستخدم
       'userName': userName, // معرف المستخدم
       'userphone': userPhone, // رقم هاتف المستخدم
       //'homeLocation': homeLocation, // إضافة homeLocation
@@ -152,7 +147,8 @@ Future<List<Map<String, dynamic>>> getActiveTripsForUser(String userId) async {
 
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
-        if (userData['sub_status'] == 'نشط') {
+        if (userData['sub_status'] == 'نشط' ||
+            userData['sub_status'] == 'منتهي') {
           final rideData = doc.data() as Map<String, dynamic>;
           rideData['tripId'] = doc.id;
           rideData['sub_status'] = userData['sub_status']; // حالة الاشتراك
@@ -162,13 +158,12 @@ Future<List<Map<String, dynamic>>> getActiveTripsForUser(String userId) async {
     }
     return activeSubscriptions;
   } catch (e) {
-    print("خطأ في جلب الرحلات النشطة: $e");
+    print("خطأ في جلب الرحلات : $e");
     return [];
   }
 }
 
-Future<void> check_Sub_tatus(
-    String tripId, String userId) async {
+Future<void> check_Sub_tatus(String tripId, String userId) async {
   try {
     // جلب بيانات الاشتراك
     final subscriptionData = await getRequestByTripId(tripId);
@@ -202,35 +197,68 @@ Future<void> check_Sub_tatus(
     }
   } catch (e) {
     print("❌ خطأ أثناء التحقق من حالة الاشتراك: $e");
-  }}
-
-    Future<void> SendByNum_Sub(
-      BuildContext context, String tripId, String userId, String homeLocation) async {
-    try {
-       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final userName = userProvider.userName ?? "unknown_user"; // اسم المستخدم
-      final userPhone =userProvider.phoneNumber ?? "unknown_phone"; // رقم هاتف المستخدم
-
-      // تحديث بيانات المستخدم في الرحلة
-      await FirebaseFirestore.instance
-          .collection('rideRequests')
-          .doc(tripId)
-          .collection('users')
-          .doc(userId)
-          .set({
-            'userId': userId, // معرف المستخدم
-            'userName': userName, // معرف المستخدم
-            'userphone': userPhone, // رقم هاتف المستخدم
-            'sub_status': 'معلق',
-            'homeLocation': homeLocation, // إضافة موقع المنزل
-            'createdAt': Timestamp.now(), // تاريخ ووقت الطلب
-
-      });
-  
-      showToast(message: "تم إرسال طلب الاشتراك بنجاح");
-    } catch (e) {
-      print("خطأ أثناء إرسال طلب الاشتراك: $e");
-      showToast(message: "حدث خطأ أثناء إرسال الطلب");
-    }
   }
+}
+
+//end
+
+Future<void> SendByNum_Sub(BuildContext context, String tripId, String userId,
+    String homeLocation) async {
+  try {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userName = userProvider.userName ?? "unknown_user"; // اسم المستخدم
+    final userPhone =
+        userProvider.phoneNumber ?? "unknown_phone"; // رقم هاتف المستخدم
+
+    // تحديث بيانات المستخدم في الرحلة
+    await FirebaseFirestore.instance
+        .collection('rideRequests')
+        .doc(tripId)
+        .collection('users')
+        .doc(userId)
+        .set({
+      'userId': userId, // معرف المستخدم
+      'userName': userName, // معرف المستخدم
+      'userphone': userPhone, // رقم هاتف المستخدم
+      'sub_status': 'معلق',
+      'homeLocation': homeLocation, // إضافة موقع المنزل
+      'createdAt': Timestamp.now(), // تاريخ ووقت الطلب
+    });
+
+    showToast(message: "تم إرسال طلب الاشتراك بنجاح");
+  } catch (e) {
+    print("خطأ أثناء إرسال طلب الاشتراك: $e");
+    showToast(message: "حدث خطأ أثناء إرسال الطلب");
+  }
+}
+
+Future<List<Map<String, dynamic>>> getPendingOrRejectedTripsForUser(
+    String userId) async {
+  try {
+    QuerySnapshot rideRequestsSnapshot =
+        await FirebaseFirestore.instance.collection('rideRequests').get();
+
+    List<Map<String, dynamic>> filteredSubscriptions = [];
+
+    for (var doc in rideRequestsSnapshot.docs) {
+      DocumentSnapshot userDoc =
+          await doc.reference.collection('users').doc(userId).get();
+
+      if (userDoc.exists) {
+        final userData = userDoc.data() as Map<String, dynamic>;
+        if (userData['sub_status'] == 'معلق' ||
+            userData['sub_status'] == 'مرفوض') {
+          final rideData = doc.data() as Map<String, dynamic>;
+          rideData['tripId'] = doc.id;
+          rideData['sub_status'] = userData['sub_status']; // حالة الاشتراك
+          filteredSubscriptions.add(rideData);
+        }
+      }
+    }
+    return filteredSubscriptions;
+  } catch (e) {
+    print("خطأ في جلب الرحلات المعلقة أو المرفوضة: $e");
+    return [];
+  }
+}
 

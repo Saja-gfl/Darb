@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/Screens/ChatPage.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
+import 'package:rem_s_appliceation9/widgets/CustomBottomNavBar.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
 
@@ -196,23 +198,25 @@ class _UserHomePageState extends State<UserHomePage> {
       onTap: (index) {
         if (index == 1) {
          final tripId = Provider.of<UserProvider>(context, listen: false).tripId;
-         //print("trip is" + tripId!);
-          //if (tripId != null && tripId.isNotEmpty) {  
+         //set tripId on prov
+
+         print("trip is" + tripId!);
+          if (tripId != null || tripId !='') {  
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>MessagesHomePage(), // Pass the tripId to ChatPage
+                builder: (context) =>ChatPage(tripId: tripId), // Pass the tripId to ChatPage
               ));
           /* Navigator.push(
              context, MaterialPageRoute(builder: (context) => ChatPage( )));*/
-          /*} else {
+          } else {
             // Handle the case when tripId is null
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text("لا توجد محادثات حالية"),
               ),
             );
-          }*/
+          }
         } else if (index == 2) {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => AccountPageUser()));

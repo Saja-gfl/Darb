@@ -137,6 +137,7 @@ class UserProvider with ChangeNotifier {
       _passengerCount = userData['passengerCount'] ?? '0';
       _price = userData['price']?.toString() ?? '0';
       _acceptedLocations = userData['acceptedLocations'] ?? '';
+      _tripId = userData['tripId'] ?? '';
 
       notifyListeners();
     }

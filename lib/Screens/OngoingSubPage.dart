@@ -42,7 +42,7 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
       final subs = await getActiveTripsForUser(currentUserId);
       setState(() {
         subscriptions = subs;
-        isLoading = false;
+        isLoading = false; // إيقاف التحميل بعد جلب البيانات
       });
     } catch (e) {
       print("خطأ أثناء جلب الاشتراكات: $e");
@@ -218,8 +218,8 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
                         schedule: scheduleText,
                         price: subscription['price'] ?? '',
                         sub_status: subscription['sub_status'] ?? 'غير معروف',
-                        driverId:
-                            subscription['driverId'] ?? '', // تمرير driverId
+                        driverId: subscription['driverId'] ?? '', // تمرير driverId
+                        
                         onSharePressed: () {
                           // Handle share functionality
                         },
