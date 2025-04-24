@@ -186,6 +186,11 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("تم ارسال الطلب  للسائق")),
       );
+
+      // الانتقال إلى صفحة Home بعد 2 ثانية (يمكنك تعديل الوقت حسب الحاجة)
+    await Future.delayed(Duration(seconds: 2));
+    Navigator.pushReplacementNamed(context, '/userHomePage'); 
+    
     } catch (e) {
       print("خطأ في إرسال طلب الاشتراك: $e");
       ScaffoldMessenger.of(context).showSnackBar(
