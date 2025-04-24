@@ -35,7 +35,8 @@ class _ReviewPageState extends State<ReviewPage> {
 
   Future<void> _fetchDriverName() async {
     try {
-      final name = await FirestoreService().getUserOrDriverName(widget.driverId , true);
+      final name =
+          await FirestoreService().getUserOrDriverName(widget.driverId, true);
       setState(() {
         driverName = name ??
             "السائق"; // إذا لم يتم العثور على الاسم، استخدم الاسم الافتراضي
@@ -87,19 +88,17 @@ class _ReviewPageState extends State<ReviewPage> {
                       child: Row(
                         children: [
                           // Driver Avatar
-                          Container(
-                            width: 64,
-                            height: 64,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: primaryColor, width: 2),
-                              image: DecorationImage(
-                                image:
-                                    NetworkImage("https://placehold.co/64x64"),
-                                fit: BoxFit.cover,
-                              ),
+                          CircleAvatar(
+                            radius: 48,
+                            backgroundColor:
+                                const Color.fromARGB(255, 255, 245, 233),
+                            child: Icon(
+                              Icons.person,
+                              size: 48,
+                              color: const Color.fromARGB(255, 255, 178, 25),
                             ),
                           ),
+
                           SizedBox(width: 16),
 
                           // Driver Info
@@ -206,7 +205,8 @@ class _ReviewPageState extends State<ReviewPage> {
                       ),
                       SizedBox(height: 8),
                       TextField(
-                        controller: _commentController, // ربط TextEditingController
+                        controller:
+                            _commentController, // ربط TextEditingController
                         maxLines: 4,
                         decoration: InputDecoration(
                           hintText: 'شارك رأيك بتجربتك (اختياري)',
@@ -253,22 +253,25 @@ class _ReviewPageState extends State<ReviewPage> {
                         }
 
                         try {
-                          final userProvider = Provider.of<UserProvider>(context, listen: false);
+                          final userProvider =
+                              Provider.of<UserProvider>(context, listen: false);
                           final userName = userProvider.userName ?? 'مجهول';
-                      
+
                           // جمع النص من TextField والعلامات المختارة
-                          final additionalComment = _commentController.text.trim();
+                          final additionalComment =
+                              _commentController.text.trim();
                           final combinedComment = [
                             ..._selectedTags,
                             if (additionalComment.isNotEmpty) additionalComment,
                           ].join(', ');
-                      
+
                           await RatingService().addRating(
                             userId: userProvider.uid!,
                             userName: userName,
                             driverId: widget.driverId,
                             rating: _rating,
-                            comment: combinedComment, // إرسال النص والعلامات معًا
+                            comment:
+                                combinedComment, // إرسال النص والعلامات معًا
                           );
 
                           ScaffoldMessenger.of(context).showSnackBar(
