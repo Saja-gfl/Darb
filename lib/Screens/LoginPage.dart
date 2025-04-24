@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
@@ -34,12 +36,31 @@ class _K0ScreenState extends State<K0Screen> {
   @override
   void initState() {
     super.initState();
+      _setupNotifications();
+
     // استدعاء الدالة للتحقق من حالة تسجيل الدخول بعد بناء الـ Widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkLoginStatus();
     });
   }
+void _setupNotifications() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
+  // ✅ يعمل تلقائي على Android
+  NotificationSettings settings = await messaging.requestPermission();
+
+  print('🔔 Android permission status: ${settings.authorizationStatus}');
+
+  // عند استقبال إشعار والتطبيق مفتوح
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('📩 Foreground: ${message.notification?.title}');
+  });
+
+  // عند فتح التطبيق من خلال إشعار
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    print('🚀 Opened from notification: ${message.notification?.title}');
+  });
+}
   @override
   void dispose() {
     usernameInputController.dispose();
@@ -180,6 +201,37 @@ class _K0ScreenState extends State<K0Screen> {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         await userProvider.loadUserData(user.uid);
 
+      String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+      if (fcmToken != null) {
+        // تحديث أو إضافة fcmToken في Firestore
+        final userDocRef = FirebaseFirestore.instance
+            .collection(userProvider.isDriver ? 'driverdata' : 'userdata')
+            .doc(user.uid);
+
+        final userDoc = await userDocRef.get();
+
+        if (userDoc.exists) {
+          // إذا كان المستند موجودًا، قم بتحديث fcmToken
+          await userDocRef.update({
+            'fcmToken': fcmToken,
+          });
+          print("✅ تم تحديث fcmToken بنجاح.");
+        } else {
+          // إذا لم يكن المستند موجودًا، قم بإنشائه مع fcmToken
+          await userDocRef.set({
+            'fcmToken': fcmToken,
+            'email': email,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+          print("✅ تم إنشاء مستند جديد مع fcmToken.");
+        }
+      } else {
+        print("❌ لم يتم الحصول على fcmToken.");
+      }
+
+      showToast(message: "تم تسجيل الدخول بنجاح");
+
         //FirestoreService firestoreService = FirestoreService();
       //  Map<String, dynamic>? userData = await firestoreService.getUserData(user.uid);;
 
@@ -237,6 +289,7 @@ class _K0ScreenState extends State<K0Screen> {
     userProvider.setGender(userData['Gender'] ?? '');
     userProvider.setCarType(userData['carType'] ?? '');
     userProvider.setPlateNumber(userData['plateNumber'] ?? '');
+    
 
     
 

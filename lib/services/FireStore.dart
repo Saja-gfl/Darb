@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'NotifProvider .dart';
+
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -80,6 +82,28 @@ class FirestoreService {
           .doc(userId)
           .update(updatedData); // تحديث البيانات حسب userId
       print("✅ تم تحديث بيانات المستخدم بنجاح");
+
+       // إرسال الإشعار بعد التحديث
+    final userDoc = await _firestore
+        .collection(isDriver ? 'driverdata' : 'userdata')
+        .doc(userId)
+        .get();
+
+      
+    if (userDoc.exists) {
+      final fcmToken = userDoc['fcmToken'];
+      if (fcmToken != null) {
+        final notificationProvider = NotificationProvider();
+        await notificationProvider.sendFCMNotificationV1(
+          fcmToken,
+          'تم تحديث بياناتك',
+          'تم تحديث بياناتك بنجاح في النظام.',
+        );
+        print("✅ تم إرسال الإشعار بنجاح.");
+      } else {
+        print("❌ لا يوجد fcmToken لهذا المستخدم.");
+      }
+    }
     } catch (e) {
       print("❌ خطأ أثناء تحديث البيانات: $e");
     }
@@ -120,10 +144,24 @@ class FirestoreService {
           .doc(userId)
           .set(data);
       print("✅ تم حفظ بيانات المستخدم بنجاح");
-    } catch (e) {
-      print("❌ خطأ أثناء حفظ البيانات: $e");
+
+      // إرسال الإشعار بعد الإنشاء
+    final fcmToken = data['fcmToken'];
+    if (fcmToken != null) {
+      final notificationProvider = NotificationProvider();
+      await notificationProvider.sendFCMNotificationV1(
+        fcmToken,
+        'مرحبًا بك!',
+        'تم إنشاء حسابك بنجاح في النظام.',
+      );
+      print("✅ تم إرسال الإشعار بنجاح.");
+    } else {
+      print("❌ لا يوجد fcmToken لهذا المستخدم.");
     }
+  } catch (e) {
+    print("❌ خطأ أثناء حفظ البيانات: $e");
   }
+}
 
 //جلب اسم السائق من قاعدة البيانات
   Future<String?> getUserOrDriverName(String userId, bool isDriver) async {

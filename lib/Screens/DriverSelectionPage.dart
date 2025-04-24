@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
+import '../services/NotifProvider .dart';
 import '../services/UserProvider.dart';
 import '../services/chatService.dart';
 import 'dart:async';
@@ -167,6 +168,8 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
     try {
       final userId = Provider.of<UserProvider>(context, listen: false).uid;
+      final passengerName = Provider.of<UserProvider>(context, listen: false)
+          .userName; // اسم الراكب من مزود المستخدم
  // UID المستخدم الحالي (الراكب)
       final tripId = widget.tripId; //
 
@@ -184,6 +187,34 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
         }, // إضافة بيانات السائق كـ Map
         'updatedAt': Timestamp.now(), // وقت التحديث
       });
+      // 2. جلب بيانات السائق (للحصول على fcmToken)
+        final driverDoc = await FirebaseFirestore.instance
+            .collection('driverdata')
+            .doc(driverData['id'])
+            .get();
+        final String? driverFcm = driverDoc['fcmToken'];
+
+         if (driverFcm != null) {
+          final notificationProvider =
+              Provider.of<NotificationProvider>(context, listen: false);
+          await notificationProvider.sendFCMNotificationV1(
+            driverFcm,
+            'طلب اشتراك جديد',
+            'لديك طلب اشتراك جديد للراكب $passengerName',
+          );
+          // (اختياري) إضافة الإشعار لقائمة الإشعارات محلياً
+          notificationProvider.addNotification({
+            'title': 'طلب اشتراك جديد',
+            'body': 'لديك طلب اشتراك جديد للراكب $passengerName',
+            'time': DateTime.now().toString(),
+          });
+        } else {
+          print('❌ لا يوجد fcmToken لهذا السائق.');
+        }
+      
+    
+  
+
  
       // إظهار رسالة تأكيد للمستخدم
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'FireStore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserProvider with ChangeNotifier {
   String? _uid;
@@ -162,5 +164,14 @@ class UserProvider with ChangeNotifier {
     _acceptedLocations = null;
 
     notifyListeners();
+  }
+
+  Future<void> saveTokenToDatabase(String userId) async {
+    String? token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      await FirebaseFirestore.instance.collection('userdata').doc(userId).update({
+        'fcmToken': token,
+      });
+    }
   }
 }
