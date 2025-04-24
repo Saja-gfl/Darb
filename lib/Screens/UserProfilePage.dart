@@ -155,7 +155,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             const SizedBox(height: 24),
 
             // Account Details
-            _buildAccountDetails(),
           ],
         ),
       ),
@@ -324,23 +323,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget _buildActionButtons() {
     return Row(
       children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              // Cancel action
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.orange,
-              side: const BorderSide(color: Colors.orange),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text("إلغاء"),
-          ),
-        ),
         const SizedBox(width: 16),
         Expanded(
           child: ElevatedButton(
@@ -360,29 +342,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             child: const Text("حفظ"),
           ),
         ),
-      ],
-    );
-  }
-
-  // Account Details
-  Widget _buildAccountDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          "تفاصيل الحساب",
-          style: TextStyle(
-            color: Colors.orange,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildDetailRow("555-123-4567", "رقم الجوال", Icons.phone),
-        const SizedBox(height: 16),
-        _buildDetailRow(
-            "example@example.com", "البريد الإلكتروني", Icons.email),
       ],
     );
   }
