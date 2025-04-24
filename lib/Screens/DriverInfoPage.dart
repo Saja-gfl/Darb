@@ -174,7 +174,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
           onPressed: () => Navigator.pushReplacement(
     context,
     MaterialPageRoute(builder: (context) => DriverHomePage()),
-  )
+  ),
         ),
         iconTheme: IconThemeData(
           color: Color(0xFFFFB300),

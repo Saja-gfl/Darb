@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
 import 'package:rem_s_appliceation9/widgets/AvailableSubscriptionsCard.dart';
 import 'package:provider/provider.dart';
 import '../services/UserProvider.dart';
@@ -125,7 +126,10 @@ class _AvailableSubscriptionsPageState
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: primaryColor),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => DriverHomePage()),
+  ),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
