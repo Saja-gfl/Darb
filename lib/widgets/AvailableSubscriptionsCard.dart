@@ -26,7 +26,7 @@ class SubscriptionCard extends StatelessWidget {
     required this.price,
     required this.onAccept,
     required this.onReject,
-    this.primaryColor = const Color(0xFFFFB300),
+    this.primaryColor = const Color(0xFFFFB300), // Orange color
     this.secondaryColor = const Color(0xFF76CB54),
   }) : super(key: key);
 
@@ -36,14 +36,14 @@ class SubscriptionCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFE5E5E5)),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 2),
+            blurRadius: 5,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -55,78 +55,118 @@ class SubscriptionCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(
-                  type,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                  ),
+                child: Row(
+                  children: [
+                    Icon(Icons.category,
+                        size: 16, color: primaryColor), // Orange icon
+                    const SizedBox(width: 6),
+                    Text(
+                      type,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Text(
-                'اشتراك #$subscriptionNumber',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                children: [
+                  Text(
+                    '#$subscriptionNumber',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(Icons.confirmation_number_outlined,
+                      size: 20, color: primaryColor), // Orange icon
+                ],
               ),
             ],
           ),
           const SizedBox(height: 16),
 
           // Customer Name
-          _buildInfoRow('اسم العميل', customerName),
-          const SizedBox(height: 8),
+          _buildInfoRow(Icons.person_outline, customerName),
+          const SizedBox(height: 10),
 
           // Route
-          _buildInfoRow('المسار', route),
-          const SizedBox(height: 8),
+          _buildInfoRow(Icons.route_outlined, route),
+          const SizedBox(height: 10),
 
           // Pickup
-          _buildInfoRow('نقطة الانطلاق', pickup),
-          const SizedBox(height: 8),
+          _buildInfoRow(Icons.location_on_outlined, pickup),
+          const SizedBox(height: 10),
 
           // Dropoff
-          _buildInfoRow('نقطة التوصيل', dropoff),
-          const SizedBox(height: 8),
+          _buildInfoRow(Icons.flag_outlined, dropoff),
+          const SizedBox(height: 10),
 
           // Schedule
-          _buildInfoRow('المواعيد', schedule),
-          const SizedBox(height: 8),
+          _buildInfoRow(Icons.access_time_outlined, schedule),
+          const SizedBox(height: 10),
 
           // Price
-          _buildInfoRow('السعر', price),
-          const SizedBox(height: 16),
+          _buildInfoRow(Icons.attach_money_outlined, price),
+          const SizedBox(height: 20),
 
           // Action Buttons
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
+                child: ElevatedButton(
                   onPressed: onReject,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: BorderSide(color: Colors.grey),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(color: Colors.red.shade300, width: 1),
+                    ),
                   ),
-                  child: const Text('رفض الاشتراك'),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.close, size: 18),
+                      SizedBox(width: 8),
+                      Text('رفض'),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
                   onPressed: onAccept,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: secondaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  child: const Text('قبول الاشتراك'),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check, size: 18),
+                      SizedBox(width: 8),
+                      Text('قبول'),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -136,28 +176,20 @@ class SubscriptionCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(IconData icon, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Text(
           value,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 15,
             fontFamily: 'Inter',
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(width: 8),
-        Text(
-          '$label:',
-          style: TextStyle(
-            fontSize: 16,
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w400,
-            color: Colors.grey,
-          ),
-        ),
+        const SizedBox(width: 10),
+        Icon(icon, size: 20, color: primaryColor), // All icons in orange
       ],
     );
   }
