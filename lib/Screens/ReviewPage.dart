@@ -4,6 +4,7 @@ import 'package:rem_s_appliceation9/services/FireStore.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
 import 'package:provider/provider.dart';
 import '../services/UserProvider.dart';
+import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
 
 class ReviewPage extends StatefulWidget {
   //جلب ID من الفايرستور
@@ -57,7 +58,14 @@ class _ReviewPageState extends State<ReviewPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: primaryColor),
-          onPressed: () => Navigator.pop(context),
+          //اخليه يرجع ل الصفحة السابقة
+
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AvailableSubscriptionsPage(),
+            ),
+          ),
         ),
         backgroundColor: backgroundColor,
         elevation: 0,
