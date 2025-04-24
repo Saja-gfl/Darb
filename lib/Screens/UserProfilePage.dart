@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rem_s_appliceation9/services/UserProvider.dart';
 
-
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
 
@@ -20,7 +19,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   TextEditingController phoneController = TextEditingController();
   String selectedGender = ""; // Track the selected gender
 
-    @override
+  @override
   void initState() {
     super.initState();
     _loadUserData(); // Load the user data from UserProvider
@@ -35,7 +34,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       addressController.text = userProvider.location ?? '';
       phoneController.text = userProvider.phoneNumber ?? '';
       selectedGender = userProvider.Gender ?? 'ذكر';
-      
     });
   }
 
@@ -44,9 +42,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
     // Save the user data to Firestore
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-    showToast(message: "المستخدم غير مسجل الدخول");
-    return;
-  }
+      showToast(message: "المستخدم غير مسجل الدخول");
+      return;
+    }
 
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
@@ -59,7 +57,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     try {
       // Update Firestore
-      await FirebaseFirestore.instance.collection('userdata').doc(user.uid).update({
+      await FirebaseFirestore.instance
+          .collection('userdata')
+          .doc(user.uid)
+          .update({
         'name': nameController.text,
         'email': emailController.text,
         'address': addressController.text,
@@ -74,8 +75,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       userProvider.setLocation(addressController.text);
       userProvider.setPhoneNumber(phoneController.text);
 
-      
-
       showToast(message: "تم حفظ البيانات بنجاح");
     } catch (e) {
       print("خطأ في حفظ بيانات المستخدم: $e");
@@ -88,9 +87,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       SnackBar(content: Text(message)),
     );
   }
-
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +155,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             const SizedBox(height: 24),
 
             // Account Details
-            _buildAccountDetails(),
           ],
         ),
       ),
@@ -186,18 +181,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
           children: [
             CircleAvatar(
               radius: 48,
-              backgroundColor: Colors.grey[300],
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                Icons.camera_alt,
-                color: Colors.white,
-                size: 20,
+              backgroundColor: Colors.grey[200],
+              child: Icon(
+                Icons.person,
+                size: 48,
+                color: const Color.fromARGB(255, 255, 178, 25),
               ),
             ),
           ],
@@ -268,7 +256,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
-          "النوع",
+          "الجنس",
           style: TextStyle(
             color: Colors.black,
             fontSize: 14,
@@ -287,10 +275,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: _buildGenderButton("أنثى", selectedGender == "أنثى"),
             ),
             const SizedBox(width: 8),
-            Expanded(
-              child: _buildGenderButton(
-                  "أفضل عدم الاجابة", selectedGender == "أفضل عدم الاجابة"),
-            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -339,31 +323,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget _buildActionButtons() {
     return Row(
       children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              // Cancel action
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.orange,
-              side: const BorderSide(color: Colors.orange),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text("إلغاء"),
-          ),
-        ),
         const SizedBox(width: 16),
         Expanded(
           child: ElevatedButton(
-            onPressed: _saveUserData, 
-              // Save action
-              //print("Selected Gender: $selectedGender");
-              //_saveUserData,
-            
+            onPressed: _saveUserData,
+            // Save action
+            //print("Selected Gender: $selectedGender");
+            //_saveUserData,
+
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
@@ -375,29 +342,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             child: const Text("حفظ"),
           ),
         ),
-      ],
-    );
-  }
-
-  // Account Details
-  Widget _buildAccountDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          "تفاصيل الحساب",
-          style: TextStyle(
-            color: Colors.orange,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildDetailRow("555-123-4567", "رقم الجوال", Icons.phone),
-        const SizedBox(height: 16),
-        _buildDetailRow(
-            "example@example.com", "البريد الإلكتروني", Icons.email),
       ],
     );
   }

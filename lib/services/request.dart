@@ -262,3 +262,34 @@ Future<List<Map<String, dynamic>>> getPendingOrRejectedTripsForUser(
   }
 }
 
+Future<List<Map<String, dynamic>>> getPendingSubscriptionsForDriver(
+    String driverId) async {
+  try {
+    QuerySnapshot rideRequestsSnapshot = await FirebaseFirestore.instance
+        .collection('rideRequests')
+        .where('driverId', isEqualTo: driverId)
+        .get();
+
+    List<Map<String, dynamic>> pendingSubscriptions = [];
+
+    for (var doc in rideRequestsSnapshot.docs) {
+      var usersSnapshot = await doc.reference.collection('users').get();
+
+      for (var userDoc in usersSnapshot.docs) {
+        final userData = userDoc.data() as Map<String, dynamic>;
+        if (userData['sub_status'] == 'معلق') {
+          final rideData = doc.data() as Map<String, dynamic>;
+          rideData['tripId'] = doc.id;
+          rideData['userId'] = userDoc.id;
+          rideData['sub_status'] = 'معلق';
+          rideData['userData'] = userData; // معلومات الراكب
+          pendingSubscriptions.add(rideData);
+        }
+      }
+    }
+    return pendingSubscriptions;
+  } catch (e) {
+    print("خطأ في جلب الطلبات المعلقة للسائق: $e");
+    return [];
+  }
+}

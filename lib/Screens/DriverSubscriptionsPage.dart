@@ -1,48 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rem_s_appliceation9/services/FireStore.dart';
-
-import '../services/ChatService.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/NotifProvider .dart';
 import '../services/UserProvider.dart';
+import '../services/ChatService.dart';
+import '../services/Firestore.dart';
+import '../widgets/CustomBottomNavBar.dart';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class DriverSubscriptionsPage extends StatefulWidget {
+class DriverSubscriptionsPage extends StatelessWidget {
   const DriverSubscriptionsPage({super.key});
 
   @override
-  State<DriverSubscriptionsPage> createState() =>
-      _DriverSubscriptionsPageState();
-}
-// انتباه هذي الصفحة مخصصة فقط للاختبار
-//!! احذفو الصفحة فقط بعد تنفيد الكومنت اللي في درايفر هوم !!
-
-class _DriverSubscriptionsPageState extends State<DriverSubscriptionsPage> {
-  final currentUserId = FirebaseAuth.instance.currentUser?.uid ??
-      "legJfO1wakMmTmUvGtQjNny7yGW2"; // 🔄 بدل testuser بـ uid الحقيقي
-
-  @override
   Widget build(BuildContext context) {
-    final driverId =
-        Provider.of<UserProvider>(context, listen: false).uid ?? 'غير معروف';
+    // الحصول على `currentUserId` من `UserProvider`
+    final currentUserId = Provider.of<UserProvider>(context, listen: false).uid; 
 
     return Scaffold(
       appBar: AppBar(title: const Text("طلبات الاشتراك")),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('rideRequests') //('subscriptionRequests')
+            .collection('rideRequests')
             .where('driverId', isEqualTo: currentUserId)
             .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting)
             return const Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
             return const Center(child: Text('لا يوجد اشتراكات حالياً.'));
-          }
 
           final docs = snapshot.data!.docs;
 
@@ -63,16 +51,17 @@ class _DriverSubscriptionsPageState extends State<DriverSubscriptionsPage> {
                   builder: (context, userSnapshot) {
                     if (userSnapshot.connectionState ==
                         ConnectionState.waiting) {
-                      return const SizedBox(); // عرض عنصر فارغ أثناء التحميل
+                      return const SizedBox();
                     }
                     if (!userSnapshot.hasData ||
                         userSnapshot.data!.docs.isEmpty) {
-                      return const SizedBox(); // لا يوجد طلبات معلقة
+                      return const SizedBox();
                     }
                     return SubscriptionTile(
                       doc: doc,
                       isPending: true,
-                      driverId: driverId,
+                      driverId:
+                          currentUserId ?? '', 
                     );
                   },
                 );
@@ -92,16 +81,17 @@ class _DriverSubscriptionsPageState extends State<DriverSubscriptionsPage> {
                   builder: (context, userSnapshot) {
                     if (userSnapshot.connectionState ==
                         ConnectionState.waiting) {
-                      return const SizedBox(); // عرض عنصر فارغ أثناء التحميل
+                      return const SizedBox();
                     }
                     if (!userSnapshot.hasData ||
                         userSnapshot.data!.docs.isEmpty) {
-                      return const SizedBox(); // لا يوجد اشتراكات جارية
+                      return const SizedBox();
                     }
                     return SubscriptionTile(
                       doc: doc,
                       isPending: false,
-                      driverId: driverId,
+                      driverId:
+                          currentUserId ?? '', // التأكد من تمرير currentUserId هنا
                     );
                   },
                 );
@@ -123,7 +113,7 @@ class SubscriptionTile extends StatelessWidget {
     super.key,
     required this.doc,
     required this.isPending,
-    required this.driverId,
+    required this.driverId, // تم التأكد من إضافة driverId هنا
   });
 
   void acceptSubscription(BuildContext context) async {
@@ -183,17 +173,7 @@ class SubscriptionTile extends StatelessWidget {
           .update({
         'sub_status': 'نشط',
       });
-      // notification
-      /*  await FirebaseFirestore.instance
-    .collection('userdata')
-    .doc(passengerId)
-    .collection('notifications')
-    .add({
-  'title': 'تم قبول الاشتراك',
-  'message': '${tripData['driverData']['name']}  فاير بيس تم إضافتك للرحلة مع السائق',
-  'timestamp': FieldValue.serverTimestamp(),
-});*/
-
+   
       // إنشاء غرفة دردشة جديدة
       final chatService = ChatService();
       await chatService.createChatRoom(tripId, driverId, passengerId);
@@ -221,8 +201,7 @@ class SubscriptionTile extends StatelessWidget {
 
         notificationProvider.addNotification({
           'title': 'تم قبول الاشتراك',
-          'body':
-              '${tripData['driverData']['name']} تم اضافتك للرحله من قبل السائق ',
+          'body':'${tripData['driverData']['name']} تم اضافتك للرحله من قبل السائق ',
           'time': DateTime.now().toString(),
         });
       } else {
@@ -278,33 +257,32 @@ class SubscriptionTile extends StatelessWidget {
         'sub_status': 'مرفوض',
       });
 
-      // إرسال الإشعار الفوري
-      final notificationProvider =
-          Provider.of<NotificationProvider>(context, listen: false);
-      await notificationProvider.sendFCMNotificationV1(
-        passengerId,
-        'تم رفض الاشتراك',
-        '${tripData['driverData']['name']} تم رفض اشتراكك من قبل السائق ',
-      );
-
-      /*//notification to user
-      await FirebaseFirestore.instance
+      // جلب fcmToken الخاص بالراكب
+      final passengerDoc = await FirebaseFirestore.instance
           .collection('userdata')
           .doc(passengerId)
-          .collection('notifications')
-          .add({
-        'title': 'تم رفض الاشتراك',
-        'message': '${tripData['driverData']['name']} تم رفض اشتراكك من قبل السائق',
-        'timestamp': FieldValue.serverTimestamp(),
-      });
+          .get();
 
-    // notification
-    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+      final fcmToken = passengerDoc['fcmToken'];
+
+      if (fcmToken != null) {
+        // إرسال الإشعار باستخدام NotificationProvider
+        final notificationProvider =
+            Provider.of<NotificationProvider>(context, listen: false);
+        await notificationProvider.sendFCMNotificationV1(
+          fcmToken,
+          'تم رفض الاشتراك',
+          '${tripData['driverData']['name']} تم رفض الطلب من قبل السائق ',
+        );
+
         notificationProvider.addNotification({
-       'title': 'تم رفض الاشتراك',
-        'body':  '${tripData['driverData']['name']} تم رفض اشتراكك من قبل السائق ',
-        'time': DateTime.now().toString(),
-        });*/
+          'title': 'تم رفض الاشتراك',
+          'body':'${tripData['driverData']['name']} تم رفض الطلب من قبل السائق ',
+          'time': DateTime.now().toString(),
+        });
+      } else {
+        print("❌ لا يوجد fcmToken لهذا الراكب.");
+      }
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("تم رفض الاشتراك.")));
     } catch (e) {
@@ -319,35 +297,63 @@ class SubscriptionTile extends StatelessWidget {
     final subscription = data['subscriptionData'] ?? {};
 
     return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 3,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        title: Text("الراكب: ${data['userId']}"),
-        subtitle: Column(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "الراكب: ${data['userId']}",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                isPending
+                    ? Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.check_circle,
+                                color: Colors.green),
+                            onPressed: () => acceptSubscription(context),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.cancel, color: Colors.red),
+                            onPressed: () => rejectSubscription(context),
+                          ),
+                        ],
+                      )
+                    : const Icon(Icons.check, color: Colors.green),
+              ],
+            ),
+            const SizedBox(height: 8),
             Text(
-                "نوع الاشتراك: ${subscription['subscriptionType'] ?? 'غير محدد'}"),
+              "نوع الاشتراك: ${subscription['subscriptionType'] ?? 'غير محدد'}",
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 4),
             Text(
-                "من: ${subscription['fromLocation'] ?? '؟'} إلى: ${subscription['toLocation'] ?? '؟'}"),
-            Text("السعر: ${subscription['price'] ?? '؟'}"),
-            Text("عدد الأيام: ${subscription['days']?.length ?? 0} يوم"),
+              "من: ${subscription['fromLocation'] ?? '؟'} إلى: ${subscription['toLocation'] ?? '؟'}",
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "السعر: ${subscription['price'] ?? '؟'}",
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "عدد الأيام: ${subscription['days']?.length ?? 0} يوم",
+              style: const TextStyle(fontSize: 16),
+            ),
           ],
         ),
-        trailing: isPending
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.check_circle, color: Colors.green),
-                    onPressed: () => acceptSubscription(context),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.cancel, color: Colors.red),
-                    onPressed: () => rejectSubscription(context),
-                  ),
-                ],
-              )
-            : const Icon(Icons.check, color: Colors.green),
       ),
     );
   }

@@ -118,6 +118,18 @@ class _AvailableSubscriptionsPageState
     );
   }
 
+  Widget _buildFilterOption(String title, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: primaryColor),
+      title: Text(title),
+      trailing: Checkbox(
+        value: false, // You would manage this state properly
+        onChanged: (value) {},
+      ),
+      onTap: () {},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -2,7 +2,23 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
+import 'package:rem_s_appliceation9/Screens/AccountPageUser.dart';
+import 'package:rem_s_appliceation9/Screens/AvailableSubscriptionsPage.dart';
+import 'package:rem_s_appliceation9/Screens/ChangePasswordPage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverInfoPage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
+import 'package:rem_s_appliceation9/Screens/DriverSubscriptionsPage.dart';
+import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
+import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
+import 'package:rem_s_appliceation9/Screens/Requestedsubpage.dart';
+import 'package:rem_s_appliceation9/Screens/ReviewPage.dart';
+import 'package:rem_s_appliceation9/Screens/SettingsPage.dart';
 import 'package:rem_s_appliceation9/Screens/Welcomepage.dart';
+import 'package:rem_s_appliceation9/Screens/number_sub.dart';
+import 'package:rem_s_appliceation9/Screens/subpage.dart';
+import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
 //  مكتبة Firebase
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
@@ -62,7 +78,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           //initialRoute: AppRoutes.k0Screen, // المسار الابتدائي
          routes: AppRoutes.routes, // تسجيل جميع المسارات
-          home: WelcomePage(),
+          home: CreateSubscriptionPage(),
 
           // initialRoute: AppRoutes.initialRoute,
           // routes: AppRoutes.routes,

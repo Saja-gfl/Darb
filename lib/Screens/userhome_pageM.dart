@@ -8,16 +8,14 @@ import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/CustomBottomNavBar.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
-
 import 'package:rem_s_appliceation9/Screens/AccountPageUser.dart';
-import 'package:rem_s_appliceation9/Screens/subpage.dart'; // Import for SubPage
+import 'package:rem_s_appliceation9/Screens/subpage.dart';
 import 'package:rem_s_appliceation9/Screens/Requestedsubpage.dart';
 
 import '../services/NotifProvider .dart';
 import '../services/UserProvider.dart';
 import 'MessagesHomePage.dart';
 
-// ignore_for_file: must_be_immutable
 class UserHomePage extends StatefulWidget {
   UserHomePage({Key? key}) : super(key: key);
 
@@ -201,10 +199,9 @@ class _UserHomePageState extends State<UserHomePage> {
       children: [
         Text("الخدمات", style: theme.textTheme.titleLarge),
         SizedBox(height: 16.h),
-        // New subscription creation service
         _buildServiceItem(
           "إنشاء اشتراك جديد",
-          " مع السائق المفضل",
+          " انشاء اشتراك ",
           Icons.add_circle_outline,
           () => _navigateToSubPage(),
         ),
@@ -228,21 +225,17 @@ class _UserHomePageState extends State<UserHomePage> {
             MaterialPageRoute(builder: (context) => Requestedsubpage()),
           ),
         ),
+        SizedBox(height: 16.h),
+        _buildServiceItem(
+          "الانضمام إلى اشتراك",
+          "عرض قائمة الاشتراكات النشطة والانضمام إليها",
+          Icons.group_add,
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ActiveSubscriptionsPage()),
+          ),
+        ),
       ],
-    );
-  }
-
-  void _navigateToSubPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CreateSubscriptionPage(
-            // Add any required parameters here
-            // For example:
-            // userId: '123',
-            // isNewSubscription: true,
-            ),
-      ),
     );
   }
 
@@ -296,32 +289,32 @@ class _UserHomePageState extends State<UserHomePage> {
         if (index == 1) {
           final tripId =
               Provider.of<UserProvider>(context, listen: false).tripId;
-          //set tripId on prov
 
-          print("trip is" + tripId!);
-          if (tripId != null || tripId != '') {
+          if (tripId != null && tripId != '') {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ChatPage(tripId: tripId), // Pass the tripId to ChatPage
-                ));
-            /* Navigator.push(
-             context, MaterialPageRoute(builder: (context) => ChatPage( )));*/
-          } else {
-            // Handle the case when tripId is null
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("لا توجد محادثات حالية"),
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatPage(tripId: tripId),
               ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("لا توجد محادثات حالية")),
             );
           }
         } else if (index == 2) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AccountPageUser()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AccountPageUser()),
+          );
         }
       },
     );
+  }
+
+  void _navigateToSubPage() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => CreateSubscriptionPage()));
   }
 }
 

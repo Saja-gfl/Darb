@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
 import 'package:rem_s_appliceation9/services/FireStore.dart';
 import 'package:rem_s_appliceation9/widgets/app_bar/custom_dropdown.dart';
 
@@ -170,7 +171,10 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => DriverHomePage()),
+          ),
         ),
         iconTheme: IconThemeData(
           color: Color(0xFFFFB300),
@@ -340,7 +344,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
           children: [
             CircleAvatar(
               radius: 48,
-              backgroundColor: Colors.grey[200],
+              backgroundColor: const Color.fromARGB(255, 255, 249, 246),
               child: Icon(
                 Icons.person,
                 size: 48,
@@ -482,23 +486,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
   Widget _buildActionButtons() {
     return Row(
       children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              // Cancel action
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.orange,
-              side: const BorderSide(color: Colors.orange),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text("إلغاء"),
-          ),
-        ),
         const SizedBox(width: 16),
         Expanded(
           child: ElevatedButton(

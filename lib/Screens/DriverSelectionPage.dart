@@ -4,11 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
 import '../services/NotifProvider .dart';
 import '../services/UserProvider.dart';
-import '../services/chatService.dart';
 import 'dart:async';
 // لإضافة مكتبة Random
-
-import 'ChatPage.dart'; // لإضافة مكتبة Random
 
 class Driver {
   final String id;
@@ -168,9 +165,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
     try {
       final userId = Provider.of<UserProvider>(context, listen: false).uid;
-      final passengerName = Provider.of<UserProvider>(context, listen: false)
-          .userName; // اسم الراكب من مزود المستخدم
- // UID المستخدم الحالي (الراكب)
+      final passengerName = Provider.of<UserProvider>(context, listen: false).userName; // اسم الراكب من مزود المستخدم
       final tripId = widget.tripId; //
 
       await FirebaseFirestore.instance
@@ -178,7 +173,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
           .doc(tripId)
           .update({
         'driverId': driverData['id'], // UID الخاص بالسائق
-        //'sub_status':(معلق) مكرر ماله داعي 
+        //'sub_status':(معلق) مكرر ماله داعي
         'driverData': {
           'id': driverData['id'],
           'name': driverData['name'],
@@ -205,21 +200,21 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
           // (اختياري) إضافة الإشعار لقائمة الإشعارات محلياً
           notificationProvider.addNotification({
             'title': 'طلب اشتراك جديد',
-            'body': 'لديك طلب اشتراك جديد للراكب $passengerName',
+            'body': '$passengerName لديك طلب اشتراك جديد للراكب ',
             'time': DateTime.now().toString(),
           });
         } else {
           print('❌ لا يوجد fcmToken لهذا السائق.');
-        }
-      
-    
-  
-
- 
+        }  
       // إظهار رسالة تأكيد للمستخدم
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("تم ارسال الطلب  للسائق")),
       );
+
+      // الانتقال إلى صفحة Home بعد 2 ثانية (يمكنك تعديل الوقت حسب الحاجة)
+    await Future.delayed(Duration(seconds: 2));
+    Navigator.pushReplacementNamed(context, '/userHomePage'); 
+    
     } catch (e) {
       print("خطأ في إرسال طلب الاشتراك: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -252,6 +247,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   }*/
   }
 
+//مرام: هنا التعديل على الباك بوتن
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -266,9 +262,17 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.chat_bubble_outline, color: Colors.amber),
-          onPressed: () {},
+          icon: const Icon(Icons.arrow_back, color: Colors.amber),
+          onPressed: () {
+            Navigator.pop(context); // This will navigate back
+          },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline, color: Colors.amber),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: filteredDrivers.isEmpty
           ? const Center(
@@ -281,16 +285,14 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: filteredDrivers.length, //drivers.length,
+                    itemCount: filteredDrivers.length,
                     itemBuilder: (context, index) {
                       return DriverCard(
                         driver: filteredDrivers[index],
                         onSubscribe: () => sendSubscriptionRequest(
                             filteredDrivers[index].toMap()),
-                        tripId: widget.tripId, // معرف الاشتراك
+                        tripId: widget.tripId,
                       );
-
-                      //return DriverCard(driver: drivers[index]);
                     },
                   ),
                 ),
@@ -300,6 +302,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   }
 }
 
+// الى هنا
 class DriverCard extends StatelessWidget {
   final Driver driver;
   //final Function(String) onSubscribe; // وظيفة يتم استدعاؤها عند الاشتراك
@@ -446,40 +449,6 @@ class DriverCard extends StatelessWidget {
                     ),
                     child: const Text(
                       'اشتراك',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                        final String userId = Provider.of<UserProvider>(context, listen: false).uid ?? 'unknown_user'; 
-
-                      final driverId = driver.id; // معرف السائق
-
-                     // await ChatService()
-                        //  .createChatRoom(tripId, driverId, userId);
-                      // الانتقال إلى صفحة الدردشة
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatPage(tripId: tripId),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'مراسلة',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
