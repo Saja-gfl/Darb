@@ -182,18 +182,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
           children: [
             CircleAvatar(
               radius: 48,
-              backgroundColor: Colors.grey[300],
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                Icons.camera_alt,
-                color: Colors.white,
-                size: 20,
+              backgroundColor: Colors.grey[200],
+              child: Icon(
+                Icons.person,
+                size: 48,
+                color: const Color.fromARGB(255, 255, 178, 25),
               ),
             ),
           ],
