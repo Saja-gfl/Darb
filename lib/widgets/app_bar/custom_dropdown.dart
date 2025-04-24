@@ -1,6 +1,4 @@
-// lib/widgets/custom_dropdown.dart
 import 'package:flutter/material.dart';
-
 
 class CustomDropdown extends StatelessWidget {
   final String label;
@@ -18,14 +16,14 @@ class CustomDropdown extends StatelessWidget {
   });
 
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: const Color(0xFFFFB300),
+            color: const Color(0xFFFFB300), // Orange label
             fontSize: 14,
             fontWeight: FontWeight.w500,
             fontFamily: 'Roboto',
@@ -59,6 +57,8 @@ class CustomDropdown extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: 'Roboto',
+                      color:
+                          const Color(0xFFFFB300), // Orange text for all items
                     ),
                   ),
                 );
@@ -69,11 +69,21 @@ class CustomDropdown extends StatelessWidget {
                     value ?? hint,
                     style: TextStyle(
                       fontSize: 14,
-                      color: value == null ? Colors.black.withOpacity(0.5) : Colors.black,
+                      color: value == null
+                          ? Colors.black.withOpacity(0.5)
+                          : const Color(0xFFFFB300), // Orange for selected item
                     ),
                   );
                 }).toList();
               },
+              dropdownColor:
+                  Colors.white, // Ensure background contrasts with orange text
+              icon: Icon(Icons.arrow_drop_down,
+                  color: const Color(0xFFFFB300)), // Orange arrow
+              style: TextStyle(
+                color: const Color(0xFFFFB300), // Fallback text color
+                fontSize: 14,
+              ),
             ),
           ),
         ),
