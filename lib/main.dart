@@ -78,7 +78,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           //initialRoute: AppRoutes.k0Screen, // المسار الابتدائي
          routes: AppRoutes.routes, // تسجيل جميع المسارات
-          home: CreateSubscriptionPage(),
+          home: WelcomePage(),
 
           // initialRoute: AppRoutes.initialRoute,
           // routes: AppRoutes.routes,
