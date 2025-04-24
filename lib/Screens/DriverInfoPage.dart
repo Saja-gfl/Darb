@@ -172,9 +172,9 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => DriverHomePage()),
-  ),
+            context,
+            MaterialPageRoute(builder: (context) => DriverHomePage()),
+          ),
         ),
         iconTheme: IconThemeData(
           color: Color(0xFFFFB300),
@@ -344,7 +344,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
           children: [
             CircleAvatar(
               radius: 48,
-              backgroundColor: Colors.grey[200],
+              backgroundColor: const Color.fromARGB(255, 255, 249, 246),
               child: Icon(
                 Icons.person,
                 size: 48,
