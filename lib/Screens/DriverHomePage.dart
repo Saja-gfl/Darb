@@ -6,6 +6,7 @@ import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'AccountPage.dart';
 import 'CustomBottomNavBar.dart';
 import 'DriverSubscriptionsPage.dart';
+import 'AvailableSubscriptionsPage.dart';
 // كومنت مهم تحت !! 
 import 'MessagesHomePage.dart';
 import 'chatPageLDriver.dart';
@@ -115,26 +116,26 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   Widget _buildServicesSection() {
     //final userProvider = Provider.of<UserProvider>(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text("الخدمات", style: theme.textTheme.titleLarge),
-        SizedBox(height: 16.h),
-        _buildServiceItem(
-          "عرض الاشتراكات الحالية",
-          "متابعة جدول اشتراكاتك الحالية",
-          Icons.list,
-          () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  // builder: (context) => AvailableSubscriptionsPage()));
-                  //اللي فاضيه تنقل الدوال من الصفحة المؤقته الي تحت الكومنت الى الصفحة اللي سوته مرام فوق الكومنت هذا
-                  builder: (context) => DriverSubscriptionsPage()));
-        }),
-      ],
-    );
+return Column(
+  crossAxisAlignment: CrossAxisAlignment.end,
+  children: [
+    Text("الخدمات", style: theme.textTheme.titleLarge),
+    SizedBox(height: 16.h),
+    _buildServiceItem(
+      "عرض الاشتراكات الحالية",
+      "متابعة جدول اشتراكاتك الحالية",
+      Icons.list,
+      () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AvailableSubscriptionsPage(),
+          ),
+        );
+      },
+    ),
+  ],
+);
   }
 
   Widget _buildServiceItem(
