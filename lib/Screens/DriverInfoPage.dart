@@ -59,13 +59,9 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       final driverData = await firestoreService.getUserData(userId);
       if (driverData != null && driverData['isDriver'] == true) {
         setState(() {
-          selectedLocation = locations.contains(driverData['location'])
-              ? driverData['location']
-              : null;
-          acceptedLocationsController =
-              locations.contains(driverData['acceptedLocations'])
-                  ? driverData['acceptedLocations']
-                  : null;
+          selectedLocation = locations.contains(driverData['address'])? driverData['address'] : null;
+          acceptedLocationsController =locations.contains(driverData['acceptedLocations'])? driverData['acceptedLocations']: null;
+          locationController .text = driverData['location'] ?? '';      
           nameController.text = driverData['name'] ?? '';
           emailController.text = driverData['email'] ?? '';
           plateNumberController.text = driverData['plateNumber'] ?? '';
@@ -73,7 +69,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
           phoneController.text = driverData['phone'] ?? '';
           priceController.text = driverData['price']?.toString() ?? '';
           selectedGender = driverData['gender'] ?? '';
-          selectedSubscriptionType = driverData['subscriptionType'] ?? '';
+          selectedSubscriptionType = locations.contains(driverData['subscriptionType'])? driverData['subscriptionType'] : null;
           passengerCountController.text =
               driverData['passengerCount']?.toString() ?? '';
         });
@@ -131,6 +127,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
         nameController: nameController.text,
         emailController: emailController.text,
         addressController: selectedLocation!,
+        
         phoneController: phoneController.text,
         selectedGender: selectedGender,
         isDriver: true,
@@ -150,6 +147,9 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       userProvider.setPlateNumber(plateNumberController.text);
       userProvider.setPhoneNumber(phoneController.text);
       userProvider.setSubscriptionType(selectedSubscriptionType!);
+      userProvider.setPassengerCount(passengerCountController.text);
+      userProvider.setPrice(priceController.text);
+
 
       showToast(message: "تم حفظ البيانات بنجاح");
     } catch (e) {
@@ -242,7 +242,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
 
             // Location Dropdown
             CustomDropdown(
-              label: "الموقع الجغرافي",
+              label: "الموقع ",
               hint: "اختر موقعك من القائمة",
               value: locations.contains(selectedLocation)
                   ? selectedLocation

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/services/request.dart';
 import 'package:rem_s_appliceation9/widgets/subscription_card.dart';
@@ -26,6 +27,8 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
   late String currentUserId;
   List<Map<String, dynamic>> subscriptions = []; // قائمة الاشتراكات
   bool isLoading = true;
+  List<String> ratedDrivers = []; // قائمة السائقين الذين تم تقييمهم
+
 
   @override
   void initState() {
@@ -221,7 +224,81 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
                         driverId: subscription['driverId'] ?? '', // تمرير driverId
                         
                         onSharePressed: () {
-                          // Handle share functionality
+                           final tripId = subscription['tripId'] ?? '';
+                            if (tripId.isNotEmpty) {
+                              Clipboard.setData(ClipboardData(text: tripId)); // نسخ رقم الرحلة إلى الحافظة
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    title: Row(
+                                      children: [
+                                        Icon(Icons.share, color: primaryColor),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'مشاركة الرحلة',
+                                          style: GoogleFonts.tajawal(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: primaryColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'تم نسخ رقم الرحلة: $tripId\nيمكنك دعوة زملائك للانضمام إلى نفس الرحلة!',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.tajawal(fontSize: 16),
+                                        ),
+                                        SizedBox(height: 16),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(Icons.message, color: Colors.green, size: 32),
+                                              onPressed: () {
+                                                // إضافة مشاركة عبر واتساب
+                                              },
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.email, color: Colors.blue, size: 32),
+                                              onPressed: () {
+                                                // إضافة مشاركة عبر البريد الإلكتروني
+                                              },
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.copy, color: Colors.orange, size: 32),
+                                              onPressed: () {
+                                                Clipboard.setData(ClipboardData(text: tripId));
+                                                showToast(message: 'تم نسخ رقم الرحلة مرة أخرى!');
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text(
+                                          'إغلاق',
+                                          style: GoogleFonts.tajawal(color: primaryColor),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            } else {
+                              showToast(message: 'رقم الرحلة غير متوفر!');
+                            }
+                          
                         },
                         onRatePressed: () {
                           final driverId = subscription['driverId'];

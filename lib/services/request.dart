@@ -163,7 +163,7 @@ Future<List<Map<String, dynamic>>> getActiveTripsForUser(String userId) async {
   }
 }
 
-Future<void> check_Sub_tatus(String tripId, String userId) async {
+Future<void> check_Sub_tatus(String tripId) async {
   try {
     // جلب بيانات الاشتراك
     final subscriptionData = await getRequestByTripId(tripId);
@@ -188,10 +188,10 @@ Future<void> check_Sub_tatus(String tripId, String userId) async {
               .collection('rideRequests')
               .doc(tripId)
               .update({
-            'sub_status': 'منتهية',
+            'status': 'منتهية',
           });
 
-          print("✅ تم تحديث حالة الاشتراك إلى منتهية");
+          print("✅ تم تحديث حالة الاشتراك رقم $tripIdإلى منتهية");
         }
       }
     }

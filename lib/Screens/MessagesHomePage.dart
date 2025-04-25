@@ -29,68 +29,42 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
   @override
   void initState() {
     super.initState();
-    _fetchActiveChats();
-  }
 
-  void _fetchActiveChats() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.uid;
+    final isDriver = userProvider.isDriver;
 
-    if (userId != null) {
-      try {
-        // Fetch active chats from the server or database
-        final querySnapshot = await FirebaseFirestore.instance
-            .collection('chatRooms')
-            .where('driverId', isEqualTo: userId)
-            //.where('status_ride', isEqualTo: 'active')
-            .get();
-
-        setState(() {
-          _activeChats = querySnapshot.docs.map((doc) {
-            final data = doc.data();
-            print("Data fetched: $data");
-            
-            return {
-              'tripId': doc.id ?? 'no tripId',
-              'userName': doc.id + ': رحلة رقم',
-              'lastMessage': data['lastMessage']  ?? 'لا توجد رسائل',
-              'time': data['timestamp'] is Timestamp
-                  ? ChatService.formatTimestamp(data['timestamp'])
-                  : 'مافيه وقت', // تحقق من النوع
-              'unread': data['unread'] ?? 0,
-            };
-          }).toList();
-        });
-      } catch (e) {
-        print("❌ خطأ أثناء جلب المحادثات: $e");
-        // Handle error if needed
-      }
+    // Check if the user is a driver
+    if (isDriver) {
+      // Fetch  chats for drivers
+      _fetchDriverChats(userId);
+    } else {
+      // Fetch  chats for users
+      _fetchUserChats(userId);
     }
   }
-  //قائم دردشات اليوزر بس خلاص غيرناه
-  /*
-  void _fetchUserChats() async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userId = userProvider.uid;
 
+  void _fetchDriverChats(userId) async {
+    if (userId != null) {
+      
+      final chats = await _chatService.getDriverChatRooms(userId);
+       setState(() {
+      _activeChats = chats; // تحديث قائمة الدردشات
+    });
+  
+    }
+  }
+  //
+
+  void _fetchUserChats(userId) async {
     if (userId != null) {
       final chats = await _chatService.getUserChatRooms(userId);
       setState(() {
-        _userChats = chats.map((chat) {
-          check_Sub_tatus(chat['tripId'], userId);
-          return {
-            'name': ((chat['name'] ?? 'غير معروف') +
-                ": رحلة رقم"), // قيمة افتراضية للاسم
-            'lastMessage':
-                chat['lastMessage'] ?? 'لا توجد رسائل', // قيمة افتراضية للرسالة
-            'time':ChatService.formatTimestamp(chat['timestamp']), // قيمة افتراضية للوقت
-            'unread': chat['unread'] ?? 0, // قيمة افتراضية لحالة القراءة
-            'tripId': chat['tripId'] ?? '', // تأكد من وجود tripId
-          };
-        }).toList();
-      });
+      _activeChats = chats; // تحديث قائمة الدردشات
+    });
+      
     }
-  }*/
+  }
 
   @override
 
@@ -228,7 +202,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text("المحادثات النشطة",
+        Text("المحادثات ",
             style: theme.textTheme.titleLarge?.copyWith(
               color: const Color(0xFFFF9800), // Orange color from theme
             )),
@@ -240,13 +214,13 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
           separatorBuilder: (context, index) => SizedBox(height: 16.h),
           itemBuilder: (context, index) {
             final chat = _activeChats[index];
-            return _buildChatItem
-              (chat);      },
-      ),
-    ],
-  );
-}
-      
+            return _buildChatItem(chat);
+          },
+        ),
+      ],
+    );
+  }
+
   Widget _buildChatItem(Map<String, dynamic> chat) {
     return InkWell(
       onTap: () async {
@@ -256,7 +230,6 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
           MaterialPageRoute(
             builder: (context) => ChatPage(
               tripId: chat['tripId'],
-
             ),
           ),
         );
@@ -292,7 +265,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                     ],
                   ),
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    Text(chat['userName'] ?? 'غير معروف',
+                    Text(chat['tripId'] ?? 'غير معروففف',
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: const Color.fromARGB(
                               255, 255, 189, 91), // Orange color
@@ -303,9 +276,9 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (chat['unread']> 0)
+                      if (chat['unread'] > 0)
                         Container(
-                           padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             color: Colors.orange,
                             shape: BoxShape.circle,

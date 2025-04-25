@@ -54,15 +54,10 @@ class _RequestedsubpageState extends State<Requestedsubpage> {
       await FirebaseFirestore.instance
           .collection('rideRequests')
           .doc(tripId)
-          .update({'sub_status': 'منتهية'});
-
-      // حذف بيانات المستخدم من مجموعة "users" داخل الرحلة
-      await FirebaseFirestore.instance
-          .collection('rideRequests')
-          .doc(tripId)
           .collection('users')
           .doc(userId)
-          .delete();
+          .update({'sub_status': 'منتهي'});
+
 
       // حذف بيانات الرحلة من البروفايدر
       final userProvider = Provider.of<UserProvider>(context, listen: false);
