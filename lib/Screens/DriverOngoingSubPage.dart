@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rem_s_appliceation9/widgets/driver_ongoing_sub_card.dart';
 
 class DriverOngoingSubPage extends StatefulWidget {
   const DriverOngoingSubPage({Key? key}) : super(key: key);
@@ -11,11 +12,6 @@ class DriverOngoingSubPage extends StatefulWidget {
 class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
   final Color primaryColor = const Color(0xFFFFB300);
   final Color secondaryColor = const Color(0xFF76CB54);
-  final TextEditingController _searchController = TextEditingController();
-
-  String _searchQuery = '';
-  String _selectedTab = 'الكل';
-  bool _isRefreshing = false;
 
   // Mock data
   final List<Map<String, dynamic>> _allSubscriptions = [
@@ -66,44 +62,6 @@ class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
     },
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _searchController.addListener(_onSearchChanged);
-  }
-
-  @override
-  void dispose() {
-    _searchController.removeListener(_onSearchChanged);
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _onSearchChanged() {
-    setState(() => _searchQuery = _searchController.text);
-  }
-
-  List<Map<String, dynamic>> get _filteredSubscriptions {
-    return _allSubscriptions.where((sub) {
-      final matchesSearch = _searchQuery.isEmpty ||
-          sub['customerName'].toString().contains(_searchQuery) ||
-          sub['route'].toString().contains(_searchQuery) ||
-          sub['id'].toString().contains(_searchQuery);
-
-      final matchesTab = _selectedTab == 'الكل' ||
-          sub['type'] == _selectedTab ||
-          (_selectedTab == 'غير منتهي' && sub['status'] != 'ended');
-
-      return matchesSearch && matchesTab;
-    }).toList();
-  }
-
-  Future<void> _refreshSubscriptions() async {
-    setState(() => _isRefreshing = true);
-    await Future.delayed(const Duration(seconds: 1)); // Simulate refresh
-    setState(() => _isRefreshing = false);
-  }
-
   void _endSubscription(String subscriptionId) {
     setState(() {
       final index =
@@ -112,281 +70,6 @@ class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
         _allSubscriptions[index]['status'] = 'ended';
       }
     });
-    _showRatingDialog(subscriptionId);
-  }
-
-  void _showRatingDialog(String subscriptionId) {
-    showDialog(
-      context: context,
-      builder: (context) => RatingDialog(
-        onRatingSubmitted: (rating, comment) {
-          _handleRatingSubmission(subscriptionId, rating, comment);
-        },
-      ),
-    );
-  }
-
-  void _handleRatingSubmission(
-      String subscriptionId, int rating, String comment) {
-    // In a real app, you would save this to your database
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('تم إرسال التقييم بنجاح ($rating نجوم)')),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: primaryColor),
-          onPressed: () => Navigator.pop(context),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          'اشتراكاتي النشطة',
-          style: GoogleFonts.tajawal(
-            color: primaryColor,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: primaryColor),
-            onPressed: _refreshSubscriptions,
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _refreshSubscriptions,
-        color: primaryColor,
-        child: Column(
-          children: [
-            // Search and Filter Row
-
-            // Subscription Type Tabs
-
-            // Subscription Cards List
-            Expanded(
-              child: _filteredSubscriptions.isEmpty
-                  ? Center(
-                      child: Text(
-                        'لا توجد اشتراكات',
-                        style: TextStyle(
-                            color: const Color.fromARGB(255, 255, 255, 255),
-                            fontSize: 18),
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      itemCount: _filteredSubscriptions.length,
-                      itemBuilder: (context, index) {
-                        final subscription = _filteredSubscriptions[index];
-                        return _buildSubscriptionCard(subscription);
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSubscriptionCard(Map<String, dynamic> subscription) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    subscription['type'],
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ),
-                Text(
-                  'اشتراك #${subscription['id']}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildInfoRow('اسم العميل', subscription['customerName']),
-            _buildInfoRow('رقم الهاتف', subscription['customerPhone']),
-            _buildInfoRow('المسار', subscription['route']),
-            _buildInfoRow('نقطة الانطلاق', subscription['pickupLocation']),
-            _buildInfoRow('نقطة التوصيل', subscription['dropoffLocation']),
-            _buildInfoRow('المواعيد', _buildScheduleText(subscription)),
-            _buildInfoRow('السعر', '${subscription['price']} ريال'),
-            _buildInfoRow('الحالة', _getStatusText(subscription['status'])),
-            _buildInfoRow('تاريخ البدء', subscription['startDate']),
-            _buildInfoRow('تاريخ الانتهاء', subscription['endDate']),
-            const SizedBox(height: 16),
-            if (subscription['status'] == 'active')
-              ElevatedButton(
-                onPressed: () => _endSubscription(subscription['id']),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text('إنهاء الاشتراك'),
-              ),
-            if (subscription['status'] == 'pending')
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => _rejectSubscription(subscription['id']),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
-                        minimumSize: const Size(0, 50),
-                      ),
-                      child: const Text('رفض',
-                          style: TextStyle(color: Colors.red)),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _acceptSubscription(subscription['id']),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: secondaryColor,
-                        minimumSize: const Size(0, 50),
-                      ),
-                      child: const Text('قبول'),
-                    ),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '$label:',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _buildScheduleText(Map<String, dynamic> subscription) {
-    if (subscription['type'] == 'يومي') {
-      return '${subscription['pickupTime']} - يومياً';
-    } else {
-      return '${subscription['pickupTime']} - ${subscription['days'].join('، ')}';
-    }
-  }
-
-  String _getStatusText(String status) {
-    switch (status) {
-      case 'active':
-        return 'نشط';
-      case 'pending':
-        return 'معلق';
-      case 'ended':
-        return 'منتهي';
-      case 'rejected':
-        return 'مرفوض';
-      default:
-        return status;
-    }
-  }
-
-  void _showAdvancedFilter() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Text(
-                    'خيارات التصفية المتقدمة',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _buildFilterOption(
-                  'عرض الاشتراكات النشطة فقط', Icons.check_circle),
-              _buildFilterOption('عرض الاشتراكات المعلقة', Icons.pending),
-              _buildFilterOption('عرض الاشتراكات المنتهية', Icons.done_all),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text('تطبيق التصفية'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildFilterOption(String title, IconData icon) {
-    return ListTile(
-      leading: Icon(icon, color: primaryColor),
-      title: Text(title, textAlign: TextAlign.right),
-      trailing: Checkbox(
-        value: false,
-        onChanged: (value) {},
-        activeColor: primaryColor,
-      ),
-    );
   }
 
   void _acceptSubscription(String subscriptionId) {
@@ -414,75 +97,39 @@ class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
       const SnackBar(content: Text('تم رفض الاشتراك بنجاح')),
     );
   }
-}
-
-class RatingDialog extends StatefulWidget {
-  final Function(int, String) onRatingSubmitted;
-
-  const RatingDialog({Key? key, required this.onRatingSubmitted})
-      : super(key: key);
-
-  @override
-  _RatingDialogState createState() => _RatingDialogState();
-}
-
-class _RatingDialogState extends State<RatingDialog> {
-  int _rating = 5;
-  final TextEditingController _commentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('قيم العميل', textAlign: TextAlign.right),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          const Text('كم نجمة تعطي لهذا العميل؟', textAlign: TextAlign.right),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(5, (index) {
-              return IconButton(
-                icon: Icon(
-                  index < _rating ? Icons.star : Icons.star_border,
-                  color: Colors.amber,
-                  size: 30,
-                ),
-                onPressed: () => setState(() => _rating = index + 1),
-              );
-            }),
-          ),
-          const SizedBox(height: 20),
-          const Text('اكتب تعليقاً (اختياري)', textAlign: TextAlign.right),
-          TextField(
-            controller: _commentController,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: primaryColor),
           onPressed: () => Navigator.pop(context),
-          child: const Text('إلغاء'),
         ),
-        ElevatedButton(
-          onPressed: () {
-            widget.onRatingSubmitted(_rating, _commentController.text);
-            Navigator.pop(context);
-          },
-          child: const Text('إرسال التقييم'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          'ادارة الاشتراكات',
+          style: GoogleFonts.tajawal(
+            color: primaryColor,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ],
+        centerTitle: true,
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _allSubscriptions.length,
+        itemBuilder: (context, index) {
+          return DriverOngoingSubCard(
+            subscription: _allSubscriptions[index],
+            primaryColor: primaryColor,
+            onEndSubscription: _endSubscription,
+          );
+        },
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    _commentController.dispose();
-    super.dispose();
   }
 }
