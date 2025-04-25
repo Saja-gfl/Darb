@@ -14,7 +14,6 @@ import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
 import 'package:rem_s_appliceation9/Screens/Requestedsubpage.dart';
 import 'package:rem_s_appliceation9/Screens/ReviewPage.dart';
-import 'package:rem_s_appliceation9/Screens/SettingsPage.dart';
 import 'package:rem_s_appliceation9/Screens/Welcomepage.dart';
 import 'package:rem_s_appliceation9/Screens/number_sub.dart';
 import 'package:rem_s_appliceation9/Screens/subpage.dart';
@@ -29,7 +28,7 @@ import 'Screens/number_sub.dart';
 import 'routes/app_routes.dart';
 import 'services/NotifProvider .dart';
 import 'services/notif.dart';
-
+import 'package:intl/date_symbol_data_local.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -42,7 +41,8 @@ void main() async {
   await Firebase.initializeApp();
   //الاشعارات 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
+  
+  await initializeDateFormatting('ar_SA', null); // تهيئة اللغة العربية
  // NotificationService notificationService = NotificationService();
  // await notificationService.initialize();
  

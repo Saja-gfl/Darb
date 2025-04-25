@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class DriverOngoingSubCard extends StatefulWidget {
   final Map<String, dynamic> subscription;
@@ -34,19 +37,25 @@ class _DriverOngoingSubCardState extends State<DriverOngoingSubCard> {
     }
   }
 
-  String _buildScheduleText(Map<String, dynamic> subscription) {
-    if (subscription['type'] == 'يومي') {
-      return '${subscription['pickupTime']} - يومياً';
-    } else {
-      return '${subscription['pickupTime']} - ${subscription['days'].join('، ')}';
-    }
+String _buildScheduleText(Map<String, dynamic> subscription) {
+  final pickupTime = subscription['schedule'] ?? 'غير معروف';
+  final days = subscription['days'] ?? [];
+
+  if (subscription['type'] == 'اسبوعي' || subscription['type'] == 'شهري') {
+    return '$pickupTime - يومياً';
+  } else {
+    return '$pickupTime - ${days.join('، ')}';
   }
+}
+
+
+
 
   void _handleEndSubscription() {
     setState(() {
       _showEndButton = false;
     });
-    widget.onEndSubscription(widget.subscription['id']);
+    widget.onEndSubscription(widget.subscription['tripId'] ?? '');
   }
 
   @override
@@ -75,7 +84,7 @@ class _DriverOngoingSubCardState extends State<DriverOngoingSubCard> {
                   ),
                 ),
                 Text(
-                  'اشتراك #${widget.subscription['tripId']}',
+                  'اشتراك #${widget.subscription['tripId'] ?? ''}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -84,27 +93,38 @@ class _DriverOngoingSubCardState extends State<DriverOngoingSubCard> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildInfoRow(Icons.person, widget.subscription['userName']),
-            _buildInfoRow(Icons.phone, widget.subscription['userphone']),
+            _buildInfoRow(Icons.person, widget.subscription['userName'] ?? ''),
+            _buildInfoRow(Icons.phone, widget.subscription['userphone'] ?? ''),
 _buildInfoRow(
   Icons.route,
   '${widget.subscription['fromLocation']} إلى ${widget.subscription['toLocation']}',
 ),
             _buildInfoRow(
-                Icons.location_on, widget.subscription['homeLocation']),
+                Icons.location_on, widget.subscription['homeLocation'] ?? 'غير محدد'),
             _buildInfoRow(
-                Icons.location_off, widget.subscription['workLocation']),
+                Icons.location_off, widget.subscription['workLocation'] ?? 'غير محدد'),
             _buildInfoRow(
-                Icons.schedule, _buildScheduleText(widget.subscription)),
+                Icons.schedule, _buildScheduleText(widget.subscription )),
             _buildInfoRow(
                 Icons.attach_money, '${widget.subscription['price']} ريال'),
             _buildInfoRow(
-                Icons.info, _getStatusText(widget.subscription['status'])),
-            _buildInfoRow(
-                Icons.calendar_today, widget.subscription['startDate']),
-            _buildInfoRow(Icons.calendar_today, widget.subscription['endDate']),
+                Icons.info, _getStatusText(widget.subscription['status'] ?? '')),
+                              //القيم من نوع تايم ستامب في الفايرستور فا لازم اعدل هنا 
+_buildInfoRow(
+  Icons.calendar_today,
+  widget.subscription['startDate'] != null && widget.subscription['startDate'] is Timestamp
+      ? DateFormat.yMd('ar_SA').format(widget.subscription['startDate'].toDate())
+      : 'غير معروف',
+),
+_buildInfoRow(
+  Icons.calendar_today,
+  widget.subscription['endDate'] != null && widget.subscription['endDate'] is Timestamp
+      ? DateFormat.yMd('ar_SA').format(widget.subscription['endDate'].toDate())
+      : 'غير معروف',
+),
+
             const SizedBox(height: 16),
-            if (_showEndButton && widget.subscription['status'] == 'active')
+            if (_showEndButton && widget.subscription['status'] == 'نشط')
               ElevatedButton(
                 onPressed: _handleEndSubscription,
                 style: ElevatedButton.styleFrom(

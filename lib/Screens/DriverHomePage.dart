@@ -171,7 +171,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AvailableSubscriptionsPage(),
+                builder: (context) => DriverOngoingSubPage(),
               ),
             );
           },
@@ -185,7 +185,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DriverOngoingSubPage(),
+                builder: (context) => AvailableSubscriptionsPage(),
               ),
             );
           },

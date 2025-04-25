@@ -319,6 +319,7 @@ Future<List<Map<String, dynamic>>> getSubscriptionsForDriver(
           rideData['userId'] = userDoc.id;
           rideData['userName'] = userData['userName']; // اسم الراكب
           rideData['sub_status'] = userData['sub_status']; // حالة الاشتراك
+          rideData['userphone'] = userData['userphone']; // رقم هاتف الراكب
           rideData['userData'] = userData; // معلومات الراكب
           subscriptions.add(rideData);
         }
