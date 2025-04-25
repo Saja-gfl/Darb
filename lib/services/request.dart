@@ -272,6 +272,7 @@ Future<List<Map<String, dynamic>>> getPendingSubscriptionsForDriver(
 
     List<Map<String, dynamic>> pendingSubscriptions = [];
 
+
     for (var doc in rideRequestsSnapshot.docs) {
       var usersSnapshot = await doc.reference.collection('users').get();
 
@@ -281,6 +282,7 @@ Future<List<Map<String, dynamic>>> getPendingSubscriptionsForDriver(
           final rideData = doc.data() as Map<String, dynamic>;
           rideData['tripId'] = doc.id;
           rideData['userId'] = userDoc.id;
+          rideData['userName'] = userData['userName']; // اسم الراكب
           rideData['sub_status'] = 'معلق';
           rideData['userData'] = userData; // معلومات الراكب
           pendingSubscriptions.add(rideData);
