@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
 import '../services/NotifProvider .dart';
 import '../services/UserProvider.dart';
@@ -205,14 +206,21 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
         const SnackBar(content: Text("تم ارسال الطلب  للسائق")),
       );
 
-  
-    
+
+      // الانتقال إلى صفحة UserHomePage
+      await Future.delayed(Duration(seconds: 2));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                UserHomePage()), // استبدال هذا بالصفحة المناسبة
+      );
     } catch (e) {
       print("خطأ في إرسال طلب الاشتراك: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("حدث خطأ أثناء إرسال الطلب")),
       );
-    }
+    } 
     //final requestId = generateRequestId(); // توليد ID عشوائي للطلب
 
     /*await FirebaseFirestore.instance
