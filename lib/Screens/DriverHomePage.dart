@@ -9,9 +9,11 @@ import 'AccountPage.dart';
 import 'CustomBottomNavBar.dart';
 import 'DriverSubscriptionsPage.dart';
 import 'AvailableSubscriptionsPage.dart';
-// كومنت مهم تحت !! 
-import 'MessagesHomePage.dart';
-import 'chatPageLDriver.dart';
+// كومنت مهم تحت !!
+
+import 'package:rem_s_appliceation9/Screens/DriverOngoingSubPage.dart';
+import 'package:rem_s_appliceation9/Screens/chatPageLDriver.dart';
+import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
 
 // كومنت مهم تحت !!
 
@@ -55,14 +57,13 @@ class _DriverHomePageState extends State<DriverHomePage> {
           setState(() {
             _currentIndex = index;
           });
-             
+
           if (index == 1) {
             //final userProvider = Provider.of<UserProvider>(context, listen: false);
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => MessagesHomePage(
-                ),
+                builder: (context) => MessagesHomePage(),
               ),
             );
           } else if (index == 2) {
@@ -86,7 +87,8 @@ class _DriverHomePageState extends State<DriverHomePage> {
       ),
     );
   }
- Widget _buildNotificationsSection() {
+
+  Widget _buildNotificationsSection() {
     return Consumer<NotificationProvider>(
       builder: (context, notificationProvider, child) {
         return Container(
@@ -129,10 +131,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            notificationProvider.clearNotifications(); 
+                            notificationProvider.clearNotifications();
                           },
                           child: Text(
-                            "تم",//اضافة الوقت 
+                            "تم", //اضافة الوقت
                             style: TextStyle(
                               color: Colors.orange,
                               fontWeight: FontWeight.bold,
@@ -156,27 +158,40 @@ class _DriverHomePageState extends State<DriverHomePage> {
   }
 
   Widget _buildServicesSection() {
-    //final userProvider = Provider.of<UserProvider>(context);
-return Column(
-  crossAxisAlignment: CrossAxisAlignment.end,
-  children: [
-    Text("الخدمات", style: theme.textTheme.titleLarge),
-    SizedBox(height: 16.h),
-    _buildServiceItem(
-      "عرض الاشتراكات الحالية",
-      "متابعة جدول اشتراكاتك الحالية",
-      Icons.list,
-      () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AvailableSubscriptionsPage(),
-          ),
-        );
-      },
-    ),
-  ],
-);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text("الخدمات", style: theme.textTheme.titleLarge),
+        SizedBox(height: 16.h),
+        _buildServiceItem(
+          "عرض الاشتراكات الحالية",
+          "متابعة جدول اشتراكاتك الحالية",
+          Icons.list,
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AvailableSubscriptionsPage(),
+              ),
+            );
+          },
+        ),
+        SizedBox(height: 8.h), // Add some spacing between items
+        _buildServiceItem(
+          "طلبات الاشتراك الجديدة ",
+          "عرض طلبات الاشتراكات الجديدة",
+          Icons.directions_car,
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DriverOngoingSubPage(),
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 
   Widget _buildServiceItem(

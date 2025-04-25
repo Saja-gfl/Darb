@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:rem_s_appliceation9/Screens/DriverHomePage.dart';
+import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
 import 'package:rem_s_appliceation9/services/FireStore.dart';
 import 'package:rem_s_appliceation9/widgets/app_bar/custom_dropdown.dart';
 
@@ -59,9 +59,14 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       final driverData = await firestoreService.getUserData(userId);
       if (driverData != null && driverData['isDriver'] == true) {
         setState(() {
-          selectedLocation = locations.contains(driverData['address'])? driverData['address'] : null;
-          acceptedLocationsController =locations.contains(driverData['acceptedLocations'])? driverData['acceptedLocations']: null;
-          locationController .text = driverData['location'] ?? '';      
+          selectedLocation = locations.contains(driverData['address'])
+              ? driverData['address']
+              : null;
+          acceptedLocationsController =
+              locations.contains(driverData['acceptedLocations'])
+                  ? driverData['acceptedLocations']
+                  : null;
+          locationController.text = driverData['location'] ?? '';
           nameController.text = driverData['name'] ?? '';
           emailController.text = driverData['email'] ?? '';
           plateNumberController.text = driverData['plateNumber'] ?? '';
@@ -69,7 +74,10 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
           phoneController.text = driverData['phone'] ?? '';
           priceController.text = driverData['price']?.toString() ?? '';
           selectedGender = driverData['gender'] ?? '';
-          selectedSubscriptionType = locations.contains(driverData['subscriptionType'])? driverData['subscriptionType'] : null;
+          selectedSubscriptionType =
+              locations.contains(driverData['subscriptionType'])
+                  ? driverData['subscriptionType']
+                  : null;
           passengerCountController.text =
               driverData['passengerCount']?.toString() ?? '';
         });
@@ -127,7 +135,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
         nameController: nameController.text,
         emailController: emailController.text,
         addressController: selectedLocation!,
-        
         phoneController: phoneController.text,
         selectedGender: selectedGender,
         isDriver: true,
@@ -149,7 +156,6 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
       userProvider.setSubscriptionType(selectedSubscriptionType!);
       userProvider.setPassengerCount(passengerCountController.text);
       userProvider.setPrice(priceController.text);
-
 
       showToast(message: "تم حفظ البيانات بنجاح");
     } catch (e) {
@@ -173,7 +179,7 @@ class _DriverInfoPageState extends State<DriverInfoPage> {
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => DriverHomePage()),
+            MaterialPageRoute(builder: (context) => AccountPage()),
           ),
         ),
         iconTheme: IconThemeData(

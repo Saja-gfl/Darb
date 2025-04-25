@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rem_s_appliceation9/Screens/AccountPageUser.dart';
 import 'package:rem_s_appliceation9/services/UserProvider.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -95,7 +96,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AccountPageUser(),
+            ),
+          ),
         ),
         iconTheme: IconThemeData(
           color: Color(0xFFFFB300), // Set the color of the back arrow icon

@@ -155,10 +155,12 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFFFFB300)),
-          onPressed: () => Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => UserHomePage()),
-  ),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserHomePage(),
+            ),
+          ),
         ),
         title: Text(
           "الاشتراكات المتاحة",
