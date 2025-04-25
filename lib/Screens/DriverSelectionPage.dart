@@ -97,23 +97,23 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
     ),
   ];
 
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    Future.delayed(Duration.zero, () async {
-      List<Driver> results = await filterDrivers(
-        fromLocation: widget.fromLocation,
-        subscriptionType: widget.subscriptionType,
-        toLocation: widget.toLocation,
-        price: widget.priceRange,
-      );
+  //   Future.delayed(Duration.zero, () async {
+  //     List<Driver> results = await filterDrivers(
+  //       fromLocation: widget.fromLocation,
+  //       subscriptionType: widget.subscriptionType,
+  //       toLocation: widget.toLocation,
+  //       price: widget.priceRange,
+  //     );
 
-      setState(() {
-        filteredDrivers = results;
-      });
-    });
-  }
+  //     setState(() {
+  //       filteredDrivers = results;
+  //     });
+  //   });
+  // }
 
 // استدعاء الفلترة عند تحميل الصفحة
   Future<List<Driver>> filterDrivers({
@@ -292,12 +292,6 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
             }
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.chat_bubble_outline, color: Colors.amber),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: filteredDrivers.isEmpty
           ? const Center(
@@ -364,39 +358,7 @@ class DriverCard extends StatelessWidget {
             child: Row(
               textDirection: TextDirection.rtl,
               children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: Colors.grey[200],
-                  child: Text(
-                    driver.name.isNotEmpty ? driver.name[0] : '',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        driver.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        driver.status,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
@@ -418,24 +380,11 @@ class DriverCard extends StatelessWidget {
             ...driver.ratings.map((rating) {
               String userName = (rating['userName'] ?? 'غير معروف');
 
-              // تنسيق الاسم لإظهار أول ثلاث أحرف فقط والباقي **
-              String formattedUserName = userName.length > 3
-                  ? '${userName.substring(0, 3)}**'
-                  : userName;
-
               String truncatedComment = (rating['comment'] ?? 'لا يوجد تعليق')
                   .split(' ')
                   .take(4)
                   .join(' ');
               return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.amber,
-                  child: Text(
-                    formattedUserName,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
                 title: Text(
                   truncatedComment,
                   // rating['comment'] ?? 'لا يوجد تعليق',
