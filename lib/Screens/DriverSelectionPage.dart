@@ -166,7 +166,8 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
     try {
       final userId = Provider.of<UserProvider>(context, listen: false).uid;
-      final passengerName = Provider.of<UserProvider>(context, listen: false).userName; // اسم الراكب من مزود المستخدم
+      final passengerName = Provider.of<UserProvider>(context, listen: false)
+          .userName; // اسم الراكب من مزود المستخدم
       final tripId = widget.tripId; //
 
       await FirebaseFirestore.instance
@@ -184,28 +185,27 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
         'updatedAt': Timestamp.now(), // وقت التحديث
       });
       // 2. جلب بيانات السائق (للحصول على fcmToken)
-        final driverDoc = await FirebaseFirestore.instance
-            .collection('driverdata')
-            .doc(driverData['id'])
-            .get();
-        final String? driverFcm = driverDoc['fcmToken'];
+      final driverDoc = await FirebaseFirestore.instance
+          .collection('driverdata')
+          .doc(driverData['id'])
+          .get();
+      final String? driverFcm = driverDoc['fcmToken'];
 
-         if (driverFcm != null) {
-          final notificationProvider =Provider.of<NotificationProvider>(context, listen: false);
-          await notificationProvider.sendFCMNotificationV1(
-            driverFcm,
-            'طلب اشتراك جديد',
-            'لديك طلب اشتراك جديد للراكب $passengerName',
-          );
-
-        } else {
-          print('❌ لا يوجد fcmToken لهذا السائق.');
-        }  
+      if (driverFcm != null) {
+        final notificationProvider =
+            Provider.of<NotificationProvider>(context, listen: false);
+        await notificationProvider.sendFCMNotificationV1(
+          driverFcm,
+          'طلب اشتراك جديد',
+          'لديك طلب اشتراك جديد للراكب $passengerName',
+        );
+      } else {
+        print('❌ لا يوجد fcmToken لهذا السائق.');
+      }
       // إظهار رسالة تأكيد للمستخدم
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("تم ارسال الطلب  للسائق")),
       );
-
 
       // الانتقال إلى صفحة UserHomePage
       await Future.delayed(Duration(seconds: 2));
@@ -220,7 +220,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("حدث خطأ أثناء إرسال الطلب")),
       );
-    } 
+    }
     //final requestId = generateRequestId(); // توليد ID عشوائي للطلب
 
     /*await FirebaseFirestore.instance
@@ -263,8 +263,33 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.amber),
-          onPressed: () {
-            Navigator.pop(context); // This will navigate back
+          onPressed: () async {
+            bool shouldExit = await showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('تحذير'),
+                content: const Text(
+                    'إذا خرجت الآن، لن يتم إكمال عملية الاشتراك. هل أنت متأكد أنك تريد المتابعة؟'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('إلغاء'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text('نعم، أريد الخروج'),
+                  ),
+                ],
+              ),
+            );
+            if (shouldExit == true) {
+              if (mounted) {
+                () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => UserHomePage()),
+                    );
+              }
+            }
           },
         ),
         actions: [
