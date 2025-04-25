@@ -1,51 +1,81 @@
-//welcome Screan
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/UserProvider.dart';
+import 'LoginPage.dart';
+import 'DriverHomePage.dart';
+import 'userhome_pageM.dart';
 
-import '../routes/app_routes.dart';
-
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
+
+  @override
+  _WelcomePageState createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    // تأخير بسيط لمحاكاة شاشة سبلاش
+    await Future.delayed(const Duration(seconds: 2));
+
+    final user = FirebaseAuth.instance.currentUser;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    if (user != null) {
+      // إذا كان هناك مستخدم مسجل الدخول
+      await userProvider.loadUserData(user.uid); // تحميل بيانات المستخدم
+
+      if (userProvider.isDriver) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DriverHomePage()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => UserHomePage()),
+        );
+      }
+    } else {
+      // إذا لم يكن هناك مستخدم مسجل الدخول
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => K0Screen()), // شاشة تسجيل الدخول
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // خلفية الصورة
-          /* Positioned.fill(
-            child: Image.asset(
-              'assets/images/welcome_bg.png', 
-              fit: BoxFit.cover,
-            ),
-          ),*/
           Positioned.fill(
             child: Container(
               color: Colors.black.withOpacity(0.3), // شفافية بسيطة
             ),
           ),
-          // المحتوى
           Positioned.fill(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Spacer(flex: 3),
-                // النص "مرحبًا بك في"
-                const SizedBox(height: 8),
                 Align(
-                  alignment: Alignment.centerRight, 
+                  alignment: Alignment.centerRight,
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                        right: 50), 
+                    padding: const EdgeInsets.only(right: 50),
                     child: Text(
                       'مرحبًا بك في',
-                      style: GoogleFonts.tajawal(
-                        // تغيير نوع الخط باستخدام مكتبة google_fonts
-                        textStyle: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 26,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
@@ -62,31 +92,6 @@ class WelcomePage extends StatelessWidget {
                   ),
                 ),
                 const Spacer(flex: 3),
-                // زر "ابدأ"
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                          context,  AppRoutes.k0Screen); 
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFF9000), // لون درب البرتقالي
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'ابدأ',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 60),
               ],
             ),
           ),

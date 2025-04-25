@@ -50,13 +50,13 @@ class _RequestedsubpageState extends State<Requestedsubpage> {
 
   Future<void> _cancelSubscription(String tripId, String userId) async {
     try {
-      // تحديث حالة الاشتراك إلى "منتهية"
       await FirebaseFirestore.instance
           .collection('rideRequests')
           .doc(tripId)
           .collection('users')
           .doc(userId)
-          .update({'sub_status': 'منتهي'});
+          .delete(); // حذف بيانات الاشتراك من مجموعة المستخدمين
+      
 
 
       // حذف بيانات الرحلة من البروفايدر
