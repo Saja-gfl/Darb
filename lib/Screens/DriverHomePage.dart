@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
+import '../services/NotifProvider .dart';
 import 'AccountPage.dart';
 import 'CustomBottomNavBar.dart';
 import 'DriverSubscriptionsPage.dart';
@@ -84,33 +86,72 @@ class _DriverHomePageState extends State<DriverHomePage> {
       ),
     );
   }
-
-  Widget _buildNotificationsSection() {
-    return Container(
-      padding: EdgeInsets.all(16.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.h),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4.h,
-            offset: Offset(0, 2.h),
+ Widget _buildNotificationsSection() {
+    return Consumer<NotificationProvider>(
+      builder: (context, notificationProvider, child) {
+        return Container(
+          padding: EdgeInsets.all(16.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.h),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4.h,
+                offset: Offset(0, 2.h),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text("الإشعارات", style: theme.textTheme.titleLarge),
-          SizedBox(height: 8.h),
-          Text("تم استلام طلب اشتراك جديد من المستخدم خالد",
-              style: theme.textTheme.bodyMedium),
-          SizedBox(height: 4.h),
-          Text("منذ ساعة واحدة",
-              style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text("الإشعارات", style: theme.textTheme.titleLarge),
+              SizedBox(height: 8.h),
+              if (notificationProvider.notifications.isEmpty)
+                Center(
+                  child: Text(
+                    "لا يوجد إشعار حاليًا.",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                )
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      notificationProvider.notifications.first['title'] ?? '',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            notificationProvider.clearNotifications(); 
+                          },
+                          child: Text(
+                            "تم",//اضافة الوقت 
+                            style: TextStyle(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          notificationProvider.notifications.first['body'] ??
+                              '',
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 

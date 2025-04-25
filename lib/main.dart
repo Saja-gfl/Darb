@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
@@ -24,27 +25,45 @@ import 'package:rem_s_appliceation9/theme/theme_helper.dart';
 import 'package:rem_s_appliceation9/services/UserProvider.dart';
 import 'package:provider/provider.dart';
 
+import 'Screens/number_sub.dart';
 import 'routes/app_routes.dart';
+import 'services/NotifProvider .dart';
+import 'services/notif.dart';
 
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // await Firebase.initializeApp();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  //SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await Firebase.initializeApp();
+  //الاشعارات 
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+ // NotificationService notificationService = NotificationService();
+ // await notificationService.initialize();
+ 
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+
       ],
       child: MyApp(),
     ),
   );
 }
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // معالجة الإشعارات في الخلفية
+  print("Handling a background message: ${message.messageId}");
+    print('📩 [BG] Message received: ${message.notification?.title}');
+
+}
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -59,7 +78,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           //initialRoute: AppRoutes.k0Screen, // المسار الابتدائي
          routes: AppRoutes.routes, // تسجيل جميع المسارات
-          home: WelcomePage(), // الصفحة الابتدائية
+          home: WelcomePage(),
 
           // initialRoute: AppRoutes.initialRoute,
           // routes: AppRoutes.routes,

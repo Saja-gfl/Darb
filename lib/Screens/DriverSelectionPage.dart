@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/Screens/userhome_pageM.dart';
 import 'package:rem_s_appliceation9/services/rating.dart';
+import '../services/NotifProvider .dart';
 import '../services/UserProvider.dart';
 import 'dart:async';
 // لإضافة مكتبة Random
@@ -165,7 +166,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   Future<void> sendSubscriptionRequest(Map<String, dynamic> driverData) async {
     try {
       final userId = Provider.of<UserProvider>(context, listen: false).uid;
-      // UID المستخدم الحالي (الراكب)
+      final passengerName = Provider.of<UserProvider>(context, listen: false).userName; // اسم الراكب من مزود المستخدم
       final tripId = widget.tripId; //
 
       await FirebaseFirestore.instance
@@ -182,16 +183,38 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
         }, // إضافة بيانات السائق كـ Map
         'updatedAt': Timestamp.now(), // وقت التحديث
       });
+      // 2. جلب بيانات السائق (للحصول على fcmToken)
+        final driverDoc = await FirebaseFirestore.instance
+            .collection('driverdata')
+            .doc(driverData['id'])
+            .get();
+        final String? driverFcm = driverDoc['fcmToken'];
 
+         if (driverFcm != null) {
+          final notificationProvider =Provider.of<NotificationProvider>(context, listen: false);
+          await notificationProvider.sendFCMNotificationV1(
+            driverFcm,
+            'طلب اشتراك جديد',
+            'لديك طلب اشتراك جديد للراكب $passengerName',
+          );
+
+        } else {
+          print('❌ لا يوجد fcmToken لهذا السائق.');
+        }  
       // إظهار رسالة تأكيد للمستخدم
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("تم ارسال الطلب  للسائق")),
       );
 
-      // الانتقال إلى صفحة Home بعد 2 ثانية (يمكنك تعديل الوقت حسب الحاجة)
+
+      // الانتقال إلى صفحة UserHomePage
       await Future.delayed(Duration(seconds: 2));
-    Navigator.pushReplacementNamed(context, '/userHomePage'); 
-    
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                UserHomePage()), // استبدال هذا بالصفحة المناسبة
+      );
     } catch (e) {
       print("خطأ في إرسال طلب الاشتراك: $e");
       ScaffoldMessenger.of(context).showSnackBar(

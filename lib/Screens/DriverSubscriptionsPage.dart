@@ -2,11 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/NotifProvider .dart';
 import '../services/UserProvider.dart';
 import '../services/ChatService.dart';
 import '../services/Firestore.dart';
 import '../widgets/CustomBottomNavBar.dart';
 
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DriverSubscriptionsPage extends StatelessWidget {
   const DriverSubscriptionsPage({super.key});
@@ -170,7 +173,7 @@ class SubscriptionTile extends StatelessWidget {
           .update({
         'sub_status': 'نشط',
       });
-
+   
       // إنشاء غرفة دردشة جديدة
       final chatService = ChatService();
       await chatService.createChatRoom(tripId, driverId, passengerId);
@@ -178,6 +181,32 @@ class SubscriptionTile extends StatelessWidget {
       // إضافة tripId إلى بيانات المستخدم
       await FirestoreService.addTripIdToUser(passengerId, tripId);
 
+      // جلب fcmToken الخاص بالراكب
+      final passengerDoc = await FirebaseFirestore.instance
+          .collection('userdata')
+          .doc(passengerId)
+          .get();
+
+      final fcmToken = passengerDoc['fcmToken'];
+
+      if (fcmToken != null) {
+        // إرسال الإشعار باستخدام NotificationProvider
+        final notificationProvider =
+            Provider.of<NotificationProvider>(context, listen: false);
+        await notificationProvider.sendFCMNotificationV1(
+          fcmToken,
+          'تم قبول الاشتراك',
+          '${tripData['driverData']['name']} تم اضافتك للرحله من قبل السائق ',
+        );
+
+        notificationProvider.addNotification({
+          'title': 'تم قبول الاشتراك',
+          'body':'${tripData['driverData']['name']} تم اضافتك للرحله من قبل السائق ',
+          'time': DateTime.now().toString(),
+        });
+      } else {
+        print("❌ لا يوجد fcmToken لهذا الراكب.");
+      }
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("تم قبول الاشتراك.")));
     } catch (e) {
@@ -189,6 +218,12 @@ class SubscriptionTile extends StatelessWidget {
   void rejectSubscription(BuildContext context) async {
     try {
       final tripId = doc.id;
+
+      // جلب بيانات الرحلة
+      final tripData = await FirebaseFirestore.instance
+          .collection('rideRequests')
+          .doc(tripId)
+          .get();
 
       // جلب بيانات المستخدم
       final userSnapshot = await FirebaseFirestore.instance
@@ -222,6 +257,32 @@ class SubscriptionTile extends StatelessWidget {
         'sub_status': 'مرفوض',
       });
 
+      // جلب fcmToken الخاص بالراكب
+      final passengerDoc = await FirebaseFirestore.instance
+          .collection('userdata')
+          .doc(passengerId)
+          .get();
+
+      final fcmToken = passengerDoc['fcmToken'];
+
+      if (fcmToken != null) {
+        // إرسال الإشعار باستخدام NotificationProvider
+        final notificationProvider =
+            Provider.of<NotificationProvider>(context, listen: false);
+        await notificationProvider.sendFCMNotificationV1(
+          fcmToken,
+          'تم رفض الاشتراك',
+          '${tripData['driverData']['name']} تم رفض الطلب من قبل السائق ',
+        );
+
+        notificationProvider.addNotification({
+          'title': 'تم رفض الاشتراك',
+          'body':'${tripData['driverData']['name']} تم رفض الطلب من قبل السائق ',
+          'time': DateTime.now().toString(),
+        });
+      } else {
+        print("❌ لا يوجد fcmToken لهذا الراكب.");
+      }
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("تم رفض الاشتراك.")));
     } catch (e) {
