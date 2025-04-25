@@ -75,7 +75,7 @@ class _DriverOngoingSubCardState extends State<DriverOngoingSubCard> {
                   ),
                 ),
                 Text(
-                  'اشتراك #${widget.subscription['id']}',
+                  'اشتراك #${widget.subscription['tripId']}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -84,13 +84,16 @@ class _DriverOngoingSubCardState extends State<DriverOngoingSubCard> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildInfoRow(Icons.person, widget.subscription['customerName']),
-            _buildInfoRow(Icons.phone, widget.subscription['customerPhone']),
-            _buildInfoRow(Icons.route, widget.subscription['route']),
+            _buildInfoRow(Icons.person, widget.subscription['userName']),
+            _buildInfoRow(Icons.phone, widget.subscription['userphone']),
+_buildInfoRow(
+  Icons.route,
+  '${widget.subscription['fromLocation']} إلى ${widget.subscription['toLocation']}',
+),
             _buildInfoRow(
-                Icons.location_on, widget.subscription['pickupLocation']),
+                Icons.location_on, widget.subscription['homeLocation']),
             _buildInfoRow(
-                Icons.location_off, widget.subscription['dropoffLocation']),
+                Icons.location_off, widget.subscription['workLocation']),
             _buildInfoRow(
                 Icons.schedule, _buildScheduleText(widget.subscription)),
             _buildInfoRow(

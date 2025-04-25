@@ -295,3 +295,38 @@ Future<List<Map<String, dynamic>>> getPendingSubscriptionsForDriver(
     return [];
   }
 }
+
+Future<List<Map<String, dynamic>>> getSubscriptionsForDriver(
+    String driverId) async {
+  try {
+    QuerySnapshot rideRequestsSnapshot = await FirebaseFirestore.instance
+        .collection('rideRequests')
+        .where('driverId', isEqualTo: driverId)
+        .get();
+
+    List<Map<String, dynamic>> subscriptions = [];
+
+
+    for (var doc in rideRequestsSnapshot.docs) {
+      var usersSnapshot = await doc.reference.collection('users').get();
+
+      for (var userDoc in usersSnapshot.docs) {
+        final userData = userDoc.data() as Map<String, dynamic>;
+        if (userData['sub_status'] == 'نشط' ||
+            userData['sub_status'] == 'مرفوض') {
+          final rideData = doc.data() as Map<String, dynamic>;
+          rideData['tripId'] = doc.id;
+          rideData['userId'] = userDoc.id;
+          rideData['userName'] = userData['userName']; // اسم الراكب
+          rideData['sub_status'] = userData['sub_status']; // حالة الاشتراك
+          rideData['userData'] = userData; // معلومات الراكب
+          subscriptions.add(rideData);
+        }
+      }
+    }
+    return subscriptions;
+  } catch (e) {
+    print("خطأ في جلب الطلبات المعلقة للسائق: $e");
+    return [];
+  }
+}
