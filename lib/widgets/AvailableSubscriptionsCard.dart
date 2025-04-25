@@ -32,6 +32,10 @@ class SubscriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Split the schedule string into individual days
+    List<String> scheduleDays =
+        schedule.split(',').map((day) => day.trim()).toList();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -112,8 +116,28 @@ class SubscriptionCard extends StatelessWidget {
           _buildInfoRow(Icons.flag_outlined, dropoff),
           const SizedBox(height: 10),
 
-          // Schedule
-          _buildInfoRow(Icons.access_time_outlined, schedule),
+          // Schedule - Modified to show days line by line
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: scheduleDays
+                    .map((day) => Text(
+                          day,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ))
+                    .toList(),
+              ),
+              const SizedBox(width: 10),
+              Icon(Icons.access_time_outlined, size: 20, color: primaryColor),
+            ],
+          ),
           const SizedBox(height: 10),
 
           // Price
