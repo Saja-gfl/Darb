@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/Screens/MessagesHomePage.dart';
 import 'package:rem_s_appliceation9/Screens/UserProfilePage.dart';
-import 'package:rem_s_appliceation9/Screens/SettingsPage.dart';
 
 import '../services/UserProvider.dart';
 import 'userhome_pageM.dart';
@@ -128,7 +127,7 @@ class _AccountPageState extends State<AccountPageUser> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) =>  UserHomePage()),
+              MaterialPageRoute(builder: (context) => UserHomePage()),
             );
           } else if (index == 1) {
             Navigator.pushReplacement(
@@ -180,11 +179,15 @@ class _AccountPageState extends State<AccountPageUser> {
     );
   }
 
-  Widget _buildInfoCard({required String title, required List<Map<String, String>> items}) {
-  final filteredItems = items.where((item) => item['value'] != null && item['value']!.isNotEmpty).toList();
+  Widget _buildInfoCard(
+      {required String title, required List<Map<String, String>> items}) {
+    final filteredItems = items
+        .where((item) => item['value'] != null && item['value']!.isNotEmpty)
+        .toList();
 
     if (filteredItems.isEmpty) {
-      return const SizedBox.shrink(); // Return an empty widget if no items to display
+      return const SizedBox
+          .shrink(); // Return an empty widget if no items to display
     }
     return Card(
       elevation: 2,
@@ -205,8 +208,9 @@ class _AccountPageState extends State<AccountPageUser> {
               ),
             ),
             const SizedBox(height: 12),
-            ...filteredItems.map((item) => _buildInfoItem(item['label']!, item['value']!)).toList(),
-
+            ...filteredItems
+                .map((item) => _buildInfoItem(item['label']!, item['value']!))
+                .toList(),
           ],
         ),
       ),
@@ -214,7 +218,6 @@ class _AccountPageState extends State<AccountPageUser> {
   }
 
   Widget _buildInfoItem(String label, String value) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -259,21 +262,6 @@ class _AccountPageState extends State<AccountPageUser> {
         ),
         const Divider(height: 1),
         ListTile(
-          leading: const Icon(Icons.settings, color: Color(0xFFFFB300)),
-          title: const Text(
-            "الإعدادات",
-            textAlign: TextAlign.right,
-            style: TextStyle(color: Colors.black87),
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SettingsPage()),
-            );
-          },
-        ),
-        const Divider(height: 1),
-        ListTile(
           leading: const Icon(Icons.logout, color: Colors.red),
           title: const Text(
             "تسجيل الخروج",
@@ -281,12 +269,13 @@ class _AccountPageState extends State<AccountPageUser> {
             style: TextStyle(color: Colors.red),
           ),
           onTap: () async {
-           await FirebaseAuth.instance.signOut();
+            await FirebaseAuth.instance.signOut();
 
-            final userProvider = Provider.of<UserProvider>(context, listen: false);
+            final userProvider =
+                Provider.of<UserProvider>(context, listen: false);
             userProvider.clearUserData();
 
-            //اخبار المستخدم تم تسجيل الخروج بنجاح 
+            //اخبار المستخدم تم تسجيل الخروج بنجاح
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text("تم تسجيل الخروج بنجاح"),
@@ -294,7 +283,6 @@ class _AccountPageState extends State<AccountPageUser> {
               ),
             );
             Navigator.pushReplacementNamed(context, '/login_page');
-
 
             // Handle logout
           },

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
+import 'request.dart';
+
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -123,7 +125,33 @@ class ChatService {
     try {
       final querySnapshot = await _firestore
           .collection('chatRooms')
-          .where('driverId', arrayContains: userId)
+          .where('driverId', isEqualTo:  userId)
+          .get();
+
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'tripId': data['tripId'] + ':رحلة رقم '?? '',
+          //'driverId': data['driverId'] ?? '',
+          'lastMessage':
+              data['lastMessage'] ?? 'لا توجد رسائل', // رسالة افتراضية
+          'time': data['timestamp'] is Timestamp
+                  ? ChatService.formatTimestamp(data['timestamp'])
+                  : 'مافيه وقت', // تحقق من النوع // وقت افتراضي
+          'unread': data['unread'] ?? 0, // عدد الرسائل غير المقروءة
+        };
+      }).toList();
+    } catch (e) {
+      print('Error fetching user chat rooms: $e');
+      return [];
+    }
+  }
+  //getUserChatRooms
+  Future<List<Map<String, dynamic>>> getUserChatRooms(String userId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('chatRooms')
+          .where('passengerIds', arrayContains: userId)
           .get();
 
       return querySnapshot.docs.map((doc) {
@@ -134,7 +162,9 @@ class ChatService {
           'name': data['tripId'] ?? 'غير معروف', // اسم افتراضي
           'lastMessage':
               data['lastMessage'] ?? 'لا توجد رسائل', // رسالة افتراضية
-          'time': ChatService.formatTimestamp(data['timestamp']), // وقت افتراضي
+          'time': data['timestamp'] 
+         // تنسيق الوقت إذا كان موجودًا
+        ?? 'غير متrفر', // وقت افتراضي
           'unread': data['unread'] ?? 0, // عدد الرسائل غير المقروءة
         };
       }).toList();
@@ -149,7 +179,22 @@ class ChatService {
       final userDoc = await FirebaseFirestore.instance
           .collection('rideRequests')
           .doc(chatId)
+          .collection('users')
+          .doc(userId)
           .get();
+
+      // تحقق من  الاشتراك العامه 
+      final subscriptionDoc = await FirebaseFirestore.instance
+          .collection('rideRequests')
+          .doc(chatId)
+          .get();
+      if (subscriptionDoc.exists) {
+        final Status = subscriptionDoc.data()?['status'];
+        if (Status == 'منتهي') {
+          return false; // الاشتراك منتهي
+        }
+      }
+
 
       if (userDoc.exists) {
         final subStatus = userDoc.data()?['sub_status'];
@@ -157,6 +202,8 @@ class ChatService {
           return false; // الاشتراك منتهي
         }
       }
+
+
       return true; // يمكن الإرسال
     } catch (e) {
       print("❌ خطأ أثناء التحقق من حالة الاشتراك: $e");
@@ -180,4 +227,5 @@ class ChatService {
     final date = timestamp.toDate();
     return DateFormat('hh:mm a').format(date); // تنسيق الوقت
   }
+
 }

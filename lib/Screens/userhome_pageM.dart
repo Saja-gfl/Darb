@@ -208,7 +208,7 @@ class _UserHomePageState extends State<UserHomePage> {
         SizedBox(height: 16.h),
         _buildServiceItem(
           "عرض الاشتراكات الجارية",
-          "استعراض جميع الاشتراكات الجارية مع السائقين",
+          "استعراض جميع الاشتراكات  مع السائقين",
           Icons.calendar_today,
           () => Navigator.push(
             context,
@@ -225,7 +225,7 @@ class _UserHomePageState extends State<UserHomePage> {
             MaterialPageRoute(builder: (context) => Requestedsubpage()),
           ),
         ),
-        SizedBox(height: 16.h),
+        /*SizedBox(height: 16.h),
         _buildServiceItem(
           "الانضمام إلى اشتراك",
           "عرض قائمة الاشتراكات النشطة والانضمام إليها",
@@ -234,7 +234,7 @@ class _UserHomePageState extends State<UserHomePage> {
             context,
             MaterialPageRoute(builder: (context) => ActiveSubscriptionsPage()),
           ),
-        ),
+        ),*/
       ],
     );
   }
@@ -294,7 +294,9 @@ class _UserHomePageState extends State<UserHomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChatPage(tripId: tripId),
+                builder: (context) => MessagesHomePage(
+                 
+                ),
               ),
             );
           } else {
@@ -325,6 +327,7 @@ class ActiveSubscriptionsPage extends StatelessWidget {
       appBar: AppBar(title: Text("الاشتراكات الجارية")),
       body: Center(child: Text("محتوى صفحة الاشتراكات الجارية")),
     );
+    
   }
 }
 

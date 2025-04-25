@@ -149,7 +149,7 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
         backgroundColor: backgroundColor,
         elevation: 0,
         title: Text(
-          'إنشاء اشتراك جديد',
+          'إنشاء اشتراك ',
           style: GoogleFonts.tajawal(
             color: textColor,
             fontSize: 22,
@@ -722,9 +722,9 @@ class _CreateSubscriptionPageState extends State<CreateSubscriptionPage> {
 
       //استدعاء submitSubscription من ملف request.dart
       String tripId =
-          await submitRequest(context,"", userId, subscriptionData);
+          await submitRequest(context, "", userId, subscriptionData);
       userProvider.setTripId(tripId); // Set the trip ID in the provider
-    print("🚀 تم إرسال الطلب، tripId: $tripId");
+      print("🚀 تم إرسال الطلب، tripId: $tripId");
 
       // Move to DriverSelectionPage
       Navigator.push(
