@@ -156,10 +156,29 @@ class _RequestedsubCardState extends State<RequestedsubCard> {
             const SizedBox(height: 10),
           ],
 
-          // Schedule and Price
-          _buildInfoRow(Icons.access_time_outlined,
-              'المواعيد: ${widget.subscription['schedule'] ?? 'غير محدد'}'),
+          // Schedule and Price - FIXED: Added Flexible to prevent overflow
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Text(
+                  'المواعيد: ${widget.subscription['schedule'] ?? 'غير محدد'}',
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Icon(Icons.access_time_outlined,
+                  size: 20, color: widget.primaryColor),
+            ],
+          ),
           const SizedBox(height: 10),
+
           _buildInfoRow(Icons.attach_money_outlined,
               'السعر: ${widget.subscription['price']} ريال'),
           const SizedBox(height: 20),
@@ -215,12 +234,15 @@ class _RequestedsubCardState extends State<RequestedsubCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 15,
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w500,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontSize: 15,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         const SizedBox(width: 10),
