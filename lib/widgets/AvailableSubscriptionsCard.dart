@@ -7,7 +7,7 @@ class SubscriptionCard extends StatelessWidget {
   final String route;
   final String pickup;
   final String dropoff;
-  final String schedule;
+  final String schedule; // This should contain both days and time
   final String price;
   final VoidCallback onAccept;
   final VoidCallback onReject;
@@ -26,7 +26,7 @@ class SubscriptionCard extends StatelessWidget {
     required this.price,
     required this.onAccept,
     required this.onReject,
-    this.primaryColor = const Color(0xFFFFB300), // Orange color
+    this.primaryColor = const Color(0xFFFFB300),
     this.secondaryColor = const Color(0xFF76CB54),
   }) : super(key: key);
 
@@ -63,8 +63,7 @@ class SubscriptionCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.category,
-                        size: 16, color: primaryColor), // Orange icon
+                    Icon(Icons.category, size: 16, color: primaryColor),
                     const SizedBox(width: 6),
                     Text(
                       type,
@@ -89,7 +88,7 @@ class SubscriptionCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Icon(Icons.confirmation_number_outlined,
-                      size: 20, color: primaryColor), // Orange icon
+                      size: 20, color: primaryColor),
                 ],
               ),
             ],
@@ -112,7 +111,7 @@ class SubscriptionCard extends StatelessWidget {
           _buildInfoRow(Icons.flag_outlined, dropoff),
           const SizedBox(height: 10),
 
-          // Schedule
+          // Schedule - Display as single line
           _buildInfoRow(Icons.access_time_outlined, schedule),
           const SizedBox(height: 10),
 
@@ -180,16 +179,19 @@ class SubscriptionCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 15,
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w500,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontSize: 15,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         const SizedBox(width: 10),
-        Icon(icon, size: 20, color: primaryColor), // All icons in orange
+        Icon(icon, size: 20, color: primaryColor),
       ],
     );
   }

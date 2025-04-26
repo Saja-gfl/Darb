@@ -371,6 +371,27 @@ class DriverCard extends StatelessWidget {
               textDirection: TextDirection.rtl,
               children: [
                 const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        driver.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        driver.status,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -391,6 +412,11 @@ class DriverCard extends StatelessWidget {
           if (driver.ratings.isNotEmpty)
             ...driver.ratings.map((rating) {
               String userName = (rating['userName'] ?? 'غير معروف');
+
+              // تنسيق الاسم لإظهار أول ثلاث أحرف فقط والباقي **
+              String formattedUserName = userName.length > 3
+                  ? '${userName.substring(0, 3)}**'
+                  : userName;
 
               String truncatedComment = (rating['comment'] ?? 'لا يوجد تعليق')
                   .split(' ')
