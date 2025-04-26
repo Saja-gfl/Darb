@@ -145,7 +145,7 @@ class _RequestedsubCardState extends State<RequestedsubCard> {
           // Driver Information
           if (widget.subscription['driverData'] != null) ...[
             _buildInfoRow(Icons.person_outlined,
-                'السائق: ${widget.subscription['driverData']['name']}'),
+                ' ${widget.subscription['driverData']['name']}: السائق '),
             const SizedBox(height: 10),
             _buildInfoRow(Icons.directions_car_outlined,
                 ' ${widget.subscription['driverData']['carType']} :نوع السيارة: '),
@@ -155,12 +155,31 @@ class _RequestedsubCardState extends State<RequestedsubCard> {
             //const SizedBox(height: 10),
           ],
 
-          // Schedule and Price
-          _buildInfoRow(Icons.access_time_outlined,
-              'المواعيد:'),
+          // Schedule and Price - FIXED: Added Flexible to prevent overflow
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Text(
+                  ' ${widget.subscription['schedule'] ?? 'غير محدد'} : المواعيد',
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Icon(Icons.access_time_outlined,
+                  size: 20, color: widget.primaryColor),
+            ],
+          ),
           const SizedBox(height: 10),
+
           _buildInfoRow(Icons.attach_money_outlined,
-              'السعر: ${widget.subscription['price']} ريال'),
+              'ريال${widget.subscription['price']} :السعر'),
           const SizedBox(height: 20),
 
           // Status
@@ -214,12 +233,15 @@ class _RequestedsubCardState extends State<RequestedsubCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 15,
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w500,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontSize: 15,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         const SizedBox(width: 10),
