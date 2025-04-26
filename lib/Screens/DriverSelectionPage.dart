@@ -276,7 +276,12 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
                     child: const Text('إلغاء'),
                   ),
                   TextButton(
-                    onPressed: () => Navigator.of(context).pop(true),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserHomePage(),
+                      ),
+                    ),
                     child: const Text('نعم، أريد الخروج'),
                   ),
                 ],
