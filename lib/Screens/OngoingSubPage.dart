@@ -168,9 +168,8 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = Color(0xFFFFB300);
-    final Color secondaryColor = Color(0xFF76CB54);
     final Color backgroundColor = Colors.white;
-    final Color textColor = Colors.black;
+final Color textColor = Colors.black;
     final double borderRadius = 12.0;
 
     return Scaffold(
@@ -183,7 +182,7 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
         backgroundColor: backgroundColor,
         elevation: 0,
         title: Text(
-          ' الاشتراكات',
+          'الاشتراكات',
           style: GoogleFonts.tajawal(
             color: primaryColor,
             fontSize: 22,
@@ -192,13 +191,25 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Subscription Cards
-            subscriptions.isNotEmpty
-                ? Column(
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.amber, // لون مؤشر التحميل
+              ),
+            )
+          : subscriptions.isEmpty
+              ? Center(
+                  child: Text(
+                    'لا توجد اشتراكات حالياً',
+                    style: GoogleFonts.tajawal(
+                      color: Colors.grey,
+                      fontSize: 18,
+                    ),
+                  ),
+                )
+              : SingleChildScrollView(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
                     children: subscriptions.map((subscription) {
                       final driverName =
                           subscription['driverData']?['name'] ?? 'غير معروف';
@@ -210,7 +221,7 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
                               .join(", ")
                           : schedule;
 
-                      // عرض بطاقة الاشتراك
+// عرض بطاقة الاشتراك
                       return SubscriptionCard(
                         subscriptionNumber: subscription['tripId'] ?? '',
                         driverName: driverName,
@@ -221,84 +232,15 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
                         schedule: scheduleText,
                         price: subscription['price'] ?? '',
                         sub_status: subscription['sub_status'] ?? 'غير معروف',
-                        driverId: subscription['driverId'] ?? '', // تمرير driverId
-                        
+                        driverId: subscription['driverId'] ?? '',
                         onSharePressed: () {
-                           final tripId = subscription['tripId'] ?? '';
-                            if (tripId.isNotEmpty) {
-                              Clipboard.setData(ClipboardData(text: tripId)); // نسخ رقم الرحلة إلى الحافظة
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    title: Row(
-                                      children: [
-                                        Icon(Icons.share, color: primaryColor),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'مشاركة الرحلة',
-                                          style: GoogleFonts.tajawal(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: primaryColor,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'تم نسخ رقم الرحلة: $tripId\nيمكنك دعوة زملائك للانضمام إلى نفس الرحلة!',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.tajawal(fontSize: 16),
-                                        ),
-                                        SizedBox(height: 16),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            IconButton(
-                                              icon: Icon(Icons.message, color: Colors.green, size: 32),
-                                              onPressed: () {
-                                                // إضافة مشاركة عبر واتساب
-                                              },
-                                            ),
-                                            IconButton(
-                                              icon: Icon(Icons.email, color: Colors.blue, size: 32),
-                                              onPressed: () {
-                                                // إضافة مشاركة عبر البريد الإلكتروني
-                                              },
-                                            ),
-                                            IconButton(
-                                              icon: Icon(Icons.copy, color: Colors.orange, size: 32),
-                                              onPressed: () {
-                                                Clipboard.setData(ClipboardData(text: tripId));
-                                                showToast(message: 'تم نسخ رقم الرحلة مرة أخرى!');
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text(
-                                          'إغلاق',
-                                          style: GoogleFonts.tajawal(color: primaryColor),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            } else {
-                              showToast(message: 'رقم الرحلة غير متوفر!');
-                            }
-                          
+                          final tripId = subscription['tripId'] ?? '';
+                          if (tripId.isNotEmpty) {
+                            Clipboard.setData(ClipboardData(text: tripId));
+                            showToast(message: 'تم نسخ رقم الرحلة!');
+                          } else {
+                            showToast(message: 'رقم الرحلة غير متوفر!');
+                          }
                         },
                         onRatePressed: () {
                           final driverId = subscription['driverId'];
@@ -317,19 +259,8 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
                         },
                       );
                     }).toList(),
-                  )
-                : Center(
-                    child: Text(
-                      'لا توجد اشتراكات حالياً',
-                      style: GoogleFonts.tajawal(
-                        color: Colors.grey,
-                        fontSize: 18,
-                      ),
-                    ),
                   ),
-          ],
-        ),
-      ),
+                ),
     );
   }
 }

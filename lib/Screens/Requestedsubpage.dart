@@ -19,7 +19,7 @@ class Requestedsubpage extends StatefulWidget {
 class _RequestedsubpageState extends State<Requestedsubpage> {
   List<Map<String, dynamic>> subscriptions = [];
   bool isLoading = true;
-  bool useFakeData = true; // Set to true for testing
+  bool useFakeData = false; // Set to true for testing
 
   // Fake data for testing
   final List<Map<String, dynamic>> _fakeSubscriptions = [
@@ -125,10 +125,7 @@ class _RequestedsubpageState extends State<Requestedsubpage> {
 
       if (!useFakeData) {
         // Original Firebase cancellation code
-        await FirebaseFirestore.instance
-            .collection('rideRequests')
-            .doc(tripId)
-            .update({'sub_status': 'منتهية'});
+      ;
 
         await FirebaseFirestore.instance
             .collection('rideRequests')
@@ -179,7 +176,10 @@ class _RequestedsubpageState extends State<Requestedsubpage> {
         backgroundColor: Colors.white,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(
+            color: Colors.amber,
+          ),
+            )
           : subscriptions.isEmpty
               ? const Center(child: Text("لا توجد اشتراكات لعرضها"))
               : ListView.builder(
