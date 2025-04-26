@@ -466,7 +466,7 @@ class DriverCard extends StatelessWidget {
                       ),
                     ),
                     child: const Text(
-                      'اشتراك',
+                      'طلب اشتراك ',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
