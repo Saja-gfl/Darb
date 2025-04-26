@@ -136,7 +136,7 @@ class _RequestedsubCardState extends State<RequestedsubCard> {
               '${widget.subscription['fromLocation']} → ${widget.subscription['toLocation']}'),
           const SizedBox(height: 10),
           _buildInfoRow(Icons.location_on_outlined,
-              ' ${widget.subscription['homeLocation']} :نقطة الانطلاق: '),
+              ' ${widget.subscription['homeLocation']} '),
           const SizedBox(height: 10),
           _buildInfoRow(Icons.flag_outlined,
               ' ${widget.subscription['workLocation']} :نقطة التوصيل'),
@@ -148,7 +148,7 @@ class _RequestedsubCardState extends State<RequestedsubCard> {
                 ' ${widget.subscription['driverData']['name']}: السائق '),
             const SizedBox(height: 10),
             _buildInfoRow(Icons.directions_car_outlined,
-                ' ${widget.subscription['driverData']['carType']} :نوع السيارة: '),
+                ' ${widget.subscription['driverData']['carType']} :نوع السيارة '),
             const SizedBox(height: 10),
            // _buildInfoRow(Icons.phone_outlined,
            //     'رقم الجوال: ${widget.subscription['driverData']['phone']}'),
@@ -179,7 +179,7 @@ class _RequestedsubCardState extends State<RequestedsubCard> {
           const SizedBox(height: 10),
 
           _buildInfoRow(Icons.attach_money_outlined,
-              'ريال${widget.subscription['price']} :السعر'),
+              'السعر${widget.subscription['price']} ريال'),
           const SizedBox(height: 20),
 
           // Status
