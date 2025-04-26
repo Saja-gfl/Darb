@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-import 'request.dart';
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -131,7 +130,7 @@ class ChatService {
       return querySnapshot.docs.map((doc) {
         final data = doc.data();
         return {
-          'tripId': data['tripId'] + ':رحلة رقم '?? '',
+          'tripId': data['tripId'] ?? '',
           //'driverId': data['driverId'] ?? '',
           'lastMessage':
               data['lastMessage'] ?? 'لا توجد رسائل', // رسالة افتراضية
@@ -162,9 +161,9 @@ class ChatService {
           'name': data['tripId'] ?? 'غير معروف', // اسم افتراضي
           'lastMessage':
               data['lastMessage'] ?? 'لا توجد رسائل', // رسالة افتراضية
-          'time': data['timestamp'] 
-         // تنسيق الوقت إذا كان موجودًا
-        ?? 'غير متrفر', // وقت افتراضي
+          'time': data['timestamp'] is Timestamp
+                  ? ChatService.formatTimestamp(data['timestamp'])
+                  : 'مافيه وقت',
           'unread': data['unread'] ?? 0, // عدد الرسائل غير المقروءة
         };
       }).toList();

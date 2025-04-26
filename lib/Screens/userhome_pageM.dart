@@ -1,11 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rem_s_appliceation9/Screens/ChatPage.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
 import 'package:rem_s_appliceation9/theme/theme_helper.dart';
-import 'package:rem_s_appliceation9/widgets/CustomBottomNavBar.dart';
 import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import 'package:rem_s_appliceation9/Screens/OngoingSubPage.dart';
 import 'package:rem_s_appliceation9/Screens/AccountPageUser.dart';

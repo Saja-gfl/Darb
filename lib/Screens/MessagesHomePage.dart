@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/core/utils/image_constant.dart';
 import 'package:rem_s_appliceation9/core/utils/size_utils.dart';
@@ -12,7 +10,6 @@ import 'package:rem_s_appliceation9/Screens/AccountPage.dart';
 
 import '../services/ChatService.dart';
 import '../services/UserProvider.dart';
-import '../services/request.dart';
 
 class MessagesHomePage extends StatefulWidget {
   const MessagesHomePage({Key? key}) : super(key: key);
@@ -265,7 +262,7 @@ class _MessagesHomePageState extends State<MessagesHomePage> {
                     ],
                   ),
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    Text(chat['tripId'] ?? 'غير معروففف',
+                    Text(chat['tripId']  +": رحلة رقم"?? 'غير معروففف',
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: const Color.fromARGB(
                               255, 255, 189, 91), // Orange color

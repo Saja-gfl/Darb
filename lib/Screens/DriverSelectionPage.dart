@@ -72,6 +72,7 @@ class DriverSelectionPage extends StatefulWidget {
 
 class _DriverSelectionPageState extends State<DriverSelectionPage> {
   List<Driver> filteredDrivers = [];
+  bool isLoading = true; // متغير لتتبع حالة التحميل
   final List<Driver> drivers = [
     Driver(
       id: '1',
@@ -102,6 +103,10 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
     super.initState();
 
     Future.delayed(Duration.zero, () async {
+      setState(() {
+        isLoading = true; // بدء التحميل
+      });
+
       List<Driver> results = await filterDrivers(
         fromLocation: widget.fromLocation,
         subscriptionType: widget.subscriptionType,
@@ -111,6 +116,7 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
 
       setState(() {
         filteredDrivers = results;
+        isLoading = false; // انتهاء التحميل
       });
     });
   }
@@ -293,30 +299,36 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
           },
         ),
       ),
-      body: filteredDrivers.isEmpty
+      body: isLoading
           ? const Center(
-              child: Text(
-                'لا توجد بيانات للسائقين المتاحين',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+              child: CircularProgressIndicator(
+                color: Colors.amber, // لون مؤشر التحميل
               ),
             )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredDrivers.length,
-                    itemBuilder: (context, index) {
-                      return DriverCard(
-                        driver: filteredDrivers[index],
-                        onSubscribe: () => sendSubscriptionRequest(
-                            filteredDrivers[index].toMap()),
-                        tripId: widget.tripId,
-                      );
-                    },
+          : filteredDrivers.isEmpty
+              ? const Center(
+                  child: Text(
+                    'لا توجد بيانات للسائقين المتاحين',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: filteredDrivers.length,
+                        itemBuilder: (context, index) {
+                          return DriverCard(
+                            driver: filteredDrivers[index],
+                            onSubscribe: () => sendSubscriptionRequest(
+                                filteredDrivers[index].toMap()),
+                            tripId: widget.tripId,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
     );
   }
 }

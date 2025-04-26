@@ -5,8 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
 import 'package:rem_s_appliceation9/services/UserProvider.dart';
 import 'package:rem_s_appliceation9/services/request.dart';
-import 'package:rem_s_appliceation9/widgets/driver_ongoing_sub_card.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DriverOngoingSubPage extends StatefulWidget {
   const DriverOngoingSubPage({Key? key}) : super(key: key);
@@ -18,12 +16,12 @@ class DriverOngoingSubPage extends StatefulWidget {
 class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
   final Color primaryColor = const Color(0xFFFFB300);
   final Color secondaryColor = const Color(0xFF76CB54);
-    List<Map<String, dynamic>> subscriptions = [];
-      List<Map<String, dynamic>> activeSubscriptionsList = [];
+  List<Map<String, dynamic>> subscriptions = [];
+  List<Map<String, dynamic>> activeSubscriptionsList = [];
   List<Map<String, dynamic>> expiredSubscriptionsList = [];
   bool isLoading = true;
 
-    @override
+  @override
   void initState() {
     super.initState();
     _fetchSubscriptions();
@@ -79,44 +77,38 @@ class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
   ];
 
   void _endSubscription(String subscriptionId) {
-    setState(() {
-
-      
-    });
+    setState(() {});
   }
 
+  Future<void> _fetchSubscriptions() async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final driverId = userProvider.uid;
 
-Future<void> _fetchSubscriptions() async {
-  try {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final driverId = userProvider.uid;
+      if (driverId == null) {
+        print("🚨 معرف السائق غير متوفر.");
+        showToast(message: "معرف السائق غير متوفر.");
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
 
-    if (driverId == null) {
-      print("🚨 معرف السائق غير متوفر.");
-      showToast(message: "معرف السائق غير متوفر.");
+      final data = await getSubscriptionsForDriver(driverId);
+
+      // نحفظ كل الاشتراكات في متغير واحد
+      setState(() {
+        subscriptions = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("🚨 حدث خطأ أثناء جلب البيانات: $e");
+      showToast(message: "حدث خطأ أثناء جلب البيانات: $e");
       setState(() {
         isLoading = false;
       });
-      return;
     }
-
-    final data = await getSubscriptionsForDriver(driverId);
-
-    // نحفظ كل الاشتراكات في متغير واحد
-    setState(() {
-      subscriptions = data;
-      isLoading = false;
-    });
-  } catch (e) {
-    print("🚨 حدث خطأ أثناء جلب البيانات: $e");
-    showToast(message: "حدث خطأ أثناء جلب البيانات: $e");
-    setState(() {
-      isLoading = false;
-    });
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -139,17 +131,30 @@ Future<void> _fetchSubscriptions() async {
         ),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: subscriptions.length,
-        itemBuilder: (context, index) {
-          return DriverOngoingSubCard(
-            subscription: subscriptions[index],
-            primaryColor: primaryColor,
-            onEndSubscription: _endSubscription,
-          );
-        },
-      ),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.amber, // لون مؤشر التحميل
+              ),
+            )
+          : subscriptions.isEmpty
+              ? const Center(
+                  child: Text(
+                    'لا توجد اشتراكات حالياً',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: subscriptions.length,
+                  itemBuilder: (context, index) {
+                    return DriverOngoingSubCard(
+                      subscription: subscriptions[index],
+                      primaryColor: primaryColor,
+                      onEndSubscription: _endSubscription,
+                    );
+                  },
+                ),
     );
   }
 }

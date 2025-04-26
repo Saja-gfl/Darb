@@ -32,8 +32,8 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
     //   status: 'متاح',
     //   phone: '0551234567',
     // ),
-    SubscriptionInfo(
-      id: '67890',
+   // SubscriptionInfo(
+     /* id: '67890',
       type: 'أسبوعي',
       route: 'الرياض -> الدمام',
       // pickup: 'حي النخيل',
@@ -42,8 +42,8 @@ class _SubscriptionNumberPageState extends State<SubscriptionNumberPage> {
       price: '300 ريال/أسبوعياً',
       driver: 'علي خالد',
       status: 'متاح',
-      phone: '0559876543',
-    ),
+      phone: '0559876543',*/
+  //  ),
   ];
 
   @override

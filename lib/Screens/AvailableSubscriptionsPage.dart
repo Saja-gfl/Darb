@@ -5,10 +5,8 @@ import 'package:provider/provider.dart';
 import '../services/UserProvider.dart';
 import '../services/request.dart';
 import '../core/utils/show_toast.dart';
-import '../services/Firestore.dart';
 import '../services/chatService.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 
 class AvailableSubscriptionsPage extends StatefulWidget {
   const AvailableSubscriptionsPage({Key? key}) : super(key: key);
@@ -59,8 +57,6 @@ class _AvailableSubscriptionsPageState
     },
   ];
 
-
-
   List<Map<String, dynamic>> subscriptions = [];
   bool isLoading = true;
   List<Map<String, String>> _filteredSubscriptions = [];
@@ -73,42 +69,41 @@ class _AvailableSubscriptionsPageState
     _fetchSubscriptions();
   }
 
-Future<void> _fetchSubscriptions() async {
-  try {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final driverId = userProvider.uid;
+  Future<void> _fetchSubscriptions() async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final driverId = userProvider.uid;
 
-    if (driverId == null) {
-      print("🚨 معرف السائق غير متوفر.");
-      showToast(message: "معرف السائق غير متوفر.");
+      if (driverId == null) {
+        print("🚨 معرف السائق غير متوفر.");
+        showToast(message: "معرف السائق غير متوفر.");
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      final data = await getPendingSubscriptionsForDriver(driverId);
+
+      final filteredData = data.where((sub) {
+        return sub['sub_status'] == 'معلق';
+      }).toList();
+
+      setState(() {
+        subscriptions = filteredData;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("🚨 حدث خطأ أثناء جلب البيانات: $e");
+      showToast(message: "حدث خطأ أثناء جلب البيانات: $e");
       setState(() {
         isLoading = false;
       });
-      return;
     }
-
-    final data = await getPendingSubscriptionsForDriver(driverId);
-
-    final filteredData = data.where((sub) {
-      return sub['sub_status'] == 'معلق';
-    }).toList();
-
-    setState(() {
-      subscriptions = filteredData;
-      isLoading = false;
-    });
-  } catch (e) {
-    print("🚨 حدث خطأ أثناء جلب البيانات: $e");
-    showToast(message: "حدث خطأ أثناء جلب البيانات: $e");
-    setState(() {
-      isLoading = false;
-    });
   }
-}
 
-
-  
-  Future<void> acceptSubscription(BuildContext context, String tripId, String userId, int index) async {
+  Future<void> acceptSubscription(
+      BuildContext context, String tripId, String userId, int index) async {
     try {
       print("🚀 بدء عملية قبول الاشتراك");
       print("📦 tripId: $tripId");
@@ -168,7 +163,8 @@ Future<void> _fetchSubscriptions() async {
     }
   }
 
-  Future<void> rejectSubscription(BuildContext context, String tripId, String userId, int index) async {
+  Future<void> rejectSubscription(
+      BuildContext context, String tripId, String userId, int index) async {
     try {
       final userSnapshot = await FirebaseFirestore.instance
           .collection('rideRequests')
@@ -179,7 +175,8 @@ Future<void> _fetchSubscriptions() async {
           .get();
 
       if (userSnapshot.docs.isEmpty) {
-        throw Exception("لم يتم العثور على المستخدم داخل المجموعة الفرعية users");
+        throw Exception(
+            "لم يتم العثور على المستخدم داخل المجموعة الفرعية users");
       }
 
       final userDoc = userSnapshot.docs.first;
@@ -203,7 +200,6 @@ Future<void> _fetchSubscriptions() async {
       print("خطأ أثناء الرفض: $e");
     }
   }
-
 
   // @override
   // void dispose() {
@@ -294,69 +290,76 @@ Future<void> _fetchSubscriptions() async {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          // Subscription Cards List
-          Expanded(
-            child: subscriptions.isEmpty
-                ? Center(
-                    child: Text(
-                      'لا توجد اشتراكات متاحة',
-                      style: TextStyle(color: Colors.grey, fontSize: 18),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    itemCount: subscriptions.length,
-                    itemBuilder: (context, index) {
-                      final subscription = subscriptions[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        child: SubscriptionCard(
-subscriptionNumber: subscription['tripId'] ?? '',
-type: subscription['type'] ?? '',
-customerName: subscription['userName'] ?? 'الاسم غير متوفر',
-route: '${subscription['fromLocation'] ?? ''} -> ${subscription['toLocation'] ?? ''}',
-pickup: subscription['homeLocation'] ?? 'لم يحدد بعد',
-dropoff: subscription['workLocation'] ?? '',
-schedule: subscription['schedule'] ?? '',
-price: subscription['price'] ?? '',
-
-                          onAccept: () {
-	                            final tripId = subscription['tripId']!;
-                            final userId = Provider.of<UserProvider>(context, listen: false).uid;
-                            if (userId != null) {
-                              acceptSubscription(context, tripId, userId, index);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("تعذر الحصول على معرف المستخدم.")),
-                              );
-                            }
-                          },
-onReject: () {
-  final tripId = subscription['tripId']!;
-  final userId = Provider.of<UserProvider>(context, listen: false).uid;
-  if (userId != null) {
-    rejectSubscription(context, tripId, userId, index);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("تعذر الحصول على معرف المستخدم.")),
-    );
-  }
-},
-
-                          primaryColor: primaryColor,
-                          secondaryColor: secondaryColor,
-                        ),
-                      );
-                    },
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.amber, // لون مؤشر التحميل
+              ),
+            )
+          : subscriptions.isEmpty
+              ? const Center(
+                  child: Text(
+                    'لا توجد اشتراكات متاحة',
+                    style: TextStyle(color: Colors.grey, fontSize: 18),
                   ),
-          ),
-        ],
-      ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  itemCount: subscriptions.length,
+                  itemBuilder: (context, index) {
+                    final subscription = subscriptions[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: SubscriptionCard(
+                        subscriptionNumber: subscription['tripId'] ?? '',
+                        type: subscription['type'] ?? '',
+                        customerName:
+                            subscription['userName'] ?? 'الاسم غير متوفر',
+                        route:
+                            '${subscription['fromLocation'] ?? ''} -> ${subscription['toLocation'] ?? ''}',
+                        pickup: subscription['homeLocation'] ?? 'لم يحدد بعد',
+                        dropoff: subscription['workLocation'] ?? '',
+                        schedule: subscription['schedule'] ?? '',
+                        price: subscription['price'] ?? '',
+                        onAccept: () {
+                          final tripId = subscription['tripId']!;
+                          final userId =
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .uid;
+                          if (userId != null) {
+                            acceptSubscription(context, tripId, userId, index);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text("تعذر الحصول على معرف المستخدم.")),
+                            );
+                          }
+                        },
+                        onReject: () {
+                          final tripId = subscription['tripId']!;
+                          final userId =
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .uid;
+                          if (userId != null) {
+                            rejectSubscription(context, tripId, userId, index);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text("تعذر الحصول على معرف المستخدم.")),
+                            );
+                          }
+                        },
+                        primaryColor: primaryColor,
+                        secondaryColor: secondaryColor,
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }

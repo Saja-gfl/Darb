@@ -28,9 +28,6 @@ class NotificationService {
     });
 
     // التعامل مع الإشعارات عند فتح التطبيق من الإشعار
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Notification clicked!');
-      // يمكنك هنا توجيه المستخدم إلى شاشة معينة
-    });
+   
   }
 }

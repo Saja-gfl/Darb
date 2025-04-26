@@ -1,15 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/NotifProvider .dart';
 import '../services/UserProvider.dart';
 import '../services/ChatService.dart';
 import '../services/Firestore.dart';
-import '../widgets/CustomBottomNavBar.dart';
 
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class DriverSubscriptionsPage extends StatelessWidget {
   const DriverSubscriptionsPage({super.key});
