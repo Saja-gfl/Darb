@@ -333,19 +333,17 @@ class _DriverSelectionPageState extends State<DriverSelectionPage> {
   }
 }
 
-// الى هنا
 class DriverCard extends StatelessWidget {
   final Driver driver;
-  //final Function(String) onSubscribe; // وظيفة يتم استدعاؤها عند الاشتراك
   final VoidCallback onSubscribe;
-  final String tripId; // معرف الاشتراك
+  final String tripId;
 
-  const DriverCard(
-      {Key? key,
-      required this.driver,
-      required this.onSubscribe,
-      required this.tripId})
-      : super(key: key);
+  const DriverCard({
+    Key? key,
+    required this.driver,
+    required this.onSubscribe,
+    required this.tripId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -370,6 +368,19 @@ class DriverCard extends StatelessWidget {
             child: Row(
               textDirection: TextDirection.rtl,
               children: [
+                // Added CircleAvatar here
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: Colors.amber.withOpacity(0.2),
+                  child: Text(
+                    driver.name.isNotEmpty ? driver.name[0] : '?',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber[800],
+                    ),
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -395,7 +406,7 @@ class DriverCard extends StatelessWidget {
               ],
             ),
           ),
-          // عرض التقييمات
+          // Rest of your existing code...
           if (driver.ratings.isNotEmpty)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -412,12 +423,9 @@ class DriverCard extends StatelessWidget {
           if (driver.ratings.isNotEmpty)
             ...driver.ratings.map((rating) {
               String userName = (rating['userName'] ?? 'غير معروف');
-
-              // تنسيق الاسم لإظهار أول ثلاث أحرف فقط والباقي **
               String formattedUserName = userName.length > 3
                   ? '${userName.substring(0, 3)}**'
                   : userName;
-
               String truncatedComment = (rating['comment'] ?? 'لا يوجد تعليق')
                   .split(' ')
                   .take(4)
@@ -425,7 +433,6 @@ class DriverCard extends StatelessWidget {
               return ListTile(
                 title: Text(
                   truncatedComment,
-                  // rating['comment'] ?? 'لا يوجد تعليق',
                   textDirection: TextDirection.rtl,
                   style: const TextStyle(fontSize: 14),
                 ),
@@ -450,8 +457,7 @@ class DriverCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed:
-                        onSubscribe, // نقوم هنا فقط باستدعاء onSubscribe بدون معلمات.
+                    onPressed: onSubscribe,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 221, 145, 21),
                       padding: const EdgeInsets.symmetric(vertical: 12),
