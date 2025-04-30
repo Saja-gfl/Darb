@@ -10,6 +10,7 @@ import 'package:rem_s_appliceation9/widgets/custom_image_view.dart';
 import '../widgets/custom_checkbox_button.dart';
 import '../widgets/custom_text_form_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../services/auth.dart';
 import '../core/utils/show_toast.dart';
 import 'package:provider/provider.dart';
@@ -28,39 +29,40 @@ class _K0ScreenState extends State<K0Screen> {
   TextEditingController passwordInputController = TextEditingController();
   TextEditingController phoneInputController = TextEditingController();
 
-
   bool tf = false;
   bool _isSigning = false;
-  bool hidePassword = true; 
+  bool hidePassword = true;
 
   @override
   void initState() {
     super.initState();
-      _setupNotifications();
+    _setupNotifications();
 
     // استدعاء الدالة للتحقق من حالة تسجيل الدخول بعد بناء الـ Widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkLoginStatus();
     });
   }
-void _setupNotifications() async {
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  // ✅ يعمل تلقائي على Android
-  NotificationSettings settings = await messaging.requestPermission();
+  void _setupNotifications() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  print('🔔 Android permission status: ${settings.authorizationStatus}');
+    // ✅ يعمل تلقائي على Android
+    NotificationSettings settings = await messaging.requestPermission();
 
-  // عند استقبال إشعار والتطبيق مفتوح
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('📩 Foreground: ${message.notification?.title}');
-  });
+    print('🔔 Android permission status: ${settings.authorizationStatus}');
 
-  // عند فتح التطبيق من خلال إشعار
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    print('🚀 Opened from notification: ${message.notification?.title}');
-  });
-}
+    // عند استقبال إشعار والتطبيق مفتوح
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('📩 Foreground: ${message.notification?.title}');
+    });
+
+    // عند فتح التطبيق من خلال إشعار
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('🚀 Opened from notification: ${message.notification?.title}');
+    });
+  }
+
   @override
   void dispose() {
     usernameInputController.dispose();
@@ -71,34 +73,33 @@ void _setupNotifications() async {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-       backgroundColor: theme.colorScheme.onPrimaryContainer,
-       resizeToAvoidBottomInset: false,
-       body: Container(
-
-        width: double.maxFinite,
-        padding: EdgeInsets.only(
-          left: 36.h,
-          top: 94.h,
-          right: 36.h,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            CustomImageView(
-              imagePath: ImageConstant.img5935976241859510486,
-              height: 122.h,
-              width: 182.h,
-              margin: EdgeInsets.only(left: 70.h),
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          backgroundColor: theme.colorScheme.onPrimaryContainer,
+          resizeToAvoidBottomInset: false,
+          body: Container(
+            width: double.maxFinite,
+            padding: EdgeInsets.only(
+              left: 36.h,
+              top: 94.h,
+              right: 36.h,
             ),
-            SizedBox(height: 38.h),
-            _buildUserLoginForm(context)
-          ],
-        ),
-      ),
-    ));
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                CustomImageView(
+                  imagePath: ImageConstant.img5935976241859510486,
+                  height: 122.h,
+                  width: 182.h,
+                  margin: EdgeInsets.only(left: 70.h),
+                ),
+                SizedBox(height: 38.h),
+                _buildUserLoginForm(context)
+              ],
+            ),
+          ),
+        ));
   }
 
   /// Section Widget
@@ -131,7 +132,7 @@ void _setupNotifications() async {
             controller: usernameInputController,
             hintText: "ادخل البريد الالكتروني",
             contentPadding: EdgeInsets.fromLTRB(12.h, 10.h, 12.h, 6.h),
-            textStyle: TextStyle(color: Colors.black), 
+            textStyle: TextStyle(color: Colors.black),
           ),
           SizedBox(height: 24.h),
           Align(
@@ -147,25 +148,25 @@ void _setupNotifications() async {
             hintText: "أدخل كلمة السر هنا",
             textInputAction: TextInputAction.done,
             contentPadding: EdgeInsets.fromLTRB(12.h, 10.h, 12.h, 6.h),
-            textStyle: TextStyle(color: Colors.black), 
-            obscureText: hidePassword,  
+            textStyle: TextStyle(color: Colors.black),
+            obscureText: hidePassword,
           ),
           SizedBox(height: 26.h),
           CustomCheckboxButton(
             text: "عرض كلمة المرور",
-            value: !hidePassword, 
+            value: !hidePassword,
             onChange: (value) {
               setState(() {
-                hidePassword = !value; 
+                hidePassword = !value;
               });
             },
           ),
           SizedBox(height: 44.h),
           CustomElevatedButton(
-            text: "تسجيل دخول",
-            onPressed: () {
-              _login();
-              })  ,
+              text: "تسجيل دخول",
+              onPressed: () {
+                _login();
+              }),
           SizedBox(height: 8.h),
           GestureDetector(
             onTap: () {
@@ -195,80 +196,76 @@ void _setupNotifications() async {
     String password = passwordInputController.text;
 
     try {
+      // استدعاء دالة تسجيل الدخول من FirebaseAuthServises
       User? user = await _auth.login(email, password);
 
       if (user != null) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         await userProvider.loadUserData(user.uid);
 
-      String? fcmToken = await FirebaseMessaging.instance.getToken();
+        // جلب fcmToken
+        String? fcmToken = await FirebaseMessaging.instance.getToken();
 
-      if (fcmToken != null) {
-        // تحديث أو إضافة fcmToken في Firestore
-        final userDocRef = FirebaseFirestore.instance
-            .collection(userProvider.isDriver ? 'driverdata' : 'userdata')
-            .doc(user.uid);
+        if (fcmToken != null) {
+          // تحديث أو إضافة fcmToken في Firestore
+          final userDocRef = FirebaseFirestore.instance
+              .collection(userProvider.isDriver ? 'driverdata' : 'userdata')
+              .doc(user.uid);
 
-        final userDoc = await userDocRef.get();
+          final userDoc = await userDocRef.get();
 
-        if (userDoc.exists) {
-          // إذا كان المستند موجودًا، قم بتحديث fcmToken
-          await userDocRef.update({
-            'fcmToken': fcmToken,
-          });
-          print("✅ تم تحديث fcmToken بنجاح.");
+          if (userDoc.exists) {
+            // إذا كان المستند موجودًا، قم بتحديث fcmToken
+            await userDocRef.update({
+              'fcmToken': fcmToken,
+            });
+            print("✅ تم تحديث fcmToken بنجاح.");
+          } else {
+            // إذا لم يكن المستند موجودًا، قم بإنشائه مع fcmToken
+            await userDocRef.set({
+              'fcmToken': fcmToken,
+              'email': email,
+              'createdAt': FieldValue.serverTimestamp(),
+            });
+            print("✅ تم إنشاء مستند جديد مع fcmToken.");
+          }
         } else {
-          // إذا لم يكن المستند موجودًا، قم بإنشائه مع fcmToken
-          await userDocRef.set({
-            'fcmToken': fcmToken,
-            'email': email,
-            'createdAt': FieldValue.serverTimestamp(),
-          });
-          print("✅ تم إنشاء مستند جديد مع fcmToken.");
+          print("❌ لم يتم الحصول على fcmToken.");
         }
+
+        // عرض رسالة نجاح
+        showToast(message: "تم تسجيل الدخول بنجاح");
+
+        // الانتقال إلى الصفحة الرئيسية بناءً على نوع المستخدم
+        Navigator.pushReplacementNamed(
+          context,
+          userProvider.isDriver
+              ? AppRoutes.driverHomePage
+              : AppRoutes.userHomePage,
+        );
       } else {
-        print("❌ لم يتم الحصول على fcmToken.");
+        showToast(message: "تعذر تسجيل الدخول. يرجى المحاولة لاحقًا.");
       }
-
-      showToast(message: "تم تسجيل الدخول بنجاح");
-
-        //FirestoreService firestoreService = FirestoreService();
-      //  Map<String, dynamic>? userData = await firestoreService.getUserData(user.uid);;
-
-        //print("🔍 البحث عن بيانات المستخدم في المجموعة: ${false ? 'driverdata' : 'userdata'}");
-        //print("🔍 User ID: ${user.uid}");
-
-       // if (userData != null ) {
-        //  _updateUserProvider(user, userData);
-
-          showToast(message: "تم تسجيل الدخول بنجاح");
-
-          Navigator.pushReplacementNamed(
-            context,
-            userProvider.isDriver ? AppRoutes.driverHomePage : AppRoutes.userHomePage,
-          );
-        } else {
-          showToast(message: "تعذر جلب بيانات المستخدم. يرجى المحاولة لاحقًا.");
-        }
-      //} else {
-      //  showToast(message: "البريد الإلكتروني أو كلمة المرور غير صحيحة");
-      //}
+    } on FirebaseAuthException catch (e) {
+      // معالجة الأخطاء الخاصة بـ FirebaseAuth
+      switch (e.code) {
+        case 'user-not-found':
+          showToast(
+              message: "المستخدم غير موجود. يرجى التحقق من البريد الإلكتروني.");
+          break;
+        case 'wrong-password':
+          showToast(message: "كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.");
+          break;
+        case 'invalid-email':
+          showToast(message: "صيغة البريد الإلكتروني غير صحيحة.");
+          break;
+        default:
+          showToast(message: "حدث خطأ أثناء تسجيل الدخول: ${e.message}");
+      }
     } catch (e) {
-      if (e is FirebaseAuthException) {
-        switch (e.code) {
-          case 'user-not-found':
-            showToast(message: "المستخدم غير موجود");
-            break;
-          case 'wrong-password':
-            showToast(message: "كلمة المرور غير صحيحة");
-            break;
-          default:
-            showToast(message: "حدث خطأ: ${e.message}");
-        }
-      } else {
-        showToast(message: "حدث خطأ غير متوقع: ${e.toString()}");
-        print(e.toString());
-      }
+      // معالجة الأخطاء العامة
+      showToast(message: "حدث خطأ غير متوقع: ${e.toString()}");
+      print(e.toString());
     } finally {
       setState(() {
         _isSigning = false;
@@ -289,10 +286,6 @@ void _setupNotifications() async {
     userProvider.setGender(userData['Gender'] ?? '');
     userProvider.setCarType(userData['carType'] ?? '');
     userProvider.setPlateNumber(userData['plateNumber'] ?? '');
-    
-
-    
-
   }
 
   Future<void> _checkLoginStatus() async {
@@ -304,11 +297,10 @@ void _setupNotifications() async {
   }
 }
 
-
 // تعريف الـ CustomElevatedButton مع required parameters
 class CustomElevatedButton extends StatelessWidget {
-  final String text;  // required text parameter
-  final VoidCallback onPressed;  // required onPressed callback
+  final String text; // required text parameter
+  final VoidCallback onPressed; // required onPressed callback
 
   // constructor with required parameters
   CustomElevatedButton({
@@ -321,7 +313,8 @@ class CustomElevatedButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.orange, // يمكنك تغيير اللون أو إضافة المزيد من الخصائص
+        backgroundColor:
+            Colors.orange, // يمكنك تغيير اللون أو إضافة المزيد من الخصائص
         padding: EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),

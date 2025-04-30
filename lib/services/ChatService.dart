@@ -136,7 +136,7 @@ class ChatService {
               data['lastMessage'] ?? 'لا توجد رسائل', // رسالة افتراضية
           'time': data['timestamp'] is Timestamp
                   ? ChatService.formatTimestamp(data['timestamp'])
-                  : 'مافيه وقت', // تحقق من النوع // وقت افتراضي
+                  : ' 9:33', // تحقق من النوع // وقت افتراضي
           'unread': data['unread'] ?? 0, // عدد الرسائل غير المقروءة
         };
       }).toList();
@@ -182,7 +182,7 @@ class ChatService {
           .doc(userId)
           .get();
 
-      // تحقق من  الاشتراك العامه 
+      // تحقق من حالة الاشتراك في rideRequests
       final subscriptionDoc = await FirebaseFirestore.instance
           .collection('rideRequests')
           .doc(chatId)

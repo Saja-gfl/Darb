@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rem_s_appliceation9/services/ChatService.dart';
 import 'package:rem_s_appliceation9/widgets/driver_ongoing_sub_card.dart';
 import 'package:provider/provider.dart';
 import 'package:rem_s_appliceation9/core/utils/show_toast.dart';
@@ -76,8 +78,64 @@ class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
     },
   ];
 
-  void _endSubscription(String subscriptionId) {
-    setState(() {});
+  Future<void> _endSubscription(String tripId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('تأكيد الإلغاء'),
+          content: const Text('هل تريد إنهاء هذا الاشتراك؟'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // إلغاء
+              child: const Text('إلغاء'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // تأكيد
+              child: const Text('تأكيد'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      try {
+        // جلب جميع المستخدمين داخل مجموعة users
+        final usersSnapshot = await FirebaseFirestore.instance
+            .collection('rideRequests')
+            .doc(tripId)
+            .collection('users')
+            .get();
+
+        // التحقق من وجود المستخدمين
+        if (usersSnapshot.docs.isNotEmpty) {
+          for (var userDoc in usersSnapshot.docs) {
+            final passengerId = userDoc.id; // رقم الراكب (document ID)
+
+            // تحديث حالة الراكب إلى "منتهي"
+            await FirebaseFirestore.instance
+                .collection('rideRequests')
+                .doc(tripId)
+                .collection('users')
+                .doc(passengerId)
+                .update({'sub_status': 'منتهي'});
+          }
+
+          // إزالة الاشتراك من القائمة
+          setState(() {
+            subscriptions.removeWhere((sub) => sub['id'] == tripId);
+          });
+
+          showToast(message: 'تم إلغاء الاشتراك بنجاح.');
+        } else {
+          showToast(message: 'لا يوجد ركاب في هذه الرحلة.');
+        }
+      } catch (e) {
+        print("🚨 حدث خطأ أثناء إلغاء الاشتراك: $e");
+        showToast(message: 'حدث خطأ أثناء إلغاء الاشتراك.');
+      }
+    }
   }
 
   Future<void> _fetchSubscriptions() async {
@@ -151,7 +209,7 @@ class _DriverOngoingSubPageState extends State<DriverOngoingSubPage> {
                     return DriverOngoingSubCard(
                       subscription: subscriptions[index],
                       primaryColor: primaryColor,
-                      onEndSubscription: _endSubscription,
+                      onEndSubscription: (String id) => _endSubscription(id),
                     );
                   },
                 ),

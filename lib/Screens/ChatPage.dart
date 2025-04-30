@@ -7,6 +7,8 @@ import '../services/chatService.dart';
 //import 'driverHomePage.dart';
 import 'package:provider/provider.dart';
 
+import '../services/request.dart';
+
 class ChatPage extends StatefulWidget {
   final String tripId; // ID الرحلة
   const ChatPage({Key? key, required this.tripId}) : super(key: key);
@@ -35,8 +37,10 @@ class _ChatPageState extends State<ChatPage> {
     final userId = userProvider.uid;
 
     if (userId != null) {
+       await check_Sub_tatus(widget.tripId);
       final canSend = await _chatService.canSendMessage(widget.tripId, userId);
       setState(() {
+        ;
         _isSubscriptionEnded = !canSend;
       });
     }
@@ -124,22 +128,22 @@ class _ChatPageState extends State<ChatPage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-       const Text(
-          'الدردشة الجماعية',
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            color: Colors.white,
-          ),
-        ),
-        Text(
-        'رقم الرحلة: ${widget.tripId}', // عرض رقم الرحلة
-        style: const TextStyle(
-          fontFamily: 'Tajawal',
-          color: Colors.grey, // لون رمادي
-          fontSize: 12, // حجم خط صغير
-        ),
-      ),
-    ],
+            const Text(
+              'الدردشة الجماعية',
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              'رقم الرحلة: ${widget.tripId}', // عرض رقم الرحلة
+              style: const TextStyle(
+                fontFamily: 'Tajawal',
+                color: Colors.grey, // لون رمادي
+                fontSize: 12, // حجم خط صغير
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
         elevation: 2,

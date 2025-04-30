@@ -100,7 +100,7 @@ Future<void> updateRequestStatus(
         .collection('rideRequests')
         .doc(tripId)
         .collection('users')
-        .doc(userId) // استخدام userId بدلاً من tripId
+        .doc(userId) //
         .update({
       'sub_status': sub_status, // تحديث الحالة (مقبول أو مرفوض)
     });
@@ -163,41 +163,45 @@ Future<List<Map<String, dynamic>>> getActiveTripsForUser(String userId) async {
   }
 }
 
-Future<void> check_Sub_tatus(String tripId) async {
+Future<bool> check_Sub_tatus(String tripId) async {
   try {
     // جلب بيانات الاشتراك
     final subscriptionData = await getRequestByTripId(tripId);
 
     if (subscriptionData != null) {
       final startDate = subscriptionData['startDate'] as Timestamp?;
-      final subscriptionType =
-          subscriptionData['type']; // نوع الاشتراك (شهر/أسبوع)
+      final subscriptionType = subscriptionData['type']; //   (شهر/أسبوع)
+
+      print("start Date is $startDate");
 
       if (startDate != null) {
         final startDateTime = startDate.toDate();
         final now = DateTime.now();
 
-        // تحديد مدة الاشتراك بناءً على النوع
+        //update the status of the subscription
         final subscriptionDuration =
             subscriptionType == 'شهري' ? Duration(days: 30) : Duration(days: 7);
 
-        // التحقق إذا انتهت مدة الاشتراك
+        //end the subscription if the time is over
         if (now.isAfter(startDateTime.add(subscriptionDuration))) {
-          // تحديث حالة الاشتراك إلى "منتهية"
           await FirebaseFirestore.instance
               .collection('rideRequests')
               .doc(tripId)
               .update({
-            'status': 'منتهية',
+            'status': 'منتهي',
           });
-
           print("✅ تم تحديث حالة الاشتراك رقم $tripIdإلى منتهية");
+
+          return false; // الاشتراك منتهي
+
         }
+        return true; // الاشتراك نشط
       }
     }
   } catch (e) {
     print("❌ خطأ أثناء التحقق من حالة الاشتراك: $e");
   }
+  return false; // 
 }
 
 //end
@@ -272,7 +276,6 @@ Future<List<Map<String, dynamic>>> getPendingSubscriptionsForDriver(
 
     List<Map<String, dynamic>> pendingSubscriptions = [];
 
-
     for (var doc in rideRequestsSnapshot.docs) {
       var usersSnapshot = await doc.reference.collection('users').get();
 
@@ -305,7 +308,6 @@ Future<List<Map<String, dynamic>>> getSubscriptionsForDriver(
         .get();
 
     List<Map<String, dynamic>> subscriptions = [];
-
 
     for (var doc in rideRequestsSnapshot.docs) {
       var usersSnapshot = await doc.reference.collection('users').get();

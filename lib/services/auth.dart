@@ -17,6 +17,18 @@ class FirebaseAuthServises {
     String? plateNumber,
   }) async {
     try {
+
+          final phoneQuery = await _firestore
+        .collection(isDriver ? 'driverdata' : 'userdata')
+        .where('phone', isEqualTo: phone)
+        .get();
+
+    if (phoneQuery.docs.isNotEmpty) {
+      throw FirebaseAuthException(
+        code: 'phone-already-in-use',
+        message: 'رقم الهاتف مسجل مسبقاً. يرجى استخدام رقم آخر.',
+      );
+    }
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
@@ -25,7 +37,7 @@ class FirebaseAuthServises {
       User? user = userCredential.user;
 
       if (user != null) {
-        //create doc in firestore
+        // إنشاء مستند في Firestore
         FirestoreService().createUserData(
           userId: user.uid,
           nameController: username,
@@ -37,40 +49,45 @@ class FirebaseAuthServises {
           carType: carType,
           plateNumber: plateNumber,
         );
-
       }
       return user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('كلمة المرور ضعيفة');
+        throw Exception('كلمة المرور ضعيفة. يرجى اختيار كلمة مرور أقوى.');
+      } else if (e.code == 'phone-already-in-use') {
+        throw Exception(
+            'رقم الهاتف مسجل مسبقاً. يرجى استخدام رقم آخر.');
       } else if (e.code == 'email-already-in-use') {
-        print('الحساب مسجل مسبقاً');
+        throw Exception(
+            'البريد الإلكتروني مسجل مسبقاً. يرجى استخدام بريد آخر.');
+      } else if (e.code == 'invalid-email') {
+        throw Exception('صيغة البريد الإلكتروني غير صحيحة.');
+      } else {
+        throw Exception('حدث خطأ أثناء التسجيل: ${e.message}');
       }
     } catch (e) {
-      print(e.toString());
+      throw Exception('حدث خطأ غير متوقع: ${e.toString()}');
     }
-    return null;
   }
 
-  Future<User?> login(
-    String email,
-    String password,
-  ) async {
+  Future<User?> login(String email, String password) async {
     try {
-      UserCredential Credential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-
-      return Credential.user;
+      UserCredential credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return credential.user;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-        print('ايميل او كلمة مرور خاطئة');
+      if (e.code == 'user-not-found') {
+        throw Exception('المستخدم غير موجود. يرجى التحقق من البريد الإلكتروني.');
+      } else if (e.code == 'wrong-password') {
+        throw Exception('كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.');
       } else {
-        print('An error occurred: ${e.code}');
+        throw Exception('حدث خطأ أثناء تسجيل الدخول: ${e.message}');
       }
     } catch (e) {
-      print(e);
+      throw Exception('حدث خطأ غير متوقع: ${e.toString()}');
     }
-    return null;
   }
 
   Future<void> signOut() async {

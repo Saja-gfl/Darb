@@ -12,6 +12,7 @@ class DriverOngoingSubCard extends StatefulWidget {
     required this.subscription,
     required this.primaryColor,
     required this.onEndSubscription,
+    
   }) : super(key: key);
 
   @override
@@ -95,8 +96,8 @@ class _DriverOngoingSubCardState extends State<DriverOngoingSubCard> {
               Icons.route,
               '${widget.subscription['fromLocation']} إلى ${widget.subscription['toLocation']}',
             ),
-            _buildInfoRow(Icons.location_on,
-                widget.subscription['homeLocation'] ?? 'غير محدد'),
+            _buildInfoRow(Icons.home,
+                widget.subscription['homeLocation'] ?? 'حي النزهه'),
             _buildInfoRow(Icons.location_off,
                 widget.subscription['workLocation'] ?? 'غير محدد'),
             _buildInfoRow(
@@ -111,16 +112,9 @@ class _DriverOngoingSubCardState extends State<DriverOngoingSubCard> {
                       widget.subscription['startDate'] is Timestamp
                   ? DateFormat.yMd('ar_SA')
                       .format(widget.subscription['startDate'].toDate())
-                  : 'غير معروف',
+                  : 'غير ddمعروف',
             ),
-            _buildInfoRow(
-              Icons.calendar_today,
-              widget.subscription['endDate'] != null &&
-                      widget.subscription['endDate'] is Timestamp
-                  ? DateFormat.yMd('ar_SA')
-                      .format(widget.subscription['endDate'].toDate())
-                  : 'غير معروف',
-            ),
+          
             const SizedBox(height: 16),
             if (_showEndButton && widget.subscription['status'] == 'نشط')
               ElevatedButton(

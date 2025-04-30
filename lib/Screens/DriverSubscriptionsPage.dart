@@ -6,14 +6,12 @@ import '../services/UserProvider.dart';
 import '../services/ChatService.dart';
 import '../services/Firestore.dart';
 
-
 class DriverSubscriptionsPage extends StatelessWidget {
   const DriverSubscriptionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // الحصول على `currentUserId` من `UserProvider`
-    final currentUserId = Provider.of<UserProvider>(context, listen: false).uid; 
+    final currentUserId = Provider.of<UserProvider>(context, listen: false).uid;
 
     return Scaffold(
       appBar: AppBar(title: const Text("طلبات الاشتراك")),
@@ -23,10 +21,12 @@ class DriverSubscriptionsPage extends StatelessWidget {
             .where('driverId', isEqualTo: currentUserId)
             .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(child: Text('لا يوجد اشتراكات حالياً.'));
+          }
 
           final docs = snapshot.data!.docs;
 
@@ -34,9 +34,10 @@ class DriverSubscriptionsPage extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.all(12.0),
-                child: Text('طلبات معلقة:',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'طلبات معلقة:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
               ...docs.map((doc) {
                 return FutureBuilder<QuerySnapshot>(
@@ -53,20 +54,25 @@ class DriverSubscriptionsPage extends StatelessWidget {
                         userSnapshot.data!.docs.isEmpty) {
                       return const SizedBox();
                     }
-                    return SubscriptionTile(
-                      doc: doc,
-                      isPending: true,
-                      driverId:
-                          currentUserId ?? '', 
+                    return Column(
+                      children: userSnapshot.data!.docs.map((userDoc) {
+                        return SubscriptionTile(
+                          doc: doc,
+                          userDoc: userDoc,
+                          isPending: true,
+                          driverId: currentUserId ?? '',
+                        );
+                      }).toList(),
                     );
                   },
                 );
               }).toList(),
               const Padding(
                 padding: EdgeInsets.all(12.0),
-                child: Text('اشتراكات جارية:',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'اشتراكات جارية:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
               ...docs.map((doc) {
                 return FutureBuilder<QuerySnapshot>(
@@ -83,11 +89,15 @@ class DriverSubscriptionsPage extends StatelessWidget {
                         userSnapshot.data!.docs.isEmpty) {
                       return const SizedBox();
                     }
-                    return SubscriptionTile(
-                      doc: doc,
-                      isPending: false,
-                      driverId:
-                          currentUserId ?? '', // التأكد من تمرير currentUserId هنا
+                    return Column(
+                      children: userSnapshot.data!.docs.map((userDoc) {
+                        return SubscriptionTile(
+                          doc: doc,
+                          userDoc: userDoc,
+                          isPending: false,
+                          driverId: currentUserId ?? '',
+                        );
+                      }).toList(),
                     );
                   },
                 );
@@ -102,82 +112,40 @@ class DriverSubscriptionsPage extends StatelessWidget {
 
 class SubscriptionTile extends StatelessWidget {
   final QueryDocumentSnapshot doc;
+  final QueryDocumentSnapshot userDoc;
   final bool isPending;
   final String driverId;
 
   const SubscriptionTile({
     super.key,
     required this.doc,
+    required this.userDoc,
     required this.isPending,
-    required this.driverId, // تم التأكد من إضافة driverId هنا
+    required this.driverId,
   });
 
   void acceptSubscription(BuildContext context) async {
     try {
       final tripId = doc.id;
+      final passengerId = userDoc.id;
 
-      // جلب بيانات المستخدم من المجموعة الفرعية "users"
-      final userSnapshot = await FirebaseFirestore.instance
+      await FirebaseFirestore.instance
           .collection('rideRequests')
           .doc(tripId)
-          .collection('users')
-          .where('sub_status', isEqualTo: 'معلق') // التأكد من الحالة
-          .limit(1)
-          .get();
+          .update({'status': 'نشط', 'driverId': driverId});
 
-      if (userSnapshot.docs.isEmpty) {
-        throw Exception("لا يوجد مستخدمين في هذه المجموعة الفرعية.");
-      }
-
-      final userDoc = userSnapshot.docs.first;
-
-      if (!userDoc.data().containsKey('userId')) {
-        throw Exception("الحقل 'userId' غير موجود في الوثيقة.");
-      }
-
-      final passengerId = userDoc['userId'] as String;
-
-      // جلب بيانات الرحلة
-      final tripData = await FirebaseFirestore.instance
-          .collection('rideRequests')
-          .doc(tripId)
-          .get();
-
-      if (!tripData.data()!.containsKey('status')) {
-        throw Exception("الحقل 'status' غير موجود في بيانات الرحلة.");
-      }
-
-      final tripStatus = tripData['status'];
-
-      // تحديث حالة الرحلة إلى "نشط" إذا لم تكن بالفعل "نشط"
-      if (tripStatus != 'نشط') {
-        await FirebaseFirestore.instance
-            .collection('rideRequests')
-            .doc(tripId)
-            .update({
-          'status': 'نشط',
-          'driverId': driverId,
-        });
-      }
-
-      // تحديث حالة اشتراك المستخدم
       await FirebaseFirestore.instance
           .collection('rideRequests')
           .doc(tripId)
           .collection('users')
           .doc(passengerId)
-          .update({
-        'sub_status': 'نشط',
-      });
-   
-      // إنشاء غرفة دردشة جديدة
+          .update({'sub_status': 'نشط'});
+
       final chatService = ChatService();
       await chatService.createChatRoom(tripId, driverId, passengerId);
 
-      // إضافة tripId إلى بيانات المستخدم
       await FirestoreService.addTripIdToUser(passengerId, tripId);
 
-      // جلب fcmToken الخاص بالراكب
       final passengerDoc = await FirebaseFirestore.instance
           .collection('userdata')
           .doc(passengerId)
@@ -186,74 +154,34 @@ class SubscriptionTile extends StatelessWidget {
       final fcmToken = passengerDoc['fcmToken'];
 
       if (fcmToken != null) {
-        // إرسال الإشعار باستخدام NotificationProvider
         final notificationProvider =
             Provider.of<NotificationProvider>(context, listen: false);
         await notificationProvider.sendFCMNotificationV1(
           fcmToken,
           'تم قبول الاشتراك',
-          '${tripData['driverData']['name']} تم اضافتك للرحله من قبل السائق ',
+          'تم إضافتك للرحلة من قبل السائق.',
         );
-
-        notificationProvider.addNotification({
-          'title': 'تم قبول الاشتراك',
-          'body':'${tripData['driverData']['name']} تم اضافتك للرحله من قبل السائق ',
-          'time': DateTime.now().toString(),
-        });
-      } else {
-        print("❌ لا يوجد fcmToken لهذا الراكب.");
       }
+
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("تم قبول الاشتراك.")));
     } catch (e) {
       print("خطأ أثناء القبول: $e");
-      print('tripId: ${doc.id}');
     }
   }
 
   void rejectSubscription(BuildContext context) async {
     try {
       final tripId = doc.id;
+      final passengerId = userDoc.id;
 
-      // جلب بيانات الرحلة
-      final tripData = await FirebaseFirestore.instance
-          .collection('rideRequests')
-          .doc(tripId)
-          .get();
-
-      // جلب بيانات المستخدم
-      final userSnapshot = await FirebaseFirestore.instance
-          .collection('rideRequests')
-          .doc(tripId)
-          .collection('users')
-          .where('sub_status', isEqualTo: 'معلق') // التأكد من الحالة
-          .limit(1)
-          .get();
-
-      if (userSnapshot.docs.isEmpty) {
-        throw Exception(
-            "لم يتم العثور على المستخدم داخل المجموعة الفرعية users");
-      }
-
-      final userDoc = userSnapshot.docs.first;
-
-      if (!userDoc.data().containsKey('userId')) {
-        throw Exception("الحقل 'userId' غير موجود في الوثيقة.");
-      }
-
-      final passengerId = userDoc['userId'] as String;
-
-      // تحديث حالة اشتراك المستخدم إلى "مرفوض"
       await FirebaseFirestore.instance
           .collection('rideRequests')
           .doc(tripId)
           .collection('users')
           .doc(passengerId)
-          .update({
-        'sub_status': 'مرفوض',
-      });
+          .update({'sub_status': 'مرفوض'});
 
-      // جلب fcmToken الخاص بالراكب
       final passengerDoc = await FirebaseFirestore.instance
           .collection('userdata')
           .doc(passengerId)
@@ -262,34 +190,25 @@ class SubscriptionTile extends StatelessWidget {
       final fcmToken = passengerDoc['fcmToken'];
 
       if (fcmToken != null) {
-        // إرسال الإشعار باستخدام NotificationProvider
         final notificationProvider =
             Provider.of<NotificationProvider>(context, listen: false);
         await notificationProvider.sendFCMNotificationV1(
           fcmToken,
           'تم رفض الاشتراك',
-          '${tripData['driverData']['name']} تم رفض الطلب من قبل السائق ',
+          'تم رفض طلبك من قبل السائق.',
         );
-
-        notificationProvider.addNotification({
-          'title': 'تم رفض الاشتراك',
-          'body':'${tripData['driverData']['name']} تم رفض الطلب من قبل السائق ',
-          'time': DateTime.now().toString(),
-        });
-      } else {
-        print("❌ لا يوجد fcmToken لهذا الراكب.");
       }
+
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("تم رفض الاشتراك.")));
     } catch (e) {
       print("خطأ أثناء الرفض: $e");
-      print('tripId: ${doc.id}');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = userDoc.data() as Map<String, dynamic>;
     final subscription = data['subscriptionData'] ?? {};
 
     return Card(
@@ -306,7 +225,7 @@ class SubscriptionTile extends StatelessWidget {
               children: [
                 Text(
                   "الراكب: ${data['userId']}",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

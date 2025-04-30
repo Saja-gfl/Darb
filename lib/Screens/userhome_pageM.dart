@@ -143,14 +143,14 @@ class _UserHomePageState extends State<UserHomePage> {
             children: [
               Text("الإشعارات", style: theme.textTheme.titleLarge),
               SizedBox(height: 8.h),
-              if (notificationProvider.notifications.isEmpty)
+              //if (notificationProvider.notifications.isEmpty)
                 Center(
                   child: Text(
                     "لا يوجد إشعار حاليًا.",
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 )
-              else
+             /* else
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -183,7 +183,7 @@ class _UserHomePageState extends State<UserHomePage> {
                       ],
                     ),
                   ],
-                ),
+                ),*/
             ],
           ),
         );
@@ -288,7 +288,7 @@ class _UserHomePageState extends State<UserHomePage> {
           final tripId =
               Provider.of<UserProvider>(context, listen: false).tripId;
 
-          if (tripId != null && tripId != '') {
+          //if (tripId != null && tripId != '') {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -297,11 +297,7 @@ class _UserHomePageState extends State<UserHomePage> {
                 ),
               ),
             );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("لا توجد محادثات حالية")),
-            );
-          }
+        
         } else if (index == 2) {
           Navigator.push(
             context,

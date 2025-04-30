@@ -43,6 +43,15 @@ class _OngoingSubPageState extends State<OngoingSubPage> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       currentUserId = userProvider.uid!;
       final subs = await getActiveTripsForUser(currentUserId);
+
+      for (var subscription in subs) {
+      final tripId = subscription['tripId'];
+      if (tripId != null) {
+        final isSubscriptionValid = await check_Sub_tatus(tripId);
+        subscription['isSubscriptionValid'] = isSubscriptionValid; // إضافة حالة الاشتراك
+      }
+    }
+
       setState(() {
         subscriptions = subs;
         isLoading = false; // إيقاف التحميل بعد جلب البيانات
